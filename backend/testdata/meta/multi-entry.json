@@ -1,0 +1,85 @@
+{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "SYNTHETIC_WABA_A",
+      "changes": [
+        {
+          "field": "messages",
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "phone_number_id": "SYNTHETIC_PHONE_A"
+            },
+            "messages": [
+              {
+                "from": "SYNTHETIC_RECIPIENT_A",
+                "id": "wamid.SYNTHETIC_A_1",
+                "timestamp": "1700000000",
+                "type": "text",
+                "text": {
+                  "body": "Synthetic fixture content"
+                },
+                "future_extension": {
+                  "synthetic": true
+                }
+              },
+              {
+                "from": "SYNTHETIC_RECIPIENT_A",
+                "id": "wamid.SYNTHETIC_A_2",
+                "timestamp": "1700000000",
+                "type": "text",
+                "text": {
+                  "body": "Synthetic fixture content"
+                },
+                "future_extension": {
+                  "synthetic": true
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "SYNTHETIC_WABA_B",
+      "changes": [
+        {
+          "field": "messages",
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "phone_number_id": "SYNTHETIC_PHONE_B"
+            },
+            "messages": [
+              {
+                "from": "SYNTHETIC_RECIPIENT_B",
+                "id": "wamid.SYNTHETIC_B_1",
+                "timestamp": "1700000000",
+                "type": "text",
+                "text": {
+                  "body": "Synthetic fixture content"
+                },
+                "future_extension": {
+                  "synthetic": true
+                }
+              },
+              {
+                "from": "SYNTHETIC_RECIPIENT_B",
+                "id": "wamid.SYNTHETIC_B_2",
+                "timestamp": "1700000000",
+                "type": "text",
+                "text": {
+                  "body": "Synthetic fixture content"
+                },
+                "future_extension": {
+                  "synthetic": true
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

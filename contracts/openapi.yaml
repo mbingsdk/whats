@@ -1,0 +1,122 @@
+openapi: 3.1.0
+info:
+  title: WABA Control foundation API
+  version: 0.1.0
+  description: |
+    Sprint 0 exposes liveness and readiness only. Future domain routes use /api/v1
+    and organization-scoped authorization. Security schemes below describe future
+    contracts; no authentication or business endpoints are implemented yet.
+    Successful creation uses 201; accepted asynchronous commands use 202, never
+    an assertion of external delivery. Errors use the standard envelope.
+  license:
+    name: Proprietary
+    url: https://choosealicense.com/no-permission/
+servers:
+  - url: /
+security: []
+tags:
+  - name: Foundation
+    description: Local process and required database health.
+paths:
+  /healthz:
+    get:
+      operationId: getLiveness
+      summary: Check process liveness
+      description: Does not contact Meta, SMTP or PostgreSQL.
+      tags: [Foundation]
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+      responses:
+        '200':
+          $ref: '#/components/responses/Health'
+        '413':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
+  /readyz:
+    get:
+      operationId: getReadiness
+      summary: Check database and schema readiness
+      description: Requires compatible schema and a non-owner, non-bypass runtime role.
+      tags: [Foundation]
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+      responses:
+        '200':
+          $ref: '#/components/responses/Health'
+        '503':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
+components:
+  securitySchemes:
+    SessionCookie:
+      type: apiKey
+      in: cookie
+      name: waba_session
+      description: Future HttpOnly secure session; mutations also require CSRF/Origin checks. Not implemented.
+    APIKey:
+      type: http
+      scheme: bearer
+      description: Future organization/resource-scoped machine key. Not implemented.
+  parameters:
+    RequestID:
+      name: X-Request-ID
+      in: header
+      required: false
+      description: Valid bounded IDs are propagated; missing/invalid values are replaced.
+      schema:
+        type: string
+        pattern: '^[A-Za-z0-9_-]{1,64}$'
+  responses:
+    Health:
+      description: Check passed.
+      headers:
+        X-Request-ID:
+          schema: { type: string }
+          description: Server correlation ID.
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            required: [status]
+            properties:
+              status:
+                type: string
+                enum: [ok, ready]
+    Error:
+      description: Safe error with no underlying credentials or dependency details.
+      headers:
+        X-Request-ID:
+          schema: { type: string }
+          description: Server correlation ID.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+  schemas:
+    ErrorEnvelope:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message, request_id]
+          properties:
+            code: { type: string }
+            message: { type: string }
+            request_id: { type: string }
+            details: { type: object, additionalProperties: true }
+            field_errors:
+              type: array
+              items:
+                type: object
+                required: [field, code]
+                properties:
+                  field: { type: string }
+                  code: { type: string }

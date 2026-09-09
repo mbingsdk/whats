@@ -1,0 +1,14 @@
+{
+  "fixtures": [
+    {
+      "file": "multi-entry.json",
+      "classification": "SYNTHETIC",
+      "created_at": "2026-09-09",
+      "graph_version": null,
+      "source": "locally authored structural test example; not captured from Meta",
+      "purpose": "future multi-entry/multi-message and unknown-field compatibility tests",
+      "redaction": "all identifiers and content fictional; no credentials or PII",
+      "account_verified": false
+    }
+  ]
+}

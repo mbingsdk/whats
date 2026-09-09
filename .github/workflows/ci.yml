@@ -1,0 +1,48 @@
+name: Sprint 0 foundation
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: foundation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  foundation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      WABA_TEST_RACE: "1"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - name: Start isolated PostgreSQL
+        run: python3 scripts/dev.py up
+      - name: Migrate and verify repeat is a no-op
+        run: |
+          python3 scripts/dev.py migrate
+          python3 scripts/dev.py migrate
+      - name: Source, SQL, Go, real PostgreSQL, frontend and OpenAPI checks
+        run: python3 scripts/dev.py check
+      - name: Dependency integrity and vulnerabilities
+        run: |
+          cd backend
+          go mod verify
+          go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
+          cd ..
+          npm audit --audit-level=high
+          git diff --exit-code -- package-lock.json backend/go.mod backend/go.sum
+      - name: Stop isolated PostgreSQL
+        if: always()
+        run: docker compose down

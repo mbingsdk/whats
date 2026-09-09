@@ -1,0 +1,11 @@
+.local/
+.env
+.env.*
+!.env.example
+node_modules/
+.next/
+coverage/
+*.tsbuildinfo
+backend/bin/
+*.log
+.DS_Store

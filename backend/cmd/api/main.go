@@ -1,0 +1,45 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"log/slog"
+	"net"
+	"os"
+	"os/signal"
+	"syscall"
+	"waba.local/control/internal/config"
+	"waba.local/control/internal/database"
+	"waba.local/control/internal/httpapi"
+)
+
+func run() int {
+	c, err := config.Load()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: c.LogLevel}))
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	pool, err := database.Open(ctx, string(c.DatabaseURL), c.PoolMax)
+	if err != nil {
+		logger.Error("database configuration invalid")
+		return 1
+	}
+	defer pool.Close()
+	handler := httpapi.Handler(c, logger, func(ctx context.Context) error { return database.Ready(ctx, pool) })
+	listener, err := net.Listen("tcp", c.Listen)
+	if err != nil {
+		logger.Error("HTTP listen failed")
+		return 1
+	}
+	logger.Info("API starting", slog.String("environment", c.Environment), slog.Int64("schema_version", database.SchemaVersion))
+	if err = httpapi.Serve(ctx, httpapi.Server(c, handler), listener, c.ShutdownTimeout); err != nil {
+		logger.Error("HTTP shutdown failed")
+		return 1
+	}
+	logger.Info("API stopped")
+	return 0
+}
+func main() { os.Exit(run()) }

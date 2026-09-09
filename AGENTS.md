@@ -1,0 +1,17 @@
+# Repository working rules
+
+This is WABA Control's architecture and engineering repository. Gate A is approved and Sprint 0 ONLY is authorized (2026-09-09): build/test/CI, minimal tenant schema, health/config/logging, SMTP configuration and contract research. No Sprint 1 identity features or later product features, Meta adapters, paid sending or real deployment. Gates B/C/D remain CLOSED; follow PLANS.md. Keep implementation aligned with the approved documentation.
+
+Read README.md, PLANS.md, the capability matrix and relevant ADRs before changes. Preserve established decisions; revise their rationale and dependent contracts together when changing them.
+
+Meta claims require current official evidence. Record URL, inspection date, evidence quality, Graph/account restrictions and unresolved checks. Official Postman samples can be stale. Never convert an unavailable reference into a verified claim. Classify contract evidence as VERIFIED_CURRENT_CONTRACT, DOCUMENTED_OFFICIAL_SURFACE, UNVERIFIED, INTERNAL_PLATFORM_FEATURE or positively established NOT_PUBLICLY_EXPOSED. Record ACCOUNT_VERIFICATION_REQUIRED separately from evidence and OPTIONAL_ACCOUNT_DEPENDENT separately from DEFERRED delivery scope. Historical/indexed official requests prove surface only; never enable an adapter without a current pinned contract and the relevant account verification.
+
+All business records, jobs, events, keys, search results and storage access require an organization boundary. Use permissions with resource scope, never role-name conditionals. All outbound sends go through the shared send gate. Do not retry ambiguous external sends automatically or claim exactly-once network delivery.
+
+Keep monetary values decimal and currency-qualified. Freeze pricing and approval evidence. Never treat a webhook's category/billable flag as an invoice amount. Consent revocation survives imports and campaign snapshots. Do not log tokens, message bodies or unredacted raw payloads.
+
+Write specific decisions, invariants, tradeoffs and failure behavior. Mark UNKNOWN, NEEDS VERIFICATION and DEFERRED explicitly. Avoid placeholder content, marketing claims and fake performance results. Documentation links must resolve locally. Changes to a state machine require matching database, API, worker and test updates.
+
+Before concluding a change, check cross-document consistency and update the review record. User instructions take precedence over these repository rules.
+
+Sprint 0 checks: python scripts/dev.py up, python scripts/dev.py check; go mod verify and pinned govulncheck plus npm audit for dependency review. Never silently skip explicit integration tests. Keep migration SQL/checksum immutable after publication. Runtime credentials must never use the migration/authorizer/setup-administrator role. Only internal server-authenticated user IDs may enter InOrganization; never add a user-ID or organization-header authorization shortcut.

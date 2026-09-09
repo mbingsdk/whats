@@ -1,0 +1,76 @@
+"""Check source documentation, migration integrity and obvious credential patterns."""
+from pathlib import Path
+import hashlib
+import re
+import subprocess
+import sys
+from urllib.parse import unquote
+
+ROOT = Path(__file__).resolve().parents[1]
+EXCLUDED = {".git", ".local", "node_modules", ".next", "__pycache__", "bin"}
+TEXT = {".md", ".py", ".go", ".sql", ".json", ".yaml", ".yml", ".sh", ".mjs", ".ts", ".tsx", ".css", ".example"}
+errors = []
+paths = [p for p in ROOT.rglob("*") if p.is_file() and not set(p.relative_to(ROOT).parts) & EXCLUDED]
+# Include tracked ignored files too: an accidentally committed .env must be inspected.
+if (ROOT / ".git").exists():
+    tracked = subprocess.check_output(["git", "ls-files", "-z"], cwd=ROOT).decode().split("\0")
+    paths = list(set(paths) | {ROOT / p for p in tracked if p and (ROOT / p).is_file()})
+links = 0
+for path in paths:
+    relative = path.relative_to(ROOT)
+    if ".local" in relative.parts or (path.name.endswith(".env") or path.name == ".env"):
+        errors.append(f"Private local/config file included in source: {relative}")
+    if path.suffix not in TEXT and not path.name.startswith(".env"):
+        continue
+    try:
+        text = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        errors.append(f"Invalid UTF-8: {path.relative_to(ROOT)}")
+        continue
+    relative = path.relative_to(ROOT)
+    if "\ufffd" in text:
+        errors.append(f"Replacement character: {relative}")
+    # Values are never printed, even on failure. High-confidence patterns only;
+    # this is not a claim to recognize every possible secret.
+    patterns = [
+        r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----",
+        r"\bAKIA[0-9A-Z]{16}\b",
+        r"\bgh[pousr]_[A-Za-z0-9]{30,}\b",
+        r"\bEAA[A-Za-z0-9]{50,}\b",
+        r"postgres(?:ql)?://[^\s:]+:(?!synthetic(?:@|$))[^\s@]+@",
+    ]
+    if path.name not in {"package-lock.json", "check.py", "dev.py"}:
+        if any(re.search(pattern, text) for pattern in patterns):
+            errors.append(f"Possible credential: {relative}")
+    if path.name.startswith(".env") and path.name != ".env.example":
+        errors.append(f"Environment file included in source: {relative}")
+    if path.suffix != ".md":
+        continue
+    if len(re.findall(r"(?m)^\s*```", text)) % 2:
+        errors.append(f"Unbalanced code fence: {relative}")
+    for target in re.findall(r"\[[^\]]+\]\(([^)]+)\)", text):
+        target = target.strip("<>")
+        if re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*:", target):
+            continue
+        links += 1
+        filename, _, fragment = unquote(target).partition("#")
+        dest = (path.parent / filename).resolve() if filename else path
+        if not dest.is_file():
+            errors.append(f"Broken local link: {relative} -> {target}")
+        elif fragment and dest.suffix == ".md":
+            headings = re.findall(r"(?m)^#{1,6}\s+(.+?)\s*$", dest.read_text(encoding="utf-8"))
+            slugs = [re.sub(r"\s", "-", re.sub(r"[^\w\s-]", "", heading.lower())) for heading in headings]
+            if fragment not in slugs:
+                errors.append(f"Broken heading: {relative} -> {target}")
+manifest = ROOT / "database/migrations/manifest.sha256"
+if not manifest.exists():
+    errors.append("Migration manifest missing")
+else:
+    expected = dict(line.split("  ", 1)[::-1] for line in manifest.read_text().splitlines() if line)
+    actual = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT / "database/migrations").glob("*.sql")}
+    if actual != expected:
+        errors.append("Migration checksum mismatch; review SQL and update manifest before first release only.")
+if errors:
+    print("\n".join(errors))
+    sys.exit(1)
+print(f"Source checks passed: {links} local links; migration checksums; UTF-8/fences; obvious-secret scan.")

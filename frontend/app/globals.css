@@ -1,0 +1,5 @@
+:root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+body { margin: 0; }
+main { max-width: 48rem; margin: 4rem auto; padding: 0 1.5rem; line-height: 1.6; }
+button { font: inherit; cursor: pointer; }
+a:focus-visible, button:focus-visible { outline: 3px solid currentColor; outline-offset: 4px; }
