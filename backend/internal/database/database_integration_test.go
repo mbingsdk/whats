@@ -75,7 +75,7 @@ func TestPostgresFoundation(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer setup.Close(context.Background())
-	if _, err = setup.Exec(ctx, "REVOKE ALL ON DATABASE "+quoted+" FROM PUBLIC; GRANT CONNECT ON DATABASE "+quoted+" TO waba_migrator,waba_runtime"); err != nil {
+	if _, err = setup.Exec(ctx, "REVOKE ALL ON DATABASE "+quoted+" FROM PUBLIC; GRANT CONNECT ON DATABASE "+quoted+" TO waba_migrator,waba_runtime,waba_identity"); err != nil {
 		t.Fatal(err)
 	}
 	files := os.DirFS(filepath.Join("..", "..", "..", "database", "migrations"))
@@ -84,7 +84,7 @@ func TestPostgresFoundation(t *testing.T) {
 		if e != nil {
 			t.Fatal(e)
 		}
-		if count != 1 {
+		if count != 2 {
 			t.Fatalf("got %d initial migrations", count)
 		}
 		count, e = migrate.Up(ctx, migrationDSN, files)

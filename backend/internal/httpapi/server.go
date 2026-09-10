@@ -37,8 +37,11 @@ func writeError(w http.ResponseWriter, r *http.Request, status int, code, messag
 }
 
 // Readiness is a function seam for deterministic outage tests; the production probe uses real PostgreSQL.
-func Handler(c config.Config, logger *slog.Logger, ready func(context.Context) error) http.Handler {
+func Handler(c config.Config, logger *slog.Logger, ready func(context.Context) error, identityHandlers ...http.Handler) http.Handler {
 	mux := http.NewServeMux()
+	if len(identityHandlers) > 0 {
+		mux.Handle("/api/", identityHandlers[0])
+	}
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" && r.Method != "HEAD" {
 			w.Header().Set("Allow", "GET, HEAD")

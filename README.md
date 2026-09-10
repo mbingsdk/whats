@@ -1,6 +1,8 @@
 # WABA Control
 
-Architecture and product specification for the company's WhatsApp operations platform. Meta research dates: **2026-09-08 to 2026-09-09**; design/review completed **2026-09-09**. Gate A is approved and Sprint 0 foundation is implemented locally; Sprint 0 remains OPEN pending the evidence listed in docs/23. Gates B/C/D remain CLOSED. No product workflows or Meta adapters are enabled.
+Historical owner override (2026-09-09): **Sprint 0 IMPLEMENTATION COMPLETE; Gate A APPROVED; Sprint 1 AUTHORIZED. Hosted CI verification PENDING - EXTERNAL BLOCKER.** Run 34356265759 was attempted and failed before repository steps because GitHub reported an account billing lock. Accepted local evidence closes implementation, not hosted verification. CI requirements remain intact; rerun hosted CI when available, record the real result and fix any repository failures. Gates B/C/D remain CLOSED.
+
+Current verification (2026-09-10): **Sprint 0 IMPLEMENTATION COMPLETE; Gate A APPROVED; Sprint 1 implementation COMPLETE, acceptance OPEN.** GitHub run 34356265759 attempt 3 actually executed and passed the Sprint 0 baseline at commit 993c67e93fe5945ec820efe67d9d3abf3df8b1b3. Its original attempt 1 failed before steps due to the account billing restriction. Sprint 1 hosted verification is PENDING for these unpublished workspace changes; do not treat the Sprint 0 pass as Sprint 1 evidence. Controlled SMTP was ATTEMPTED and rejected authentication (SMTP_AUTH), so mailbox receipt remains PENDING. Gates B/C/D remain CLOSED.
 
 Normal deployment serves one PT in one company Organization. The design retains organization isolation, employees in multiple teams, multiple Meta apps, WABAs and phone numbers; an organization switcher appears only for users with multiple active memberships. There is no public organization registration, SaaS subscription billing, tenant marketplace or generic onboarding wizard. Every sending path uses the same authorization, consent, service-window, pricing, approval and budget controls.
 
@@ -26,11 +28,13 @@ Normal deployment serves one PT in one company Organization. The design retains 
 
 **Design baseline, with explicit implementation gates.** Official policy, public pricing overview and Meta's official Postman examples were inspected. Many developer pages returned HTTP 429, login-only content or fetch failures. The Postman examples include old Graph versions and contradictory prose; they prove API surface, not compatibility with an untested 2026 account.
 
-No live Meta account was queried. Current rate cards, upcoming pricing changes, Graph version, permissions on the company's assets and advanced feature eligibility remain NEEDS VERIFICATION. Do not describe this repository as a working or production-ready system. No real prices, credentials, customers or fabricated analytics are included.
+No live Meta account was queried. Current rate cards, upcoming pricing changes, Graph version, permissions on the company's assets and advanced feature eligibility remain NEEDS VERIFICATION. The identity application works locally; the full WhatsApp product is not implemented or production-ready. No real prices, credentials, customers or fabricated analytics are included.
 
-Sprint 0 alone is authorized under [PLANS.md](PLANS.md). Unverified optional modules stay disabled; foundational work need not wait for Calling or Coexistence.
+## Implemented identity application
 
-## Local foundation workflow
+Sprint 1 provides invitation-only company access, authentication, teams, scoped permissions, MFA, account security, audit and durable SMTP delivery. Implementation verification is recorded in [Sprint 1 evidence](docs/24-sprint-1-evidence.md). Sprint 1 acceptance remains OPEN until controlled SMTP mailbox evidence exists; hosted CI verification is tracked independently. Gate B remains CLOSED.
+
+## Local workflow
 
 Install Go 1.27.1, Node 24.21.0 (npm 11.19.0), Python 3 and Docker Compose. With fnm installed, use fnm install 24.21.0; the local runner selects it. From the repository root:
 
@@ -42,6 +46,8 @@ python scripts/dev.py backend
 
 In another terminal run npm ci with the pinned Node version, then python scripts/dev.py frontend. Open http://localhost:3000; /healthz and /readyz go to the Go backend through the development proxy. Run python scripts/dev.py test for Go/unit/real-PostgreSQL tests, or python scripts/dev.py check for the complete local validation sequence including frontend production build and OpenAPI. Stop PostgreSQL with python scripts/dev.py down; its volume remains.
 
-The runner generates ignored local credentials. Never copy them to production. The API receives only the runtime URL; test setup uses separate disposable-database administrative access. SMTP configuration names are in [.env.example](.env.example). No automatic .env loading is used by Go; use the runner or explicit protected environment/files.
+The runner generates ignored local credentials. Never copy them to production. The API receives the limited runtime URL plus the dedicated identity-service URL and root-key file; it receives no migration/setup-administrator credentials; test setup uses separate disposable-database administrative access. SMTP configuration names are in [.env.example](.env.example). No automatic .env loading is used by Go; use the runner or explicit protected environment/files.
+
+Use python scripts/dev.py bootstrap with protected operator inputs to initialize the first Owner, and python scripts/dev.py mailworker to process identity mail. See the exact [bootstrap and mail procedure](docs/16-deployment.md#sprint-1-identity-operations). Browser verification uses npx playwright install chromium followed by python scripts/dev.py e2e against a disposable database and local TLS SMTP server.
 
 [Database workflow](database/README.md), [deployment foundation](deploy/README.md), [OpenAPI](contracts/openapi.yaml) and [Sprint 0 evidence/status](docs/23-sprint-0-evidence.md) describe actual scope and limitations.

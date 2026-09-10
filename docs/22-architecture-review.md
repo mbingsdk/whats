@@ -60,10 +60,28 @@ Only ADR 007 changes a recorded architecture decision (dispatch coordination); m
 
 Subsequent owner decision: Gate A **APPROVED** on 2026-09-09, with D2/D5 accepted provisionally and Sprint 0 ONLY authorized. This supersedes the correction-phase readiness recommendation; see PLANS and doc 23. Gate B official/account contracts, Gate C pricing and send evidence, and Gate D runtime/operational acceptance remain open; optional integrations do not block foundation approval.
 
-## Sprint 0 implementation review
+## Historical Sprint 0 implementation review
 
 The earlier 37-file/no-code verification above describes the completed documentation phase, not current repository state. Gate A approval subsequently authorized the foundation recorded in [doc 23](23-sprint-0-evidence.md). Review focused on actual RLS roles and pool reuse, same-origin API access, safe dependency errors, no secret output, SMTP TLS/auth without email transmission, migration-role separation and real integration execution. No empty domain packages, generic repositories, future feature routes or Meta send behavior were added.
 
 The final local check passed, including frontend compilation and real PostgreSQL integration tests; Linux backend race tests, the compiled API health/readiness smoke test and actionlint also passed. Dependency integrity and vulnerability checks passed. See doc 23 for the separate evidence entries.
 
-Remaining acceptance is explicit: hosted CI is not yet observed; official Graph/version/webhook evidence remains blocked; SMTP mailbox/production recovery and product-level tests have not run. No other gate is opened by local foundation test results.
+## Owner acceptance and hosted CI reconciliation, 2026-09-09
+
+The product owner accepts the Sprint 0 architecture/implementation baseline subject to successful hosted CI. Review of the committed workflow at 993c67e93fe5945ec820efe67d9d3abf3df8b1b3 and GitHub run 34356265759 found a completed failure, with the foundation job blocked before any steps by an account billing lock. GitHub's exact annotation and timestamps are preserved in doc 23. This run provides no hosted test result; no repository-caused test failure was reported. The workflow's checks and migration SQL were not weakened or changed.
+
+Historical interpretation, superseded by the owner override below: Sprint 0 was considered OPEN pending a successful required hosted workflow. Unresolved current Meta contracts remain Gate B blockers only; the provider-neutral SMTP boundary satisfies Sprint 0, while controlled mailbox delivery is required for Sprint 1 identity-email completion. That review treated Sprint 1 authorization as conditional; the owner subsequently explicitly authorized it. Gates B/C/D remain CLOSED; no Sprint 1 or Meta functionality was implemented in this reconciliation.
+
+## Subsequent owner override, 2026-09-09
+
+Owner override (2026-09-09): **Sprint 0 IMPLEMENTATION COMPLETE; Gate A APPROVED; Sprint 1 AUTHORIZED. Hosted CI verification PENDING - EXTERNAL BLOCKER.** Run 34356265759 was attempted and failed before repository steps because GitHub reported an account billing lock. Accepted local evidence closes implementation, not hosted verification. CI requirements remain intact; rerun hosted CI when available, record the real result and fix any repository failures. Gates B/C/D remain CLOSED.
+
+This supersedes the prior closure interpretation above. Sprint 1 implementation proceeds without waiting for external CI or SMTP evidence. Controlled mailbox evidence remains required before Sprint 1 email acceptance; automated tests use local SMTP only.
+
+## Sprint 1 implementation review, 2026-09-10
+
+Implemented the approved identity/access/security scope with dedicated limited identity credentials, nine FORCE-RLS tenant tables, explicit scoped permissions, revision/Owner invariants, TOTP/recovery, session invalidation and durable authenticated SMTP. Review findings corrected: UUID JSON encoding, sensitive-window renewal on organization switching, pending login-MFA proofs surviving password/security changes, account-rate-limit evasion via unrelated fields, stale organization sessions after role/offboarding changes, archived-team direct grants and incomplete list pagination. Matching regression tests exercise these behaviors.
+
+Frontend routes and OpenAPI now match implementation; source validation checks route coverage. CI retains its existing checks and adds pinned Chromium/local SMTP E2E. [Sprint 1 evidence](24-sprint-1-evidence.md) records executed checks and external blockers separately. Controlled mailbox receipt remains pending; hosted run 34356265759 is an attempted external billing/account failure, never a hosted pass. Gates B/C/D remain CLOSED.
+
+Final inspection distinguishes historical billing failure (run 34356265759 attempt 1) from actual Sprint 0 hosted success (attempt 3, job 102491330281). Sprint 1 code is locally complete with full check, browser and Linux race evidence, but is not yet published/hosted-verified. Controlled SMTP was authorized and attempted; authentication failed before transmission, leaving the sole Sprint 1 acceptance blocker as external SMTP credentials/receipt evidence. The unused OpenPGP module advisory is disclosed in doc 24; imported packages and symbols have no govulncheck finding.

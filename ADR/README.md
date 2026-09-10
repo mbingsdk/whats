@@ -1,6 +1,6 @@
 # Architecture decisions
 
-Status for all records: **accepted architecture baseline for Sprint 0**, product owner Gate A approval, 2026-09-09. This accepts design decisions, not implementation/production evidence. User-confirmed constraint: existing Meta Cloud API WABA. Sprint 0 alone is authorized; record evidence before revising these decisions. Supersede records explicitly rather than erasing rationale.
+Status for all records: **accepted architecture baseline for Sprint 0**, product owner Gate A approval, 2026-09-09. This accepts design decisions, not implementation/production evidence. User-confirmed constraint: existing Meta Cloud API WABA. Sprint 0 implementation is complete and Sprint 1 is authorized by the owner override; record evidence before revising these decisions. Supersede records explicitly rather than erasing rationale.
 
 | Record | Decision |
 | --- | --- |
@@ -14,5 +14,6 @@ Status for all records: **accepted architecture baseline for Sprint 0**, product
 | [008](008-webhook-persistence.md) | Durable raw ingress and child-level deduplication |
 | [009](009-media-storage.md) | Private external object storage |
 | [010](010-vps-processes.md) | systemd-managed VPS processes |
+| [011](011-identity-runtime.md) | Sprint 1 identity privileges, session invalidation and mail execution |
 
 Revisit on evidence: sustained queue contention, unacceptable restore/downtime, required realtime bidirectional signaling, cross-tenant Meta app sharing, regulated key custody, or materially larger media/search workload. None alone justifies automatic adoption of distributed infrastructure.

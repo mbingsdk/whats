@@ -1,4 +1,4 @@
-name: Sprint 0 foundation
+name: Foundation and identity
 on:
   push:
   pull_request:
@@ -35,6 +35,10 @@ jobs:
           python3 scripts/dev.py migrate
       - name: Source, SQL, Go, real PostgreSQL, frontend and OpenAPI checks
         run: python3 scripts/dev.py check
+      - name: Install pinned Chromium and test identity browser flows with local TLS SMTP
+        run: |
+          npx playwright install --with-deps chromium
+          python3 scripts/dev.py e2e
       - name: Dependency integrity and vulnerabilities
         run: |
           cd backend

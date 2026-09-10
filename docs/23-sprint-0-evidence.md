@@ -1,6 +1,10 @@
 # Sprint 0 engineering evidence
 
-Gate A approved by product owner on 2026-09-09; D2/D5 accepted as provisional testing/recovery assumptions. Sprint 0 only is authorized. Gates B/C/D remain CLOSED. This record distinguishes implemented foundation from future architecture and pending evidence.
+Historical owner override (2026-09-09): **Sprint 0 IMPLEMENTATION COMPLETE; Gate A APPROVED; Sprint 1 AUTHORIZED. Hosted CI verification PENDING - EXTERNAL BLOCKER.** Run 34356265759 was attempted and failed before repository steps because GitHub reported an account billing lock. Accepted local evidence closes implementation, not hosted verification. CI requirements remain intact; rerun hosted CI when available, record the real result and fix any repository failures. Gates B/C/D remain CLOSED.
+
+Current verification (2026-09-10): **Sprint 0 IMPLEMENTATION COMPLETE; Gate A APPROVED; Sprint 1 implementation COMPLETE, acceptance OPEN.** GitHub run 34356265759 attempt 3 actually executed and passed the Sprint 0 baseline at commit 993c67e93fe5945ec820efe67d9d3abf3df8b1b3. Its original attempt 1 failed before steps due to the account billing restriction. Sprint 1 hosted verification is PENDING for these unpublished workspace changes; do not treat the Sprint 0 pass as Sprint 1 evidence. Controlled SMTP was ATTEMPTED and rejected authentication (SMTP_AUTH), so mailbox receipt remains PENDING. Gates B/C/D remain CLOSED.
+
+This is the historical Sprint 0 closure record. Subsequent Sprint 1 code and verification are recorded separately in [Sprint 1 evidence](24-sprint-1-evidence.md); statements below about absent identity features apply to the Sprint 0 baseline.
 
 ## Toolchain selection
 
@@ -24,7 +28,7 @@ Results are recorded after checks execute. Local Windows execution and hosted Li
 
 | Check | Status |
 | --- | --- |
-| Backend configuration, HTTP and SMTP unit tests | PASS on Windows and Linux with race detection; synthetic SMTP tests use TLS/auth/NOOP and never send mail |
+| Backend configuration, HTTP and SMTP unit tests | PASS on Windows; PASS on Linux with race detection; synthetic SMTP tests use TLS/auth/NOOP and never send mail |
 | Clean database and repeated migration | PASS on PostgreSQL 18.6; second application is a no-op |
 | Two-tenant/RLS/role/pool isolation | PASS on real PostgreSQL through runtime role |
 | Go vet/build | PASS on Windows and Linux |
@@ -36,7 +40,7 @@ Results are recorded after checks execute. Local Windows execution and hosted Li
 | Compiled API smoke | PASS: /healthz and /readyz returned 200 and request ID propagated; API process received runtime credentials only |
 | Workflow syntax | PASS: actionlint 1.7.12; this does not establish a hosted workflow result |
 | Source and migration verification | PASS: 69 local links, UTF-8/fences, obvious-secret baseline and migration SHA256 manifest |
-| Hosted GitHub Actions | NOT RUN: no Git repository/remote or hosted runner connection supplied |
+| Hosted GitHub Actions | Attempt 1: external billing failure before steps. Attempt 3: PASS with actual executed steps at the same Sprint 0 commit; see subsequent verification below |
 | Controlled provider SMTP mailbox | NOT RUN: provider/sender credentials and designated mailbox not supplied |
 | Product concurrency/load and restore drills | NOT IMPLEMENTED / NOT RUN; future sprint gates |
 
@@ -44,13 +48,41 @@ The Linux verification used golang:1.27.1-bookworm at sha256:648f440f42a0958804e
 
 The initial integration failure showed that a SELECT-only authorizer RLS policy could not see rows for SHARE locking. The corrected narrow visibility policy permits locking and denies writes with WITH CHECK false; runtime bypass was not introduced. A real ESLint 10/plugin API mismatch was corrected with the official compatibility package; lint rules were not disabled to hide the error.
 
+## Hosted CI inspection, 2026-09-09
+
+The original attempt of the hosted [Sprint 0 foundation run](https://github.com/mbingsdk/whats/actions/runs/34356265759) was inspected through authenticated GitHub CLI/API, including run metadata, jobs, commit check runs and check annotations. The hosted result is an attempted failure caused by an external restriction.
+
+| Evidence | Observed value |
+| --- | --- |
+| Repository / branch | mbingsdk/whats / main |
+| Commit | 993c67e93fe5945ec820efe67d9d3abf3df8b1b3 (matches local HEAD) |
+| Workflow / trigger | .github/workflows/ci.yml / push |
+| Run ID / status / conclusion | 34356265759 / completed / failure |
+| Created / updated UTC | 2026-09-09T13:18:40Z / 2026-09-09T13:18:44Z |
+| Job/check ID | 102481617622, foundation |
+| Job timestamps UTC | 2026-09-09T13:18:40Z to 2026-09-09T13:18:43Z |
+| Job steps | Empty list; no build, dependency installation or test step ran |
+| Failure classification | EXTERNAL_ACCOUNT_BILLING_RESTRICTION; not an observed repository test/code failure |
+
+GitHub's [check annotation](https://api.github.com/repos/mbingsdk/whats/check-runs/102481617622/annotations) states:
+
+> The job was not started because your account is locked due to a billing issue.
+
+
+
+## Historical reconciliation validation, 2026-09-09
+
+After inspecting the hosted failure, this review changed only README.md, AGENTS.md, PLANS.md and docs 19, 20, 22 and 23. The existing filename remains docs/23-sprint-0-evidence.md; no duplicate evidence document was created for the alternate spelling in the request.
+
+Executed again on the local Windows environment: python scripts/dev.py up (healthy PostgreSQL); python scripts/dev.py check (exit 0: source/format/vet, Go unit results PASS with cached packages, all nine PostgreSQL integration subtests PASS with -count=1, Go build, npm ci, lint, typecheck, two frontend tests PASS with zero skips/failures, OpenAPI validation and production Next build); go mod verify (all modules verified); pinned govulncheck 1.8.0 (no vulnerabilities); npm audit --audit-level=high (zero vulnerabilities). This rerun did not use the Linux race detector; the separate Linux race evidence above is from the earlier implementation verification.
+
+The final source validator passed 69 local links, UTF-8/fences, the obvious-secret scan and unchanged migration checksums. git diff --check passed. A path-scoped diff confirmed no changes to workflow, migration SQL, backend, frontend, scripts or dependency locks. The latest hosted run was checked again and remained completed/failure with the same commit. Local checks do not satisfy the hosted CI requirement.
+
 ## Scope and outstanding acceptance
 
 Implemented foundation: API bootstrap/config/safe logging/request IDs/body/time limits/graceful shutdown; /healthz and /readyz; schema/role checks; transactional membership scope; migrations and isolation tests; tiny Next shell/API read boundary/error component; validated contract; local runner and CI definition; SMTP probe/config; synthetic fixture conventions.
 
-No authentication/login/invitation feature, tenant HTTP CRUD, inbox, campaigns, contacts, templates, automation, Meta adapter or paid sending is implemented. No real VPS or Meta asset was changed. Local PostgreSQL contains development data only; test databases are disposable.
-
-Sprint 0 remains OPEN until outstanding definition-of-done evidence is resolved, especially a successful hosted CI run and acceptance of unresolved official Meta contract research. SMTP relay/mailbox verification must occur before identity-email rollout. Product owner assumptions are capacity inputs, not benchmark results or Meta limits. No production-readiness checkbox is completed by these foundation tests.
+At Sprint 0 closure, no authentication/login/invitation feature, tenant HTTP CRUD, inbox, campaigns, contacts, templates, automation, Meta adapter or paid sending was implemented. No real VPS or Meta asset was changed. Local PostgreSQL contains development data only; test databases are disposable.
 
 ## SMTP configuration and controlled-mailbox procedure
 
@@ -58,7 +90,7 @@ Select an ordinary authenticated SMTP relay; configure SMTP_HOST, SMTP_PORT, SMT
 
 Run backend/cmd/smtpcheck with the same validated app configuration and protected secret files. It performs connection, TLS, authentication, NOOP and QUIT, with bounded timeout/cancellation; it issues no MAIL, RCPT or DATA command. Its success establishes relay acceptance only, not inbox delivery. SMTP is not a dependency of /healthz or a restart trigger.
 
-For delivery evidence, the operator must designate an approved sender and controlled recipient, then use the configured relay's standard SMTP/mail client to send one nonsecret test marker. Record UTC time, sanitized delivery/Message-ID and confirmed receipt (and any bounce); never include credentials or customer data. No such email is sent by this agent or automated tests. Full invitation/verification/reset/security notification delivery is Sprint 1, behind this same provider-neutral contract.
+For delivery evidence, the operator must designate an approved sender and controlled recipient, then use the configured relay's standard SMTP/mail client to send one nonsecret test marker. Record UTC time, sanitized delivery/Message-ID and confirmed receipt (and any bounce); never include credentials or customer data. No controlled provider email was sent for Sprint 0. Sprint 1 now exercises actual identity mail through a local test relay; the [current controlled-mailbox procedure](16-deployment.md#sprint-1-identity-operations) requires the implemented outbox and actual identity flows.
 
 ## Dependency and source controls
 
@@ -68,7 +100,7 @@ The source checker verifies local links, UTF-8/fences and reviewed migration has
 
 ## Source inventory and document changes
 
-The source inventory contains 87 files, excluding local credentials/build outputs, dependency installations and caches: 50 new foundation files alongside the original 37-document package. There is no Git history in this workspace, so this is a filesystem inventory rather than a Git diff.
+The original pre-publication Sprint 0 source inventory contained 87 files, excluding local credentials/build outputs, dependency installations and caches: 50 new foundation files alongside the original 37-document package. That inventory was recorded before Git publication. The current workspace is on main with origin https://github.com/mbingsdk/whats.git and baseline commit 993c67e93fe5945ec820efe67d9d3abf3df8b1b3; the closure review began with a clean working tree.
 
 | New source area | Files | Concrete purpose |
 | --- | ---: | --- |
@@ -83,3 +115,9 @@ The source inventory contains 87 files, excluding local credentials/build output
 | docs | 1 | This executed-evidence and acceptance record |
 
 Existing documents maintained in Sprint 0: README.md, AGENTS.md, PLANS.md, ADR/README.md and docs 02, 03, 05, 06, 14, 16, 17, 19, 20, 21 and 22. The ADR index records acceptance; no individual ADR decision was changed during implementation. The earlier documentation correction's ADR 007 change remains part of the approved baseline.
+
+## Subsequent hosted verification inspected 2026-09-10
+
+Authenticated GitHub API inspection found that run 34356265759 was rerun. Attempt 3 is completed/success for the same baseline commit 993c67e93fe5945ec820efe67d9d3abf3df8b1b3. Job 102491330281 ran 2026-09-09T13:45:36Z to 2026-09-09T13:47:22Z; the run updated at 13:47:23Z. Setup, PostgreSQL startup, clean/repeated migration, source/Go/PostgreSQL/frontend/OpenAPI checks, dependency checks and cleanup all have success conclusions. [Attempt 3](https://github.com/mbingsdk/whats/actions/runs/34356265759/attempts/3) is actual hosted Sprint 0 evidence.
+
+The attempt-1 jobs endpoint was also rechecked: job 102481617622 remains failure with an empty steps array. Its external account/billing failure is preserved above. This new evidence resolves the historical Sprint 0 hosted-verification blocker; it does not rewrite the failed attempt as a pass and does not cover unpublished Sprint 1 changes. No CI check was weakened.

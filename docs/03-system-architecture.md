@@ -1,5 +1,7 @@
 # System architecture
 
+Implemented through Sprint 1: Next identity UI, Go API, dedicated SMTP worker and PostgreSQL. The diagram below remains the full target architecture; Valkey, SSE, Meta, object storage and messaging workers are not implemented. The identity process/security boundary is specified in [ADR 011](../ADR/011-identity-runtime.md).
+
 Use a Go modular monolith with two execution modes: API and worker. Deploy the Next.js frontend separately behind the same origin. PostgreSQL owns durable domain state, jobs and an outbox. Valkey owns disposable presence, caching and coordination hints; it is not the authority for money, consent, idempotency or job recovery. [ADRs](../ADR/README.md) record alternatives.
 
 ```mermaid

@@ -17,6 +17,7 @@
     "contracts": "redocly lint contracts/openapi.yaml"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "@redocly/cli": "2.51.2"
   }
 }

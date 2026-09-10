@@ -11,6 +11,7 @@ import (
 	"waba.local/control/internal/config"
 	"waba.local/control/internal/database"
 	"waba.local/control/internal/httpapi"
+	"waba.local/control/internal/identity"
 )
 
 func run() int {
@@ -28,7 +29,18 @@ func run() int {
 		return 1
 	}
 	defer pool.Close()
-	handler := httpapi.Handler(c, logger, func(ctx context.Context) error { return database.Ready(ctx, pool) })
+	auth, err := identity.Load(ctx, c.PublicOrigin, c.Environment == "production")
+	if err != nil {
+		logger.Error("identity configuration invalid")
+		return 1
+	}
+	defer auth.Pool.Close()
+	handler := httpapi.Handler(c, logger, func(ctx context.Context) error {
+		if e := database.Ready(ctx, pool); e != nil {
+			return e
+		}
+		return auth.Pool.Ping(ctx)
+	}, auth.Handler())
 	listener, err := net.Listen("tcp", c.Listen)
 	if err != nil {
 		logger.Error("HTTP listen failed")

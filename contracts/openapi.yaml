@@ -1,13 +1,11 @@
 openapi: 3.1.0
 info:
-  title: WABA Control foundation API
-  version: 0.1.0
-  description: |
-    Sprint 0 exposes liveness and readiness only. Future domain routes use /api/v1
-    and organization-scoped authorization. Security schemes below describe future
-    contracts; no authentication or business endpoints are implemented yet.
-    Successful creation uses 201; accepted asynchronous commands use 202, never
-    an assertion of external delivery. Errors use the standard envelope.
+  title: WABA Control identity and organization API
+  version: 0.2.0
+  description: >-
+    Implemented Sprint 0 health and Sprint 1 company identity/access endpoints. No public registration or Meta/product
+    messaging endpoints. Cookie mutations require matching Origin, CSRF cookie/header and the session-bound CSRF digest.
+    Organization IDs never establish authorization.
   license:
     name: Proprietary
     url: https://choosealicense.com/no-permission/
@@ -17,13 +15,18 @@ security: []
 tags:
   - name: Foundation
     description: Local process and required database health.
+  - name: Identity
+    description: Global company identity and own-session security.
+  - name: Organization
+    description: Membership-checked, permission-scoped organization operations.
 paths:
   /healthz:
     get:
       operationId: getLiveness
       summary: Check process liveness
       description: Does not contact Meta, SMTP or PostgreSQL.
-      tags: [Foundation]
+      tags:
+        - Foundation
       parameters:
         - $ref: '#/components/parameters/RequestID'
       responses:
@@ -38,17 +41,4240 @@ paths:
       operationId: getReadiness
       summary: Check database and schema readiness
       description: Requires compatible schema and a non-owner, non-bypass runtime role.
-      tags: [Foundation]
+      tags:
+        - Foundation
       parameters:
         - $ref: '#/components/parameters/RequestID'
       responses:
         '200':
           $ref: '#/components/responses/Health'
+        '413':
+          $ref: '#/components/responses/Error'
         '503':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
+  /api/v1/auth/csrf:
+    get:
+      operationId: csrf
+      summary: csrf
+      tags:
+        - Identity
+      security: []
+      description: Return/initiate the same-origin CSRF cookie and readable token.
+      x-permission: Public proof/throttling or CSRF bootstrap
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
           $ref: '#/components/responses/Error'
         '413':
           $ref: '#/components/responses/Error'
-        default:
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+  /api/v1/auth/login:
+    post:
+      operationId: public_login
+      summary: public login
+      tags:
+        - Identity
+      security: []
+      description: >-
+        Generic authentication failure. Successful password authentication returns a rotated session or a bounded MFA
+        challenge.
+      x-permission: Public proof/throttling or CSRF bootstrap
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required:
+                - email
+                - password
+  /api/v1/auth/logout:
+    post:
+      operationId: logout
+      summary: logout
+      tags:
+        - Identity
+      security:
+        - SessionCookie: []
+      description: Revoke current session and expire its cookie.
+      x-permission: Authenticated self
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required: []
+  /api/v1/auth/session:
+    get:
+      operationId: session
+      summary: session
+      tags:
+        - Identity
+      security:
+        - SessionCookie: []
+      description: Return current nonsecret identity metadata and active organization memberships.
+      x-permission: Authenticated self
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+  /api/v1/auth/mfa/verify:
+    post:
+      operationId: public_mfa
+      summary: public mfa
+      tags:
+        - Identity
+      security: []
+      description: Consume an MFA login challenge after one-use TOTP/recovery-code validation; establish a rotated session.
+      x-permission: Public proof/throttling or CSRF bootstrap
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required:
+                - token
+                - code
+  /api/v1/auth/reauthenticate:
+    post:
+      operationId: reauth
+      summary: reauth
+      tags:
+        - Identity
+      security:
+        - SessionCookie: []
+      description: Password plus current factor if enrolled. Rotate session; five-minute reauthentication freshness.
+      x-permission: Authenticated self
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required:
+                - password
+  /api/v1/auth/password-reset/request:
+    post:
+      operationId: public_reset_request
+      summary: public reset request
+      tags:
+        - Identity
+      security: []
+      description: >-
+        Generic 202 for known/unknown addresses. Atomically supersede the previous reset challenge and enqueue encrypted
+        identity mail for eligible identities.
+      x-permission: Public proof/throttling or CSRF bootstrap
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '202':
+          description: Accepted for asynchronous email delivery; not proof of inbox receipt.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required:
+                - email
+  /api/v1/auth/password-reset/complete:
+    post:
+      operationId: public_reset_complete
+      summary: public reset complete
+      tags:
+        - Identity
+      security: []
+      description: >-
+        Consume a single-use 30-minute reset challenge, change the password, invalidate old sessions and enqueue a
+        security notice.
+      x-permission: Public proof/throttling or CSRF bootstrap
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required:
+                - token
+                - password
+  /api/v1/auth/email-verification/request:
+    post:
+      operationId: public_verify_request
+      summary: public verify request
+      tags:
+        - Identity
+      security: []
+      description: Generic 202. Enqueue verification for eligible unverified identities.
+      x-permission: Public proof/throttling or CSRF bootstrap
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '202':
+          description: Accepted for asynchronous email delivery; not proof of inbox receipt.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required:
+                - email
+  /api/v1/auth/email-verification/complete:
+    post:
+      operationId: public_verify_complete
+      summary: public verify complete
+      tags:
+        - Identity
+      security: []
+      description: Consume a single-use 24-hour verification challenge; GET never consumes proof.
+      x-permission: Public proof/throttling or CSRF bootstrap
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required:
+                - token
+  /api/v1/auth/organization-session:
+    post:
+      operationId: organization_select
+      summary: organization select
+      tags:
+        - Identity
+      security:
+        - SessionCookie: []
+      description: Validate current membership and rotate to an organization-bound session.
+      x-permission: Authenticated self
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required:
+                - organization_id
+  /api/v1/auth/mfa/enrollment:
+    post:
+      operationId: mfa_enroll
+      summary: mfa enroll
+      tags:
+        - Identity
+      security:
+        - SessionCookie: []
+      description: Recent-authentication required. Return the setup secret only during enrollment; store envelope-encrypted secret.
+      x-permission: Authenticated self
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required: []
+  /api/v1/auth/mfa/enrollment/confirm:
+    post:
+      operationId: mfa_confirm
+      summary: mfa confirm
+      tags:
+        - Identity
+      security:
+        - SessionCookie: []
+      description: Confirm authenticator possession, enable TOTP, invalidate prior sessions and show ten recovery codes once.
+      x-permission: Authenticated self
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required:
+                - code
+  /api/v1/auth/mfa/disable:
+    post:
+      operationId: mfa_disable
+      summary: mfa disable
+      tags:
+        - Identity
+      security:
+        - SessionCookie: []
+      description: Recent-authentication required. Remove factor/codes, invalidate prior sessions and send a security notice.
+      x-permission: Authenticated self
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required: []
+  /api/v1/auth/mfa/recovery-codes/regenerate:
+    post:
+      operationId: mfa_recovery
+      summary: mfa recovery
+      tags:
+        - Identity
+      security:
+        - SessionCookie: []
+      description: >-
+        Recent-authentication required. Replace all recovery codes, invalidate prior sessions and send a security
+        notice.
+      x-permission: Authenticated self
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required: []
+  /api/v1/security/sessions:
+    get:
+      operationId: sessions
+      summary: sessions
+      tags:
+        - Identity
+      security:
+        - SessionCookie: []
+      description: List own unrevoked/unexpired sessions; no bearer or CSRF digest.
+      x-permission: Authenticated self
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: query
+          name: cursor
+          required: false
+          description: >-
+            Opaque signed continuation bound to the authenticated user, organization and endpoint. Reauthorization
+            occurs on every page.
+          schema:
+            type: string
+            maxLength: 128
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityList'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+  /api/v1/security/sessions/{id}/revoke:
+    post:
+      operationId: session_revoke
+      summary: session revoke
+      tags:
+        - Identity
+      security:
+        - SessionCookie: []
+      description: Revoke the path session only if owned by the caller; recent authentication required.
+      x-permission: Authenticated self
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required: []
+  /api/v1/security/sessions/revoke-others:
+    post:
+      operationId: sessions_revoke
+      summary: sessions revoke
+      tags:
+        - Identity
+      security:
+        - SessionCookie: []
+      description: Revoke all own sessions except the current one; recent authentication required.
+      x-permission: Authenticated self
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required: []
+  /api/v1/invitations/accept:
+    post:
+      operationId: public_invitation_accept
+      summary: public invitation accept
+      tags:
+        - Identity
+      security: []
+      description: >-
+        Consume invitation. New identities require name/password; existing identities must already authenticate as the
+        bound email and must not submit a replacement password. Recheck inviter permissions and role ceiling.
+      x-permission: Public proof/throttling or CSRF bootstrap
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required:
+                - token
+  /api/v1/organization:
+    get:
+      operationId: org_get
+      summary: org get
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        Return selected organization's metadata and current organization-wide permission keys. Authorization:
+        organization.view. Mutations require verified email, recent authentication and enrolled MFA in production.
+      x-permission: organization.view
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+  /api/v1/organizations/{org}/members:
+    get:
+      operationId: org_members_list
+      summary: org members list
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        List scoped resource summaries, bounded to 100 rows. Authorization: members.view. Mutations require verified
+        email, recent authentication and enrolled MFA in production.
+      x-permission: members.view
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: cursor
+          required: false
+          description: >-
+            Opaque signed continuation bound to the authenticated user, organization and endpoint. Reauthorization
+            occurs on every page.
+          schema:
+            type: string
+            maxLength: 128
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityList'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+  /api/v1/organizations/{org}/members/{id}:
+    get:
+      operationId: org_member_get
+      summary: org member get
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        Apply the reviewed resource command atomically with audit. Authorization: members.view. Mutations require
+        verified email, recent authentication and enrolled MFA in production.
+      x-permission: members.view
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityList'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+  /api/v1/organizations/{org}/members/{id}/deactivate:
+    post:
+      operationId: org_member_deactivate
+      summary: org member deactivate
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        Immediately deny future organization authorization, increment access revision and remove team memberships while
+        preserving actor history. Authorization: members.manage + delegation ceiling + last-Owner invariant. Mutations
+        require verified email, recent authentication and enrolled MFA in production.
+      x-permission: members.manage + delegation ceiling + last-Owner invariant
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+        - $ref: '#/components/parameters/Revision'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required: []
+  /api/v1/organizations/{org}/members/{id}/reactivate:
+    post:
+      operationId: org_member_reactivate
+      summary: org member reactivate
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        Restore membership with retained role grants after delegation checks; removed team memberships are not restored.
+        Authorization: members.manage + delegation ceiling. Mutations require verified email, recent authentication and
+        enrolled MFA in production.
+      x-permission: members.manage + delegation ceiling
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+        - $ref: '#/components/parameters/Revision'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required: []
+  /api/v1/organizations/{org}/members/{id}/role-grants:
+    put:
+      operationId: org_member_roles
+      summary: org member roles
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        Replace explicit ORG/TEAM/SELF role grants with cross-organization foreign-key enforcement. Authorization:
+        roles.assign + old/new permission ceiling + last-Owner invariant. Mutations require verified email, recent
+        authentication and enrolled MFA in production. Supports mixed grants[] or legacy role_ids with one scope.
+        Replaces the complete direct grant set; team inheritance remains separate.
+      x-permission: roles.assign + old/new permission ceiling + last-Owner invariant
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+        - $ref: '#/components/parameters/Revision'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+                grants:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: object
+                    additionalProperties: false
+                    required:
+                      - role_id
+                      - scope
+                      - team_id
+                    properties:
+                      role_id:
+                        type: string
+                        format: uuid
+                      scope:
+                        type: string
+                        enum:
+                          - ORG
+                          - TEAM
+                          - SELF
+                      team_id:
+                        type:
+                          - string
+                          - 'null'
+                        format: uuid
+              anyOf:
+                - required:
+                    - grants
+                - required:
+                    - role_ids
+  /api/v1/organizations/{org}/invitations:
+    get:
+      operationId: org_invitations_list
+      summary: org invitations list
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        List scoped resource summaries, bounded to 100 rows. Authorization: members.invite. Mutations require verified
+        email, recent authentication and enrolled MFA in production.
+      x-permission: members.invite
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: cursor
+          required: false
+          description: >-
+            Opaque signed continuation bound to the authenticated user, organization and endpoint. Reauthorization
+            occurs on every page.
+          schema:
+            type: string
+            maxLength: 128
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityList'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: org_invite
+      summary: org invite
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        Create a 72-hour invitation and encrypted durable email. No account/password activation until explicit
+        acceptance. Authorization: members.invite + delegation ceiling. Mutations require verified email, recent
+        authentication and enrolled MFA in production.
+      x-permission: members.invite + delegation ceiling
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '202':
+          description: Accepted for asynchronous email delivery; not proof of inbox receipt.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required:
+                - email
+                - role_ids
+  /api/v1/organizations/{org}/invitations/{id}/revoke:
+    post:
+      operationId: org_invite_revoke
+      summary: org invite revoke
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        Invalidate pending invitation and cancel unsent deliveries. Authorization: members.invite. Mutations require
+        verified email, recent authentication and enrolled MFA in production.
+      x-permission: members.invite
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+        - $ref: '#/components/parameters/Revision'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required: []
+  /api/v1/organizations/{org}/invitations/{id}/resend:
+    post:
+      operationId: org_invite_resend
+      summary: org invite resend
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        Supersede the invitation token/deadline, cancel unsent previous deliveries and enqueue the new generation.
+        Authorization: members.invite + delegation ceiling. Mutations require verified email, recent authentication and
+        enrolled MFA in production.
+      x-permission: members.invite + delegation ceiling
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+        - $ref: '#/components/parameters/Revision'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required: []
+  /api/v1/organizations/{org}/teams:
+    get:
+      operationId: org_teams_list
+      summary: org teams list
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        List scoped resource summaries, bounded to 100 rows. Authorization: teams.view. Mutations require verified
+        email, recent authentication and enrolled MFA in production.
+      x-permission: teams.view
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: cursor
+          required: false
+          description: >-
+            Opaque signed continuation bound to the authenticated user, organization and endpoint. Reauthorization
+            occurs on every page.
+          schema:
+            type: string
+            maxLength: 128
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityList'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: org_team_create
+      summary: org team create
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        Apply the reviewed resource command atomically with audit. Authorization: teams.manage. Mutations require
+        verified email, recent authentication and enrolled MFA in production.
+      x-permission: teams.manage
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '201':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required:
+                - name
+  /api/v1/organizations/{org}/teams/{id}:
+    patch:
+      operationId: org_team_update
+      summary: org team update
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        Apply the reviewed resource command atomically with audit. Authorization: teams.manage within team scope.
+        Mutations require verified email, recent authentication and enrolled MFA in production.
+      x-permission: teams.manage within team scope
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+        - $ref: '#/components/parameters/Revision'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required:
+                - name
+  /api/v1/organizations/{org}/teams/{id}/archive:
+    post:
+      operationId: org_team_archive
+      summary: org team archive
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        Apply the reviewed resource command atomically with audit. Authorization: teams.manage + current team-role
+        delegation ceiling. Mutations require verified email, recent authentication and enrolled MFA in production.
+      x-permission: teams.manage + current team-role delegation ceiling
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+        - $ref: '#/components/parameters/Revision'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required: []
+  /api/v1/organizations/{org}/teams/{id}/members:
+    get:
+      operationId: org_team_members_list
+      summary: org team members list
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        List scoped resource summaries, bounded to 100 rows. Authorization: teams.view within team scope. Mutations
+        require verified email, recent authentication and enrolled MFA in production.
+      x-permission: teams.view within team scope
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: cursor
+          required: false
+          description: >-
+            Opaque signed continuation bound to the authenticated user, organization and endpoint. Reauthorization
+            occurs on every page.
+          schema:
+            type: string
+            maxLength: 128
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityList'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: org_team_member_add
+      summary: org team member add
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        Apply the reviewed resource command atomically with audit. Authorization: teams.manage + current team-role
+        delegation ceiling. Mutations require verified email, recent authentication and enrolled MFA in production.
+      x-permission: teams.manage + current team-role delegation ceiling
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+        - $ref: '#/components/parameters/Revision'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required:
+                - member_id
+  /api/v1/organizations/{org}/teams/{id}/members/{member}:
+    delete:
+      operationId: org_team_member_remove
+      summary: org team member remove
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        Apply the reviewed resource command atomically with audit. Authorization: teams.manage + current team-role
+        delegation ceiling. Mutations require verified email, recent authentication and enrolled MFA in production.
+      x-permission: teams.manage + current team-role delegation ceiling
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: member
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+        - $ref: '#/components/parameters/Revision'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required: []
+  /api/v1/organizations/{org}/teams/{id}/role-grants:
+    put:
+      operationId: org_team_roles
+      summary: org team roles
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        Replace team-role grants; inherited permissions remain scoped to the team. Authorization: roles.assign + team
+        permission ceiling. Mutations require verified email, recent authentication and enrolled MFA in production.
+      x-permission: roles.assign + team permission ceiling
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+        - $ref: '#/components/parameters/Revision'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required:
+                - role_ids
+  /api/v1/organizations/{org}/roles:
+    get:
+      operationId: org_roles_list
+      summary: org roles list
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        List scoped resource summaries, bounded to 100 rows. Authorization: roles.view. Mutations require verified
+        email, recent authentication and enrolled MFA in production.
+      x-permission: roles.view
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: cursor
+          required: false
+          description: >-
+            Opaque signed continuation bound to the authenticated user, organization and endpoint. Reauthorization
+            occurs on every page.
+          schema:
+            type: string
+            maxLength: 128
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityList'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: org_role_create
+      summary: org role create
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        Apply the reviewed resource command atomically with audit. Authorization: roles.manage + delegation ceiling.
+        Mutations require verified email, recent authentication and enrolled MFA in production.
+      x-permission: roles.manage + delegation ceiling
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '201':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required:
+                - name
+                - permissions
+  /api/v1/organizations/{org}/roles/{id}:
+    patch:
+      operationId: org_role_update
+      summary: org role update
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        Apply the reviewed resource command atomically with audit. Authorization: roles.manage + old/new permission
+        ceiling + last-Owner invariant. Mutations require verified email, recent authentication and enrolled MFA in
+        production.
+      x-permission: roles.manage + old/new permission ceiling + last-Owner invariant
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+        - $ref: '#/components/parameters/Revision'
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityResult'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 256
+                  writeOnly: true
+                code:
+                  type: string
+                  writeOnly: true
+                token:
+                  type: string
+                  writeOnly: true
+                name:
+                  type: string
+                  maxLength: 100
+                organization_id:
+                  type: string
+                  format: uuid
+                member_id:
+                  type: string
+                  format: uuid
+                role_ids:
+                  type: array
+                  maxItems: 20
+                  items:
+                    type: string
+                    format: uuid
+                permissions:
+                  type: array
+                  maxItems: 30
+                  items:
+                    type: string
+                    enum:
+                      - organization.view
+                      - members.view
+                      - members.invite
+                      - members.manage
+                      - teams.view
+                      - teams.manage
+                      - roles.view
+                      - roles.manage
+                      - roles.assign
+                      - owners.manage
+                      - audit.view
+                scope:
+                  type: string
+                  enum:
+                    - ORG
+                    - TEAM
+                    - SELF
+                team_id:
+                  anyOf:
+                    - type: string
+                      format: uuid
+                    - type: 'null'
+              required:
+                - name
+                - permissions
+  /api/v1/organizations/{org}/audit:
+    get:
+      operationId: org_audit_list
+      summary: org audit list
+      tags:
+        - Organization
+      security:
+        - SessionCookie: []
+      description: >-
+        Read append-only redacted organization security events. Authorization: audit.view. Mutations require verified
+        email, recent authentication and enrolled MFA in production.
+      x-permission: audit.view
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - in: path
+          name: org
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: cursor
+          required: false
+          description: >-
+            Opaque signed continuation bound to the authenticated user, organization and endpoint. Reauthorization
+            occurs on every page.
+          schema:
+            type: string
+            maxLength: 128
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityList'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '428':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '503':
           $ref: '#/components/responses/Error'
 components:
   securitySchemes:
@@ -56,7 +4282,9 @@ components:
       type: apiKey
       in: cookie
       name: waba_session
-      description: Future HttpOnly secure session; mutations also require CSRF/Origin checks. Not implemented.
+      description: >-
+        Opaque server-side session. HttpOnly; Secure in production; SameSite=Lax; 12-hour absolute and 30-minute idle
+        expiry. No raw session secret in JSON.
     APIKey:
       type: http
       scheme: bearer
@@ -69,29 +4297,58 @@ components:
       description: Valid bounded IDs are propagated; missing/invalid values are replaced.
       schema:
         type: string
-        pattern: '^[A-Za-z0-9_-]{1,64}$'
+        pattern: ^[A-Za-z0-9_-]{1,64}$
+    CSRF:
+      in: header
+      name: X-CSRF-Token
+      required: true
+      schema:
+        type: string
+        minLength: 43
+        maxLength: 43
+      description: Must match the host-only waba_csrf cookie; authenticated actions also verify its session-stored digest.
+    Origin:
+      in: header
+      name: Origin
+      required: true
+      schema:
+        type: string
+      description: Exact configured PUBLIC_ORIGIN. Cross-origin state changes are rejected.
+    Revision:
+      in: header
+      name: If-Match
+      required: true
+      schema:
+        type: string
+        pattern: ^"[1-9][0-9]*"$
+      description: Current resource revision; missing returns 428, stale returns 409.
   responses:
     Health:
       description: Check passed.
       headers:
         X-Request-ID:
-          schema: { type: string }
+          schema:
+            type: string
           description: Server correlation ID.
       content:
         application/json:
           schema:
             type: object
             additionalProperties: false
-            required: [status]
+            required:
+              - status
             properties:
               status:
                 type: string
-                enum: [ok, ready]
+                enum:
+                  - ok
+                  - ready
     Error:
       description: Safe error with no underlying credentials or dependency details.
       headers:
         X-Request-ID:
-          schema: { type: string }
+          schema:
+            type: string
           description: Server correlation ID.
       content:
         application/json:
@@ -101,22 +4358,245 @@ components:
     ErrorEnvelope:
       type: object
       additionalProperties: false
-      required: [error]
+      required:
+        - error
       properties:
         error:
           type: object
           additionalProperties: false
-          required: [code, message, request_id]
+          required:
+            - code
+            - message
+            - request_id
           properties:
-            code: { type: string }
-            message: { type: string }
-            request_id: { type: string }
-            details: { type: object, additionalProperties: true }
+            code:
+              type: string
+            message:
+              type: string
+            request_id:
+              type: string
+            details:
+              type: object
+              additionalProperties: true
             field_errors:
               type: array
               items:
                 type: object
-                required: [field, code]
+                required:
+                  - field
+                  - code
                 properties:
-                  field: { type: string }
-                  code: { type: string }
+                  field:
+                    type: string
+                  code:
+                    type: string
+    IdentityInput:
+      type: object
+      additionalProperties: false
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          minLength: 12
+          maxLength: 256
+          writeOnly: true
+        code:
+          type: string
+          writeOnly: true
+        token:
+          type: string
+          writeOnly: true
+        name:
+          type: string
+          maxLength: 100
+        organization_id:
+          type: string
+          format: uuid
+        member_id:
+          type: string
+          format: uuid
+        role_ids:
+          type: array
+          maxItems: 20
+          items:
+            type: string
+            format: uuid
+        permissions:
+          type: array
+          maxItems: 30
+          items:
+            type: string
+            enum:
+              - organization.view
+              - members.view
+              - members.invite
+              - members.manage
+              - teams.view
+              - teams.manage
+              - roles.view
+              - roles.manage
+              - roles.assign
+              - owners.manage
+              - audit.view
+        scope:
+          type: string
+          enum:
+            - ORG
+            - TEAM
+            - SELF
+        team_id:
+          anyOf:
+            - type: string
+              format: uuid
+            - type: 'null'
+        grants:
+          type: array
+          maxItems: 20
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - role_id
+              - scope
+              - team_id
+            properties:
+              role_id:
+                type: string
+                format: uuid
+              scope:
+                type: string
+                enum:
+                  - ORG
+                  - TEAM
+                  - SELF
+              team_id:
+                type:
+                  - string
+                  - 'null'
+                format: uuid
+    IdentityResult:
+      type: object
+      description: >-
+        Action-specific response. Opaque session tokens are emitted only in HttpOnly cookies. Access changes invalidate
+        affected organization sessions; the acting session rotates when it retains membership. Organization switching
+        preserves the original absolute expiry and reauthentication time.
+      properties:
+        ok:
+          type: boolean
+        authenticated:
+          type: boolean
+        csrf_token:
+          type: string
+        mfa_required:
+          type: boolean
+        challenge:
+          type: string
+          description: One-use MFA login proof, five-minute expiry.
+        id:
+          type: string
+          format: uuid
+        revision:
+          type: integer
+        state:
+          type: string
+        organization_id:
+          type: string
+          format: uuid
+        secret:
+          type: string
+          description: TOTP seed returned only by enrollment.
+        uri:
+          type: string
+        recovery_codes:
+          type: array
+          items:
+            type: string
+          description: Returned only during enrollment/regeneration; never stored cleartext.
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            user_id:
+              type: string
+              format: uuid
+            organization_id:
+              anyOf:
+                - type: string
+                  format: uuid
+                - type: 'null'
+            email:
+              type: string
+              format: email
+            name:
+              type: string
+            verified:
+              type: boolean
+            mfa_enabled:
+              type: boolean
+        organizations:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              name:
+                type: string
+              member_id:
+                type: string
+                format: uuid
+        name:
+          type: string
+        timezone:
+          type: string
+        member_id:
+          type: string
+          format: uuid
+        permissions:
+          type: array
+          items:
+            type: string
+        result:
+          type: object
+        scoped_teams:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - permissions
+            properties:
+              id:
+                type: string
+                format: uuid
+              permissions:
+                type: array
+                items:
+                  type: string
+    IdentityList:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            description: >-
+              Resource rows contain only the requested organization's records or the authenticated user's sessions; no
+              credential columns.
+        next_cursor:
+          type:
+            - string
+            - 'null'
+        has_more:
+          type: boolean
+      description: >-
+        At most 100 records per page. Follow next_cursor until null; permission and tenant scope are reevaluated on
+        every request.

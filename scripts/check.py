@@ -70,6 +70,21 @@ else:
     actual = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT / "database/migrations").glob("*.sql")}
     if actual != expected:
         errors.append("Migration checksum mismatch; review SQL and update manifest before first release only.")
+# Route coverage is checked independently of the OpenAPI syntax validator.
+route_source = (ROOT / "backend/internal/identity/http.go").read_text(encoding="utf-8")
+implemented = {(method.lower(), "/api/v1" + path) for method, path in re.findall(r'\{"(GET|POST|PUT|PATCH|DELETE)", "([^"]+)"', route_source)}
+implemented |= {("get", "/healthz"), ("get", "/readyz"), ("get", "/api/v1/auth/csrf")}
+documented = set()
+current_path = None
+for line in (ROOT / "contracts/openapi.yaml").read_text(encoding="utf-8").splitlines():
+    found = re.match(r"^  (/[^:]+):$", line)
+    if found:
+        current_path = found.group(1)
+    found = re.match(r"^    (get|post|put|patch|delete):$", line)
+    if found and current_path:
+        documented.add((found.group(1), current_path))
+if implemented != documented:
+    errors.append("OpenAPI routes differ from implemented HTTP routes.")
 if errors:
     print("\n".join(errors))
     sys.exit(1)

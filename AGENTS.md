@@ -1,6 +1,8 @@
 # Repository working rules
 
-This is WABA Control's architecture and engineering repository. Gate A is approved and Sprint 0 ONLY is authorized (2026-09-09): build/test/CI, minimal tenant schema, health/config/logging, SMTP configuration and contract research. No Sprint 1 identity features or later product features, Meta adapters, paid sending or real deployment. Gates B/C/D remain CLOSED; follow PLANS.md. Keep implementation aligned with the approved documentation.
+Historical owner override (2026-09-09): **Sprint 0 IMPLEMENTATION COMPLETE; Gate A APPROVED; Sprint 1 AUTHORIZED. Hosted CI verification PENDING - EXTERNAL BLOCKER.** Run 34356265759 was attempted and failed before repository steps because GitHub reported an account billing lock. Accepted local evidence closes implementation, not hosted verification. CI requirements remain intact; rerun hosted CI when available, record the real result and fix any repository failures. Gates B/C/D remain CLOSED.
+
+Current verification (2026-09-10): **Sprint 0 IMPLEMENTATION COMPLETE; Gate A APPROVED; Sprint 1 implementation COMPLETE, acceptance OPEN.** GitHub run 34356265759 attempt 3 actually executed and passed the Sprint 0 baseline at commit 993c67e93fe5945ec820efe67d9d3abf3df8b1b3. Its original attempt 1 failed before steps due to the account billing restriction. Sprint 1 hosted verification is PENDING for these unpublished workspace changes; do not treat the Sprint 0 pass as Sprint 1 evidence. Controlled SMTP was ATTEMPTED and rejected authentication (SMTP_AUTH), so mailbox receipt remains PENDING. Gates B/C/D remain CLOSED.
 
 Read README.md, PLANS.md, the capability matrix and relevant ADRs before changes. Preserve established decisions; revise their rationale and dependent contracts together when changing them.
 

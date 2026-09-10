@@ -1,6 +1,6 @@
 # REST API contract
 
-Base `/api/v1`. Organization resources use `/organizations/{organization_id}` (abbreviated `O` below). Never trust a tenant ID from a request without principal membership/key validation. All identifiers are opaque strings. This is the target internal API, not Graph API pass-through. Sprint 0 implements only /healthz and /readyz; all domain/authentication routes below remain contracts for later sprints. Unverified Meta write operations below are explicitly capability-gated; their external adapter payload is not finalized.
+Base `/api/v1`. Organization resources use `/organizations/{organization_id}` (abbreviated `O` below). Never trust a tenant ID from a request without principal membership/key validation. All identifiers are opaque strings. This is the target internal API, not Graph API pass-through. Sprint 0 health/readiness and the Sprint 1 identity/access section are implemented. Other product sections remain future contracts. Unverified Meta write operations below are explicitly capability-gated; their external adapter payload is not finalized.
 
 ## Common protocol
 
@@ -8,7 +8,7 @@ Cookie sessions require CSRF token and matching Origin for mutations. Machine co
 
 Updates/resource-changing commands require `If-Match: "revision"` for mutable aggregates. Creating independent message intents is exempt from whole-conversation If-Match; it checks expected_assignment_revision for an agent, and captured handoff_epoch for a bot. Missing revision returns 428 PRECONDITION_REQUIRED; stale revision 409 REVISION_CONFLICT. New objects return 201; asynchronous work returns 202 with operation/job ID and status URL; a send 202 is never delivery success. GET uses 200; deletion of an internal revocable credential may use 204.
 
-List response `{items,next_cursor,has_more}`; opaque cursor binds filters, sort and authorization scope, max page size 100. Stable keyset ordering includes ID. Explicit `as_of`/watermark for reports and audience previews. Cursor tampering returns 400 INVALID_CURSOR. No unbounded exports through list APIs.
+List response `{items,next_cursor,has_more}`; opaque cursor binds filters, sort and authorization scope, max page size 100. Stable keyset ordering includes ID. Explicit `as_of`/watermark for reports and audience previews. Sprint 1 cursor tampering returns 422 VALIDATION_FAILED. No unbounded exports through list APIs.
 
 Instants are RFC3339 UTC. Money is `{amount:"decimal",currency:"ISO"}` or null with an explicit unknown reason. All enums are internal schema values; unknown external values appear as `{normalized:"UNKNOWN",raw:"..."}`. Read/detail responses include `id,organization_id,revision,created_at,updated_at` where applicable. `server_now` accompanies time-sensitive views.
 
@@ -28,24 +28,59 @@ Common errors for every authenticated route: 401 UNAUTHENTICATED, 403 PERMISSION
 
 ## Identity and access workflows
 
-| Method / route | Permission | Request -> response | Additional failures |
-| --- | --- | --- | --- |
-| POST /auth/login | Public, throttled | email,password -> session or MFA challenge, available organization IDs, nonsecret login_instance_id (stable across refresh/org switch; never a credential) | AUTHENTICATION_FAILED (generic), MFA_REQUIRED |
-| POST /auth/mfa/verify | Challenge principal | challenge_id,code -> session | MFA_INVALID, CHALLENGE_EXPIRED |
-| POST /auth/logout; GET /auth/sessions | Self | current/all selector; list own sessions | SESSION_REVOKED |
-| DELETE /auth/sessions/{id} | Self or delegated session revoke | -> 204 | RESOURCE_NOT_FOUND |
-| POST /auth/reauthenticate | Self | password + required factor -> reauth_expires_at | AUTHENTICATION_FAILED |
-| POST /auth/password-reset/request; POST /auth/password-reset/complete | Public, throttled | email -> generic 202; token,password -> success and session revocation | TOKEN_INVALID_OR_EXPIRED |
-| POST /auth/mfa/enrollment; POST /auth/mfa/enrollment/confirm | Self + reauth | -> setup secret shown once; proof -> recovery codes shown once | FACTOR_ALREADY_ENROLLED |
-| GET /organizations; POST /auth/organization-session | Self | authorized memberships; organization_id -> org-bound session, access_revision | MEMBERSHIP_INACTIVE |
-| GET O/members; GET O/teams; GET O/roles | members.view / teams.view / roles.view | filters -> paginated summaries | Common |
-| POST O/invitations | members.invite + delegation ceiling | email,role_scope_grants,expires_at -> invitation_id,state | GRANT_EXCEEDS_AUTHORITY |
-| POST /invitations/accept | Valid invite proof; existing user must authenticate and match email; new user uses invite-bound credential setup | token,password only for new identity -> verified identity/membership after atomic acceptance | INVITATION_EXPIRED, INVITATION_REVOKED, INVITER_AUTHORITY_CHANGED |
-| POST O/invitations/{id}/revoke | members.invite | expected revision -> revoked | INVALID_STATE_TRANSITION |
-| POST O/members/{id}/deactivate; /reactivate | members.manage | reason,reassignment_plan -> operation | LAST_RECOVERY_ADMIN, GRANT_EXCEEDS_AUTHORITY |
-| POST O/teams; PATCH O/teams/{id} | teams.manage | name,membership changes -> team revision | MEMBER_INACTIVE |
-| POST O/roles; PATCH O/roles/{id} | roles.manage + delegation ceiling | name,permission_keys -> role revision | UNKNOWN_PERMISSION, GRANT_EXCEEDS_AUTHORITY |
-| PUT O/members/{id}/role-grants | roles.assign + delegation ceiling | full explicit scoped grants -> access_revision | LAST_RECOVERY_ADMIN, INVALID_SCOPE |
+The executable [OpenAPI contract](../contracts/openapi.yaml) is authoritative for all 41 identity/access operations. Paths below use /api/v1. There is no public signup/organization-create endpoint.
+
+| Method | Path | Operation |
+| --- | --- | --- |
+| GET | /auth/csrf | CSRF token |
+| POST | /auth/login | public.login |
+| POST | /auth/logout | logout |
+| GET | /auth/session | session |
+| POST | /auth/mfa/verify | public.mfa |
+| POST | /auth/reauthenticate | reauth |
+| POST | /auth/password-reset/request | public.reset.request |
+| POST | /auth/password-reset/complete | public.reset.complete |
+| POST | /auth/email-verification/request | public.verify.request |
+| POST | /auth/email-verification/complete | public.verify.complete |
+| POST | /auth/organization-session | organization.select |
+| POST | /auth/mfa/enrollment | mfa.enroll |
+| POST | /auth/mfa/enrollment/confirm | mfa.confirm |
+| POST | /auth/mfa/disable | mfa.disable |
+| POST | /auth/mfa/recovery-codes/regenerate | mfa.recovery |
+| GET | /security/sessions | sessions |
+| POST | /security/sessions/{id}/revoke | session.revoke |
+| POST | /security/sessions/revoke-others | sessions.revoke |
+| POST | /invitations/accept | public.invitation.accept |
+| GET | /organization | org.get |
+| GET | /organizations/{org}/members | org.members.list |
+| GET | /organizations/{org}/members/{id} | org.member.get |
+| POST | /organizations/{org}/members/{id}/deactivate | org.member.deactivate |
+| POST | /organizations/{org}/members/{id}/reactivate | org.member.reactivate |
+| PUT | /organizations/{org}/members/{id}/role-grants | org.member.roles |
+| GET | /organizations/{org}/invitations | org.invitations.list |
+| POST | /organizations/{org}/invitations | org.invite |
+| POST | /organizations/{org}/invitations/{id}/revoke | org.invite.revoke |
+| POST | /organizations/{org}/invitations/{id}/resend | org.invite.resend |
+| GET | /organizations/{org}/teams | org.teams.list |
+| POST | /organizations/{org}/teams | org.team.create |
+| PATCH | /organizations/{org}/teams/{id} | org.team.update |
+| POST | /organizations/{org}/teams/{id}/archive | org.team.archive |
+| GET | /organizations/{org}/teams/{id}/members | org.team.members.list |
+| POST | /organizations/{org}/teams/{id}/members | org.team.member.add |
+| DELETE | /organizations/{org}/teams/{id}/members/{member} | org.team.member.remove |
+| PUT | /organizations/{org}/teams/{id}/role-grants | org.team.roles |
+| GET | /organizations/{org}/roles | org.roles.list |
+| POST | /organizations/{org}/roles | org.role.create |
+| PATCH | /organizations/{org}/roles/{id} | org.role.update |
+| GET | /organizations/{org}/audit | org.audit.list |
+
+New teams/roles return 201. Invite and generic mail requests return 202; other commands return 200. Organization aggregate changes require If-Match; missing is 428 and stale is 409. Invalid/expired action proofs return 400 TOKEN_INVALID_OR_EXPIRED; Owner invariant is 409 LAST_ACTIVE_OWNER; permission/delegation failure is 403 PERMISSION_DENIED. Every protected route rechecks session and live access; an invalidated organization session returns 401.
+
+Session tokens are opaque cookies. Login/MFA returns a CSRF token and authenticated flag or a temporary challenge. GET /auth/session returns active memberships; GET /organization returns metadata, ORG permissions and scoped team permissions. Organization switching preserves absolute expiry and the sensitive reauthentication deadline. Active session management is self-only.
+
+Role grants accept mixed grants[] (role_id, scope ORG/TEAM/SELF, nullable team_id) or role_ids with one common scope. Replacing direct grants does not replace team inheritance. Team lists filter current permission scope and archived teams confer no scoped authority. Owner/Admin/Agent are presets, never authorization branches. Invitation status exposes only sanitized delivery_state; global identity mail is not tenant-visible.
+
+Existing-identity invitation acceptance requires a matching authenticated account and CSRF proof; password replacement by invitation is rejected. No nonsecret draft login-instance protocol, machine keys, delegated cross-user session endpoint or arbitrary email-change endpoint is implemented in Sprint 1. Those future surfaces require their own reviewed implementation.
 
 ## Meta, contacts and inbox
 
@@ -137,7 +172,7 @@ Public Meta callback: GET `/webhooks/meta/{opaque_app_route}` handles challenge 
 
 422 SERVICE_WINDOW_EXPIRED/TEMPLATE_REQUIRED/CONSENT_REQUIRED/TEMPLATE_NOT_SENDABLE; 409 PRICING_CONFIRMATION_REQUIRED/APPROVAL_REQUIRED/CAMPAIGN_APPROVAL_REQUIRED/BUDGET_EXCEEDED/FREQUENCY_EXCEEDED; 409 ESTIMATE_EXPIRED/APPROVAL_INVALIDATED/HANDOFF_CONFLICT/ASSIGNMENT_CHANGED; 503 PRICING_UNKNOWN/PRICING_REVIEW_OVERDUE/CAPABILITY_UNVERIFIED. Upstream rate limits become META_RATE_LIMITED with verified retryability and retry_at; an accepted async operation instead records that status in its intent. META_TEMPLATE_REJECTED carries a redacted reason if provided. No HTTP response should suggest a retry is safe when acceptance is uncertain.
 
-Sprint 0 establishes contracts/openapi.yaml for health/readiness, error/request-ID conventions and future security schemes only. Later endpoint schemas require their actual sprint authorization; there are no placeholder domain handlers.
+OpenAPI includes implemented health/readiness and Sprint 1 identity/access schemas. Source checks compare its method/path set to the runtime route registry. Later product schemas/handlers require their actual sprint authorization.
 
 For reply concurrency, HANDOFF_CONFLICT means a bot's captured epoch/mode became invalid (or an explicitly requested human handoff failed), never merely that another human replied. ASSIGNMENT_CHANGED means the relevant assignment/access-routing revision changed; an already-created queued intent becomes BLOCKED with that reason and retains content. Colleague composing/recent-send information is advisory metadata, not a 409 or a prerequisite to send. Two legitimate payloads use two idempotency keys; one retried payload reuses its original key. An ASSIGNMENT_CHANGED human intent remains blocked until explicitly cancelled/replaced after review using the current assignment revision and fresh authorization; a replacement has a new key and audit link. Never refresh a queued bot's captured handoff_epoch. No draft, warning acknowledgement or assignment revision itself authorizes spending.
 
