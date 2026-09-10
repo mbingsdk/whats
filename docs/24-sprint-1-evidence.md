@@ -2,7 +2,7 @@
 
 Review date: 2026-09-10. Sprint 0 implementation is COMPLETE, Gate A APPROVED and Sprint 1 AUTHORIZED by the owner override. Gates B/C/D remain CLOSED.
 
-**Sprint 1 implementation COMPLETE; Sprint 1 acceptance OPEN** pending controlled SMTP mailbox evidence. Current Sprint 1 hosted verification is PENDING because these workspace changes have not been published; the Sprint 0 baseline has verified attempt-3 hosted success. External SMTP failure does not invalidate the passing local implementation evidence.
+**Sprint 1 closure verification OPEN; Sprint 1 acceptance OPEN.** Sprint 1 is published at d4fed8ce7b50ed44f0f356e9ebea8f21695fe7bd. Hosted run 34436595874 executed and failed a repository migration checksum check. A corrective published commit must pass the full workflow before closure. Brevo now accepts all four controlled identity messages; verification/reset/security receipt is confirmed by the operator; invitation receipt is pending. Sprint 2 is not authorized.
 
 ## Implemented scope
 
@@ -57,18 +57,27 @@ Ten route surfaces: /login, /forgot-password, /reset-password, /verify-email, /a
 | Final complete check/build/contracts | PASS: python scripts/dev.py check exited 0; corrected OpenAPI revalidated with no warnings |
 | Linux race detector | PASS: current Go unit + all real PostgreSQL integration packages, -race -tags=integration -count=1 ./..., pinned Linux container |
 | Dependency integrity/vulnerability review | go mod verify PASS; npm audit: zero findings; govulncheck 1.8.0: zero affected symbols/imported packages, one unused OpenPGP module advisory (details below) |
-| Controlled external SMTP mailbox | ATTEMPTED: SMTP_AUTH before MAIL/RCPT/DATA; receipt PENDING - EXTERNAL CREDENTIAL BLOCKER |
-| Hosted GitHub CI | Sprint 0 attempt 1 external failure; attempt 3 actual PASS. Sprint 1 current changes PENDING publication/hosted verification |
+| Controlled external SMTP mailbox | PASS relay acceptance for four messages after operator credential correction; 3/4 mailbox receipts confirmed; invitation receipt PENDING |
+| Hosted GitHub CI | Sprint 1 published at d4fed8c; run 34436595874 FAILED migration checksum validation. Corrective run PENDING |
 
 The browser harness uses a disposable database and local SMTP mailbox; its test-only mail/TOTP routes are compiled only with integration,e2e build tags. No production test endpoint or real mailbox credential is introduced. Login and management screenshots were inspected locally; screenshots are ignored artifacts, not production user data. These are correctness checks, not load benchmarks or an independent security audit.
 
 ## External evidence and gates
 
-Hosted [run 34356265759](https://github.com/mbingsdk/whats/actions/runs/34356265759), commit 993c67e93fe5945ec820efe67d9d3abf3df8b1b3: attempt 1 failed before any repository steps because of the external account billing lock. Subsequent attempt 3 executed the full Sprint 0 workflow successfully; authenticated API inspection verified every job step and the [historical/latest record](23-sprint-0-evidence.md) preserves both outcomes. Current Sprint 1 workspace changes are not published and have no hosted result. The unchanged mandatory CI checks plus added Chromium E2E must run on the published Sprint 1 commit; any actual repository failure must be fixed.
+Hosted [run 34356265759](https://github.com/mbingsdk/whats/actions/runs/34356265759), commit 993c67e93fe5945ec820efe67d9d3abf3df8b1b3: attempt 1 failed before any repository steps because of the external account billing lock. Subsequent attempt 3 executed the full Sprint 0 workflow successfully; authenticated API inspection verified every job step and the [historical/latest record](23-sprint-0-evidence.md) preserves both outcomes. This is historical Sprint 0 evidence only. Sprint 1 publication and the actual repository failure are recorded below; Sprint 0 success is not Sprint 1 verification.
 
-The user supplied protected SMTP configuration, confirmed authorization and designated a controlled mailbox on 2026-09-10. Configuration was retained outside source under .local/operator-settings-20260910.env; uppercase STARTTLS was normalized only in the private test runner. Database URL values incorrectly entered in *_FILE fields were not used; the controlled test used isolated local database credentials. A manually opted-in integration,controlledsmtp test exercised the real outbox/SMTP path, but the relay returned SMTP_AUTH before message transmission. No controlled email was accepted or receipt confirmed. Fix the SMTP username/app-password file and rerun the [controlled procedure](16-deployment.md#sprint-1-identity-operations). Do not commit mailbox addresses, passwords or action proofs.
+The operator authorized controlled identity mail and updated the protected Brevo SMTP credentials on 2026-09-10. The earlier attempt failed SMTP_AUTH before MAIL/RCPT/DATA. The repeated opt-in TestControlledSMTPMailbox passed using isolated local databases and the real outbox/SMTP path: verified STARTTLS, authentication, MAIL FROM, RCPT TO and DATA completed successfully for verification, reset, security notification and invitation. All one-use proofs were consumed successfully. No SMTP implementation change was made.
 
-Sprint 1 acceptance remains OPEN for this explicit external SMTP evidence blocker. The full SMTP/mail-outbox implementation has passing local TLS/STARTTLS and failure/concurrency tests. Hosted verification of the new commit is reported separately, not as the old unresolved billing restriction.
+| Purpose | Relay acceptance UTC | Delivery evidence ID |
+| --- | --- | --- |
+| Email verification | 2026-09-10T04:28:59Z | 01a08993-7702-7d12-ae2c-159941bb05b3 |
+| Password reset | 2026-09-10T04:29:01Z | 01a08993-7dda-769b-85be-bba0d611fc1c |
+| Account security notification | 2026-09-10T04:29:02Z | 01a08993-8423-727d-857d-31fff65cbe7b |
+| Company invitation | 2026-09-10T04:29:04Z | 01a08993-8ba2-7508-93f6-9c9b896cfc56 |
+
+Relay acceptance is not mailbox receipt. The operator confirmed receipt of verification, reset and security messages, and explicitly reported that Company invitation had not arrived. Thus controlled mailbox evidence is 3/4, with invitation receipt PENDING; relay acceptance alone does not close acceptance. Protected configuration and raw test artifacts remain ignored; recipient address, SMTP key and action proofs are not recorded here. The [controlled procedure](16-deployment.md#sprint-1-identity-operations) remains unchanged.
+
+Sprint 1 acceptance remains OPEN pending actual receipt and successful corrective hosted verification.
 
 Gate B remains CLOSED throughout Sprint 1. Gate C and Gate D remain CLOSED. No paid send, Meta account mutation, deployment or production readiness claim is authorized by this implementation record.
 
@@ -131,3 +140,15 @@ Current Linux race execution used golang:1.27.1-bookworm@sha256:648f440f42a09588
 [GO-2026-5932](https://pkg.go.dev/vuln/GO-2026-5932), inspected 2026-09-10, applies to the unmaintained OpenPGP packages within golang.org/x/crypto and has no fixed version. This application imports Argon2id, not OpenPGP; go list -deps confirmed no OpenPGP package in the compiled dependency graph. govulncheck reports zero affected symbols/imported packages, with this one module-level advisory. No vulnerability check or advisory was suppressed.
 
 Final password-policy review counts Unicode characters (12-256), with a bounded UTF-8 byte length for verification; regression tests reject four multibyte characters and accept a valid long Unicode password. Generated Python bytecode was removed from source and ignored.
+
+## Published Sprint 1 CI correction, 2026-09-10
+
+Authenticated gh logs for [run 34436595874](https://github.com/mbingsdk/whats/actions/runs/34436595874), commit d4fed8ce7b50ed44f0f356e9ebea8f21695fe7bd, job 102743170944, show successful runner setup, PostgreSQL startup and both migration commands. At 04:19:44Z, python3 scripts/dev.py check failed in its first child, python3 scripts/check.py: migration checksum mismatch. The subsequent Go/frontend/OpenAPI checks did not execute; browser and dependency steps were skipped because of that failure. This was not the historical account restriction.
+
+The original manifest records 00002_identity_access.sql as 8f3ec7ab37753b3b2a6e233e0a8cb53c271d7ac88dd9a8795ecb839c454b9660, the digest of its Windows working file with 229 CRLF endings. The published Git blob has 229 LF endings and digest d3ac6980f25afc379e9964dc2d799997d902856e601d9c86a758042f132513d2. Expanding that published LF blob to CRLF reproduces the original manifest digest exactly. The existing *.sql text eol=lf rule explains the difference. Previous local checks, including the Linux container reading the Windows working tree, did not exercise Git checkout normalization.
+
+Published SQL blobs and manifest.sha256 remain immutable. The additive checksum-corrections.json records the original digest, actual published artifact digest, source commit and rationale. Validation applies a correction only to its matching historical manifest entry and requires the exact published bytes; it does not normalize bytes, accept both line endings, regenerate hashes or skip integrity checks. Seven regression tests cover exact LF acceptance, CRLF rejection, SQL tampering, missing/extra migrations, correction mismatch/duplicates/malformed metadata and uncorrected migration integrity. scripts/dev.py check runs these tests in addition to all existing checks. No schema migration or application architecture changed.
+
+Corrective commit and full hosted outcome: PENDING publication and execution. This record will be updated with the real SHA/run after verification.
+
+Post-correction local execution: python scripts/dev.py up and the full check both exited 0, including seven new checksum regressions, all existing explicit real-PostgreSQL identity/foundation/security tests, Go format/vet/build, five frontend tests, lint/typecheck, OpenAPI validation and Next production build. Browser E2E passed again (14.079 seconds). go mod verify passed; pinned govulncheck 1.8.0 again reported zero affected symbols/imported packages and one unused module advisory; npm audit reported zero findings. Source validation now resolves 92 local links. A clean git archive of d4fed8c reproduced the original checksum failure; applying only the additive correction/checker made that same LF SQL and historical manifest pass. Neither migration SQL nor the original manifest differs from its published Git blob.

@@ -1,0 +1,9 @@
+[
+  {
+    "migration": "00002_identity_access.sql",
+    "manifest_sha256": "8f3ec7ab37753b3b2a6e233e0a8cb53c271d7ac88dd9a8795ecb839c454b9660",
+    "published_sha256": "d3ac6980f25afc379e9964dc2d799997d902856e601d9c86a758042f132513d2",
+    "source_commit": "d4fed8ce7b50ed44f0f356e9ebea8f21695fe7bd",
+    "reason": "The original manifest was computed from the Windows CRLF working file. Git published LF bytes under the existing *.sql text eol=lf rule. This additive erratum pins the actual published artifact without changing the historical manifest or migration SQL. Only the published LF digest is accepted."
+  }
+]

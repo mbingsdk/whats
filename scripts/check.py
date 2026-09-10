@@ -1,6 +1,6 @@
 """Check source documentation, migration integrity and obvious credential patterns."""
 from pathlib import Path
-import hashlib
+from migration_checksums import validate as validate_migrations
 import re
 import subprocess
 import sys
@@ -62,14 +62,7 @@ for path in paths:
             slugs = [re.sub(r"\s", "-", re.sub(r"[^\w\s-]", "", heading.lower())) for heading in headings]
             if fragment not in slugs:
                 errors.append(f"Broken heading: {relative} -> {target}")
-manifest = ROOT / "database/migrations/manifest.sha256"
-if not manifest.exists():
-    errors.append("Migration manifest missing")
-else:
-    expected = dict(line.split("  ", 1)[::-1] for line in manifest.read_text().splitlines() if line)
-    actual = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT / "database/migrations").glob("*.sql")}
-    if actual != expected:
-        errors.append("Migration checksum mismatch; review SQL and update manifest before first release only.")
+errors.extend(validate_migrations(ROOT / "database/migrations"))
 # Route coverage is checked independently of the OpenAPI syntax validator.
 route_source = (ROOT / "backend/internal/identity/http.go").read_text(encoding="utf-8")
 implemented = {(method.lower(), "/api/v1" + path) for method, path in re.findall(r'\{"(GET|POST|PUT|PATCH|DELETE)", "([^"]+)"', route_source)}

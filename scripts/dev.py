@@ -112,6 +112,7 @@ def main():
             run(["go", "test", *(["-race"] if env.get("WABA_TEST_RACE") == "1" else []), "-tags=integration", "-count=1", "-v", "./internal/..."], ROOT / "backend", env)
         elif action == "check":
             run([sys.executable, "scripts/check.py"])
+            run([sys.executable, "-m", "unittest", "discover", "-s", "scripts", "-p", "test_*.py"])
             formatting = subprocess.check_output(["gofmt", "-l", "backend"], cwd=ROOT, text=True)
             if formatting.strip():
                 raise SystemExit("Run gofmt on: " + formatting)
