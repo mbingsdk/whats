@@ -2,7 +2,7 @@
 
 Review date: 2026-09-10. Sprint 0 implementation is COMPLETE, Gate A APPROVED and Sprint 1 AUTHORIZED by the owner override. Gates B/C/D remain CLOSED.
 
-**Sprint 1 closure verification OPEN; Sprint 1 acceptance OPEN.** Sprint 1 is published at d4fed8ce7b50ed44f0f356e9ebea8f21695fe7bd. Hosted run 34436595874 executed and failed a repository migration checksum check. A corrective published commit must pass the full workflow before closure. Brevo now accepts all four controlled identity messages; verification/reset/security receipt is confirmed by the operator; invitation receipt is pending. Sprint 2 is not authorized.
+**Sprint 1 IMPLEMENTATION COMPLETE; HOSTED CI VERIFIED; Sprint 1 acceptance COMPLETE.** Sprint 1 is published at d4fed8ce7b50ed44f0f356e9ebea8f21695fe7bd. Hosted run 34436595874 executed and failed a repository migration checksum check. Corrective published commit 9b2c67187eea6fc2ee6b5a1929f063e76cc6797b passed the full workflow in run 34437626714. Brevo now accepts all four controlled identity messages; the operator confirms actual receipt of all four, including the initially delayed invitation. Sprint 2 is not authorized.
 
 ## Implemented scope
 
@@ -57,8 +57,8 @@ Ten route surfaces: /login, /forgot-password, /reset-password, /verify-email, /a
 | Final complete check/build/contracts | PASS: python scripts/dev.py check exited 0; corrected OpenAPI revalidated with no warnings |
 | Linux race detector | PASS: current Go unit + all real PostgreSQL integration packages, -race -tags=integration -count=1 ./..., pinned Linux container |
 | Dependency integrity/vulnerability review | go mod verify PASS; npm audit: zero findings; govulncheck 1.8.0: zero affected symbols/imported packages, one unused OpenPGP module advisory (details below) |
-| Controlled external SMTP mailbox | PASS relay acceptance for four messages after operator credential correction; 3/4 mailbox receipts confirmed; invitation receipt PENDING |
-| Hosted GitHub CI | Sprint 1 published at d4fed8c; run 34436595874 FAILED migration checksum validation. Corrective run PENDING |
+| Controlled external SMTP mailbox | PASS: verified STARTTLS/authentication/MAIL/RCPT/DATA and relay acceptance for four messages; operator confirmed all four mailbox receipts |
+| Hosted GitHub CI | Sprint 1 published at d4fed8c; run 34436595874 FAILED migration checksum validation. Corrective 9b2c671: full run 34437626714 PASS |
 
 The browser harness uses a disposable database and local SMTP mailbox; its test-only mail/TOTP routes are compiled only with integration,e2e build tags. No production test endpoint or real mailbox credential is introduced. Login and management screenshots were inspected locally; screenshots are ignored artifacts, not production user data. These are correctness checks, not load benchmarks or an independent security audit.
 
@@ -75,9 +75,9 @@ The operator authorized controlled identity mail and updated the protected Brevo
 | Account security notification | 2026-09-10T04:29:02Z | 01a08993-8423-727d-857d-31fff65cbe7b |
 | Company invitation | 2026-09-10T04:29:04Z | 01a08993-8ba2-7508-93f6-9c9b896cfc56 |
 
-Relay acceptance is not mailbox receipt. The operator confirmed receipt of verification, reset and security messages, and explicitly reported that Company invitation had not arrived. Thus controlled mailbox evidence is 3/4, with invitation receipt PENDING; relay acceptance alone does not close acceptance. Protected configuration and raw test artifacts remain ignored; recipient address, SMTP key and action proofs are not recorded here. The [controlled procedure](16-deployment.md#sprint-1-identity-operations) remains unchanged.
+Relay acceptance is not mailbox receipt. The operator confirmed receipt of verification, reset and security messages, and explicitly reported that Company invitation had not arrived. The operator subsequently confirmed receipt of Company invitation during this closure pass on 2026-09-10. Controlled mailbox evidence is now 4/4; acceptance is based on actual receipt as well as relay acceptance. Protected configuration and raw test artifacts remain ignored; recipient address, SMTP key and action proofs are not recorded here. The [controlled procedure](16-deployment.md#sprint-1-identity-operations) remains unchanged.
 
-Sprint 1 acceptance remains OPEN pending actual receipt and successful corrective hosted verification.
+Sprint 1 implementation is COMPLETE and hosted verification PASSED. Sprint 1 acceptance is COMPLETE: verification, reset, security and invitation messages are all confirmed received. No external SMTP or hosted CI evidence blocker remains.
 
 Gate B remains CLOSED throughout Sprint 1. Gate C and Gate D remain CLOSED. No paid send, Meta account mutation, deployment or production readiness claim is authorized by this implementation record.
 
@@ -149,6 +149,22 @@ The original manifest records 00002_identity_access.sql as 8f3ec7ab37753b3b2a6e2
 
 Published SQL blobs and manifest.sha256 remain immutable. The additive checksum-corrections.json records the original digest, actual published artifact digest, source commit and rationale. Validation applies a correction only to its matching historical manifest entry and requires the exact published bytes; it does not normalize bytes, accept both line endings, regenerate hashes or skip integrity checks. Seven regression tests cover exact LF acceptance, CRLF rejection, SQL tampering, missing/extra migrations, correction mismatch/duplicates/malformed metadata and uncorrected migration integrity. scripts/dev.py check runs these tests in addition to all existing checks. No schema migration or application architecture changed.
 
-Corrective commit and full hosted outcome: PENDING publication and execution. This record will be updated with the real SHA/run after verification.
+Corrective commit: 9b2c67187eea6fc2ee6b5a1929f063e76cc6797b. Full hosted outcome: [run 34437626714](https://github.com/mbingsdk/whats/actions/runs/34437626714) SUCCESS, foundation job 102745898048, 2026-09-10T04:33:18Z to 04:36:28Z. Authenticated run metadata and completed logs were inspected. Every mandatory step passed; this is Sprint 1 evidence from a corrective descendant of d4fed8c, not reused Sprint 0 evidence.
 
 Post-correction local execution: python scripts/dev.py up and the full check both exited 0, including seven new checksum regressions, all existing explicit real-PostgreSQL identity/foundation/security tests, Go format/vet/build, five frontend tests, lint/typecheck, OpenAPI validation and Next production build. Browser E2E passed again (14.079 seconds). go mod verify passed; pinned govulncheck 1.8.0 again reported zero affected symbols/imported packages and one unused module advisory; npm audit reported zero findings. Source validation now resolves 92 local links. A clean git archive of d4fed8c reproduced the original checksum failure; applying only the additive correction/checker made that same LF SQL and historical manifest pass. Neither migration SQL nor the original manifest differs from its published Git blob.
+
+## Corrective hosted execution and closure review
+
+| Hosted stage | Actual result |
+| --- | --- |
+| PostgreSQL and migration/repeated migration | PASS |
+| Source, links, strict SQL integrity and seven Python integrity regressions | PASS |
+| Go formatting, vet, unit tests and real PostgreSQL integration tests with race detector; Go build | PASS |
+| npm ci, lint, typecheck, five frontend tests, OpenAPI validation and Next production build | PASS |
+| Pinned Chromium browser identity flows with PostgreSQL and local TLS SMTP, race detector enabled | PASS |
+| go mod verify, govulncheck 1.8.0, npm audit and unchanged dependency manifests | PASS; zero affected symbols/imported packages, one unused OpenPGP module advisory disclosed above; npm zero findings |
+| Cleanup and complete workflow | PASS |
+
+Security regressions executed again locally and on the corrective hosted commit: cross-organization access and every new tenant table's FORCE RLS/missing-context rejection; runtime privileges and pooled-context reuse; session/reauthentication/MFA-reset invalidation and CSRF; invitation/reset/verification concurrent one-use consumption; recovery-code one-use and TOTP replay; offboarding ordering, scope/delegation escalation rejection and concurrent last-Owner protection; mail claim/terminal replay/lease fencing and expiry; audit redaction and append-only protection. All passed, with no reported Go data race. No new application security defect was found in this focused pass; the discovered defect was publication/checksum provenance. These tests are not an independent security audit.
+
+All five requested status documents are reconciled, with the directly dependent database checksum explanation and review/agent status updated. CI configuration, published migration SQL and the historical manifest were preserved. No new migration, endpoint, SMTP architecture change or Sprint 2 functionality was introduced. Implementation COMPLETE and hosted CI VERIFIED are accompanied by acceptance COMPLETE after all four controlled mailbox receipts were confirmed. Gates B/C/D remain CLOSED.
