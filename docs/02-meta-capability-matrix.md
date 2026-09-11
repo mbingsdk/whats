@@ -1,6 +1,6 @@
 # Meta capability matrix
 
-Research attempted **2026-09-08 for every row**; public pricing/policy revisited **2026-09-09**. No live account verification. Links resolve to [source evidence](21-research-register.md), with direct official references there. M06/M07 are official Meta Postman evidence, not third-party BSP material. Old samples prove documented surface only.
+Research attempted **2026-09-08 for every row**; public pricing/policy revisited **2026-09-09**. Initial inspections had no live account verification; the 2026-09-11 read-only result below supersedes that status for tested operations. Links resolve to [source evidence](21-research-register.md), with direct official references there. M06/M07 are official Meta Postman evidence, not third-party BSP material. Old samples prove documented surface only.
 
 Contract evidence and applicability are separate:
 - **VERIFIED_CURRENT_CONTRACT**: inspected current official specification for the pinned Graph version, including exact request/response, permissions and constraints. No operation has reached this state here.
@@ -9,7 +9,7 @@ Contract evidence and applicability are separate:
 - **INTERNAL_PLATFORM_FEATURE**: planned local responsibility, not completed implementation.
 - **OPTIONAL_ACCOUNT_DEPENDENT**: conditional applicability; **DEFERRED**: delivery scope, neither is evidence quality.
 
-**ACCOUNT_VERIFICATION_REQUIRED applies to every external operation in all tables below and is still pending.** Each adapter needs both VERIFIED_CURRENT_CONTRACT and a recorded successful probe for its target app/WABA/phone, permissions, region and supported operation before enablement. Public policy/pricing prose alone cannot satisfy an API contract gate. Table restrictions identify additional checks. A historical request never enables an adapter.
+**ACCOUNT_VERIFICATION_REQUIRED applies to each external operation. The 2026-09-11 results below establish bounded verification for specific GETs only; all other account checks remain pending.** Each adapter needs both VERIFIED_CURRENT_CONTRACT and a recorded successful probe for its target app/WABA/phone, permissions, region and supported operation before enablement. Public policy/pricing prose alone cannot satisfy an API contract gate. Table restrictions identify additional checks. A historical request never enables an adapter.
 
 Permission shorthand: WM = whatsapp_business_messaging; WA = whatsapp_business_management; BM = business_management for relevant business-portfolio queries. Possessing a scope is insufficient without app access level and assigned assets. A question mark means the exact permission is unverified. Webhook names marked ? are candidates, not a subscription contract. `none` means no webhook dependency in our plan, not proof Meta emits none.
 
@@ -18,10 +18,10 @@ Permission shorthand: WM = whatsapp_business_messaging; WA = whatsapp_business_m
 | Feature / API | Contract evidence / applicability | Permission; webhook | Account/region restrictions | Implementation and limits | Evidence |
 | --- | --- | --- | --- | --- | --- |
 | Existing Meta app connection / token use | DOCUMENTED_OFFICIAL_SURFACE | WA/WM; none | Company asset assignments; app review/access level must be checked | Write-only credentials, validation and explicit binding. Expiry/revocation observable; no promise of a permanent token | M06 |
-| Owned WABA discovery / business owned_whatsapp_business_accounts | DOCUMENTED_OFFICIAL_SURFACE | BM + WA asset access; none | Only accessible portfolios | Paginated sync into staging, administrator binds to org | M06 |
-| Shared WABA discovery / client_whatsapp_business_accounts | DOCUMENTED_OFFICIAL_SURFACE | BM + WA asset access; none | Sharing relationship required | Record OWNED/SHARED, do not infer ownership from visibility | M06 |
+| Owned WABA discovery / business owned_whatsapp_business_accounts | DOCUMENTED_OFFICIAL_SURFACE | BM for portfolio query; exact WA requirement NEEDS VERIFICATION; none | Only accessible portfolios | Paginated sync into staging, administrator binds to org | M06 |
+| Shared WABA discovery / client_whatsapp_business_accounts | DOCUMENTED_OFFICIAL_SURFACE | BM for portfolio query; exact WA requirement NEEDS VERIFICATION; none | Sharing relationship required | Record OWNED/SHARED, do not infer ownership from visibility | M06 |
 | Phone list, verified name, quality / WABA phone_numbers | DOCUMENTED_OFFICIAL_SURFACE | WA; phone_number_name_update, phone_number_quality_update | Fields depend on account/version | Preserve reported raw values, nullable unknowns and freshness | M06, M25 |
-| Business profile read/update | DOCUMENTED_OFFICIAL_SURFACE | WA; none | Verified editable fields only | Controlled form, async mutation/sync. Display-name approval is separate | M18 |
+| Business profile read/update | DOCUMENTED_OFFICIAL_SURFACE | Exact read/update scope NEEDS VERIFICATION; none | Verified editable fields only | Controlled form, async mutation/sync. Display-name approval is separate | M18 |
 | Registration / phone register | DOCUMENTED_OFFICIAL_SURFACE | WM; none | Existing registration and verification context matters | DEFERRED: existing Cloud API WABA does not need blanket re-registration | M06 |
 | App WABA subscription / subscribed_apps | DOCUMENTED_OFFICIAL_SURFACE | WA; messages and enabled fields | Correct app/WABA mapping required | Inventory existing consumers before mutation; configure app fields as well as WABA subscription | M06, M24 |
 | Account/review/name/quality changes | DOCUMENTED_OFFICIAL_SURFACE | WA; account_update, account_review_update, phone_number_name_update, phone_number_quality_update | Selected fields/access level must be verified | Events trigger targeted resync; old tier constants not hardcoded | M25 |
@@ -83,6 +83,63 @@ Link-click tracking is an optional internal redirect with privacy controls. Meta
 
 V1 existing app/WABA access and subscription inventory; V2 pinned Graph version/security/payload fixtures; V3 exact message/media constraints and eligible markets; V4 official effective-dated pricing and billing evidence; V5 template mutations/status/category/quality; V6 Flow lifecycle/static completion; V7 optional products. Each package needs source evidence, a named reviewer, account result and sanitized fixture. V1–V4 block the relevant integration/send gates. V7 does not block core implementation.
 
-## Sprint 0 implementation status
+## Historical Sprint 0 implementation status
 
 Only engineering health/config/database/frontend foundations are implemented. No Meta adapter exists or is enabled. [Sprint 0 research](21-research-register.md#sprint-0-contract-verification-attempt-2026-09-09) re-inspected official references; developer pages remained blocked. Graph version/removal timeline remain UNKNOWN; official Postman and historical SDK evidence stays DOCUMENTED_OFFICIAL_SURFACE, with account verification pending. No capability classification was promoted solely to make Sprint 0 appear complete.
+
+## Gate B and Sprint 2 dependency matrix, 2026-09-10
+
+This table refines only the ingestion/existing-assets scope. [Gate B evidence](25-gate-b-evidence.md) is the decision record; M32-M48 are in the [research register](21-research-register.md#gate-b-contract-inspection-2026-09-10). This 2026-09-10 snapshot preceded account access; the latest table below supersedes its account column for successfully tested GETs.
+
+Evidence axes remain separate: VERIFIED_CURRENT_CONTRACT is a selected-version contract result; VERIFIED_ON_COMPANY_ACCOUNT is a successful scoped account observation. ACCOUNT_DEPENDENT describes applicability (OPTIONAL_ACCOUNT_DEPENDENT for optional features), NEEDS_VERIFICATION describes missing checks, and DEFERRED describes delivery scope. None substitutes for another.
+
+| Sprint 2 dependency | Contract evidence | Account / applicability | Delivery decision and unresolved check |
+| --- | --- | --- | --- |
+| Explicit Graph version/lifecycle | UNVERIFIED (M33/M49); operator candidate v26.0, untested | ACCOUNT_VERIFICATION_REQUIRED | Blocked; no default/fallback version |
+| Company System User token | DOCUMENTED_OFFICIAL_SURFACE (M32/M34) | Token type/scopes/expiry/assignments unknown | Strategy chosen; no credential provisioned or production lifetime assumed |
+| WA/WM and operation permissions | DOCUMENTED_OFFICIAL_SURFACE (M32/M34/M41) | Grants/access levels untested | Exact selected-version operation mapping remains NEEDS_VERIFICATION |
+| BM portfolio queries | DOCUMENTED_OFFICIAL_SURFACE (M32/M37) | ACCOUNT_DEPENDENT on discovery workflow | No broad runtime BM default; confirm whether complete operator inventory avoids portfolio queries |
+| WABA object / inventory | DOCUMENTED_OFFICIAL_SURFACE (M36/M37) | Company ownership/inventory unknown | Direct reads and optional portfolio discovery gated |
+| Phone inventory / quality / name | DOCUMENTED_OFFICIAL_SURFACE (M38) | Company phone inventory unknown | Registration/name/connectivity fields and enums unverified |
+| Business profile read | DOCUMENTED_OFFICIAL_SURFACE (M39) | Available fields/access unknown | Read-only sync gated; all profile writes excluded |
+| WABA subscription list | DOCUMENTED_OFFICIAL_SURFACE (M40) | Existing consumers unknown | Read-only inventory mandatory |
+| WABA subscribe/unsubscribe | DOCUMENTED_OFFICIAL_SURFACE (M41) | App assignment unknown | One WABA-level subscription surface; later subscribe needs explicit operator approval; no automatic subscribe/unsubscribe |
+| Callback override | DOCUMENTED_OFFICIAL_SURFACE (M42) | OPTIONAL_ACCOUNT_DEPENDENT | DEFERRED unless topology demonstrates a need; no configuration change |
+| GET webhook challenge | UNVERIFIED (M35) | Callback verification untested | Mandatory blocker; verify-token candidate is distinct from App Secret |
+| POST webhook authenticity | UNVERIFIED (M35) | Signing-secret/live delivery untested | Mandatory blocker; no algorithm/header implementation from historical evidence |
+| Envelope/incoming messages | DOCUMENTED_OFFICIAL_SURFACE historical envelope; incoming shape UNVERIFIED (M43/M45) | No captured fixture | Parser gated; no full Inbox or media download scope |
+| Message statuses | DOCUMENTED_OFFICIAL_SURFACE (M44) | No captured fixture | Classification only in conditional Sprint 2; no invoice/price interpretation |
+| Name/quality/account/review/template events | DOCUMENTED_OFFICIAL_SURFACE (M45/M46) | Field availability untested | Verify Cloud subscription field set and exact schemas; old tier constants excluded |
+| Pagination | DOCUMENTED_OFFICIAL_SURFACE (M32/M47) | No multi-page probe | Cursor/limits/termination unverified |
+| Error envelope / request IDs / usage headers | UNVERIFIED (M48) | No response evidence | Diagnostic names/semantics unknown; no fabricated quotas |
+| Durable ingress/dedupe/attempts/DLQ/replay | INTERNAL_PLATFORM_FEATURE | Depends on verified routing/authenticity | Conditional scope; no implementation while Gate B CLOSED |
+| Asset sync / Meta Health / event UI | INTERNAL_PLATFORM_FEATURE | Depends on account inventory | Conditional scope; Meta-reported and infrastructure states stay separate |
+
+Sprint 0/1 are complete. No Meta adapter is implemented or enabled. At the initial inspection no real fixture existed; four sanitized account fixtures were added in the 2026-09-11 follow-up below. Gate B CLOSED; Phase B NOT STARTED; all outbound WhatsApp remains prohibited.
+
+## Gate B continuation, 2026-09-11
+
+At the first continuation the supplied .local/meta-gate-b.env was MISSING; the later successful validation and live results below supersede that observation. No account row was promoted and no live fixture captured. v26.0 is an explicitly authorized candidate for read-only testing, not a selected verified integration contract; no downgrade or live request occurred. Current Graph webhook documentation remains inaccessible (M50); the retrieved official Horizon overview (M51) is insufficient for WhatsApp authenticity. Gate B CLOSED. The owner requires a separate Gate B review before any Sprint 2 implementation, even if all checks later pass.
+
+## Latest account verification, 2026-09-11
+
+Evidence M52/M53 and [Gate B record](25-gate-b-evidence.md); exact account/version/time scope only. No VERIFIED_CURRENT_CONTRACT promotion: current authoritative lifecycle/webhook evidence remains unresolved.
+
+| Capability | Contract evidence | Account evidence and restriction |
+| --- | --- | --- |
+| v26.0 tested GETs | DOCUMENTED_OFFICIAL_SURFACE | VERIFIED_ON_COMPANY_ACCOUNT; all responses reported v26.0, no downgrade |
+| Token/App/scopes | DOCUMENTED_OFFICIAL_SURFACE | VERIFIED_ON_COMPANY_ACCOUNT: valid SYSTEM_USER and App match, WA/WM present, BM absent; expiry 2026-11-10T12:20:59Z |
+| Direct WABA read | DOCUMENTED_OFFICIAL_SURFACE | VERIFIED_ON_COMPANY_ACCOUNT for supplied WABA; currency omitted, ownership/full inventory unverified |
+| Phone inventory | DOCUMENTED_OFFICIAL_SURFACE | VERIFIED_ON_COMPANY_ACCOUNT: one matching phone, CLOUD_API, GREEN, code_verification_status NOT_VERIFIED; cursors but no next page |
+| Business profile selected read | DOCUMENTED_OFFICIAL_SURFACE | VERIFIED_ON_COMPANY_ACCOUNT: returned vertical/messaging_product only; no profile mutation |
+| WABA subscription list | DOCUMENTED_OFFICIAL_SURFACE | VERIFIED_ON_COMPANY_ACCOUNT: one subscription matching configured App |
+| Portfolio discovery / BM | DOCUMENTED_OFFICIAL_SURFACE | Not attempted; direct workflow passed with BM absent. No universal requirement claim |
+| Request/version/usage header presence | UNVERIFIED semantics | Observed safe header names and correlation IDs; quota/reset interpretation remains NEEDS_VERIFICATION |
+| GET challenge / POST authenticity | UNVERIFIED | No handler or live verification; Verify Token empty, App Secret separately present |
+| Subscribe/unsubscribe/override and every send | DOCUMENTED_OFFICIAL_SURFACE or UNVERIFIED as above | Not tested or changed; no authorization to mutate/send |
+
+Four real sanitized GET fixtures now coexist with the unchanged SYNTHETIC multi-entry fixture. Gate B CLOSED pending current authoritative contract evidence; Sprint 2 NOT STARTED. No unrelated capability is promoted.
+
+Historical credential recheck M54: operator-reported replacement still returns USER with expiry 2026-09-11T14:00:00Z; no production System User promotion. Exact v26.0 GETs remain account-verified. Verify Token is still empty; current authoritative webhook contract remains unresolved.
+
+M55 latest credential recheck, 2026-09-11 12:21:29 UTC: Meta now reports SYSTEM_USER, valid, matching App and expected WA/WM scopes. All v26.0 target GETs pass without BM. Four fixtures refreshed from this actual capture. Token-type blocker resolved; current authoritative webhook/lifecycle contract and empty Verify Token remain open. No unrelated capability or Gate B approval follows from token replacement.

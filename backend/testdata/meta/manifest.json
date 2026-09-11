@@ -9,6 +9,103 @@
       "purpose": "future multi-entry/multi-message and unknown-field compatibility tests",
       "redaction": "all identifiers and content fictional; no credentials or PII",
       "account_verified": false
+    },
+    {
+      "file": "gate-b-v26-waba.json",
+      "classification": "CAPTURED_SANITIZED",
+      "source": "GET https://graph.facebook.com/v26.0/{WABA-ID}",
+      "captured_at": "2026-09-11T12:21:29.875198+00:00",
+      "graph_version": "v26.0",
+      "http_status": 200,
+      "account_verified": true,
+      "token_type_observed": "SYSTEM_USER",
+      "requested_fields": [
+        "id",
+        "name",
+        "currency",
+        "timezone_id"
+      ],
+      "pagination_present": false,
+      "next_page_present": false,
+      "request_trace_ids": {
+        "x-fb-trace-id": "Ad2M13RkksM",
+        "x-fb-request-id": "AXqcN10pl90IiiaPIM_Ldt2"
+      },
+      "sanitization": "All private asset identifiers replaced with stable aliases; names, phone numbers, profile values, links and cursors redacted; original structure/types and selected non-PII provider state values preserved. Not usable as original signed bytes.",
+      "reviewer": "Codex structural/redaction review 2026-09-11",
+      "sha256": "d19fb818682e25254cd74bc5ee7443c55f68bd5aa7970ffa7bd82f436ce81278",
+      "purpose": "Gate B observed GET response structure only; not a version-wide or webhook contract"
+    },
+    {
+      "file": "gate-b-v26-phones.json",
+      "classification": "CAPTURED_SANITIZED",
+      "source": "GET https://graph.facebook.com/v26.0/{WABA-ID}/phone_numbers",
+      "captured_at": "2026-09-11T12:21:30.496747+00:00",
+      "graph_version": "v26.0",
+      "http_status": 200,
+      "account_verified": true,
+      "token_type_observed": "SYSTEM_USER",
+      "requested_fields": [],
+      "pagination_present": true,
+      "next_page_present": false,
+      "request_trace_ids": {
+        "x-fb-trace-id": "BPV3mpWHwUF",
+        "x-fb-request-id": "AkF65ivovtT2bhv87LBTAU9"
+      },
+      "sanitization": "All private asset identifiers replaced with stable aliases; names, phone numbers, profile values, links and cursors redacted; original structure/types and selected non-PII provider state values preserved. Not usable as original signed bytes.",
+      "reviewer": "Codex structural/redaction review 2026-09-11",
+      "sha256": "ceee91b6344086d91c4c75b69f496001dceb23d9099a2bc33dd31508db4116f8",
+      "purpose": "Gate B observed GET response structure only; not a version-wide or webhook contract"
+    },
+    {
+      "file": "gate-b-v26-profile.json",
+      "classification": "CAPTURED_SANITIZED",
+      "source": "GET https://graph.facebook.com/v26.0/{Phone-Number-ID}/whatsapp_business_profile",
+      "captured_at": "2026-09-11T12:21:31.639688+00:00",
+      "graph_version": "v26.0",
+      "http_status": 200,
+      "account_verified": true,
+      "token_type_observed": "SYSTEM_USER",
+      "requested_fields": [
+        "about",
+        "address",
+        "description",
+        "email",
+        "profile_picture_url",
+        "websites",
+        "vertical"
+      ],
+      "pagination_present": false,
+      "next_page_present": false,
+      "request_trace_ids": {
+        "x-fb-trace-id": "Ef1GGwUV/Rb",
+        "x-fb-request-id": "AYnzvAqS_UV4PVI2_cA5IiH"
+      },
+      "sanitization": "All private asset identifiers replaced with stable aliases; names, phone numbers, profile values, links and cursors redacted; original structure/types and selected non-PII provider state values preserved. Not usable as original signed bytes.",
+      "reviewer": "Codex structural/redaction review 2026-09-11",
+      "sha256": "ea397d25f8e33d4feeabd9b6e498044f8887f56f4b80877ff93f85137067f1c5",
+      "purpose": "Gate B observed GET response structure only; not a version-wide or webhook contract"
+    },
+    {
+      "file": "gate-b-v26-subscriptions.json",
+      "classification": "CAPTURED_SANITIZED",
+      "source": "GET https://graph.facebook.com/v26.0/{WABA-ID}/subscribed_apps",
+      "captured_at": "2026-09-11T12:21:32.701862+00:00",
+      "graph_version": "v26.0",
+      "http_status": 200,
+      "account_verified": true,
+      "token_type_observed": "SYSTEM_USER",
+      "requested_fields": [],
+      "pagination_present": false,
+      "next_page_present": false,
+      "request_trace_ids": {
+        "x-fb-trace-id": "EZTSfRWF7hQ",
+        "x-fb-request-id": "At9Metp5B_H-gKWWBt6Vbdy"
+      },
+      "sanitization": "All private asset identifiers replaced with stable aliases; names, phone numbers, profile values, links and cursors redacted; original structure/types and selected non-PII provider state values preserved. Not usable as original signed bytes.",
+      "reviewer": "Codex structural/redaction review 2026-09-11",
+      "sha256": "9af7a91d0250caed3007e4f80b870343d7c715a23f57f160ed6f83f16d623881",
+      "purpose": "Gate B observed GET response structure only; not a version-wide or webhook contract"
     }
   ]
 }

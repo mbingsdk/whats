@@ -198,3 +198,7 @@ All routes are organization-scoped; mutation commands use Idempotency-Key and ex
 Errors: 409 STALE_RATE_BASE, PUBLICATION_IMMUTABLE, INVALID_STATE_TRANSITION or REVISION_CONFLICT; 422 RATE_COVERAGE_GAP, RATE_DIMENSION_CONFLICT, RATE_SOURCE_UNVERIFIED; 403 SELF_REVIEW_FORBIDDEN or PERMISSION_DENIED. Async validation errors live in the operation report with the same domain codes. A stale base requires reset to DRAFT, validation/diff against the new head and fresh review. No operation result grants permission to send; dispatch also rejects 503 PRICING_REVIEW_OVERDUE or 503 PRICING_UNKNOWN for absent/unverified coverage when applicable.
 
 The implemented OpenAPI foundation is [contracts/openapi.yaml](../contracts/openapi.yaml), checked by Redocly in CI. Health endpoints are outside /api/v1 deliberately; future business endpoints retain that namespace. Liveness ignores external services; readiness checks PostgreSQL/schema/runtime role. Supported read methods are GET/HEAD; unknown paths and method/body failures use the safe error envelope. The declared auth schemes are future contracts, not a working login bypass.
+
+## Gate B and conditional Sprint 2 boundary
+
+Phase A added no executable endpoint or OpenAPI operation. Meta reads, synchronization, webhook GET/POST and subscription actions above remain target contracts until [Gate B](25-gate-b-evidence.md) passes. POST authenticity and GET challenge must be verified independently. No outbound send route is authorized for Sprint 2; an eventual subscription action requires explicit operator approval.

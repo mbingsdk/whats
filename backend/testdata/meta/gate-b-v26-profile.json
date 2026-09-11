@@ -1,0 +1,36 @@
+{
+  "capture": {
+    "classification": "CAPTURED_SANITIZED",
+    "source": "GET https://graph.facebook.com/v26.0/{Phone-Number-ID}/whatsapp_business_profile",
+    "captured_at": "2026-09-11T12:21:31.639688+00:00",
+    "graph_version": "v26.0",
+    "http_status": 200,
+    "account_verified": true,
+    "token_type_observed": "SYSTEM_USER",
+    "requested_fields": [
+      "about",
+      "address",
+      "description",
+      "email",
+      "profile_picture_url",
+      "websites",
+      "vertical"
+    ],
+    "pagination_present": false,
+    "next_page_present": false,
+    "request_trace_ids": {
+      "x-fb-trace-id": "Ef1GGwUV/Rb",
+      "x-fb-request-id": "AYnzvAqS_UV4PVI2_cA5IiH"
+    },
+    "sanitization": "All private asset identifiers replaced with stable aliases; names, phone numbers, profile values, links and cursors redacted; original structure/types and selected non-PII provider state values preserved. Not usable as original signed bytes.",
+    "reviewer": "Codex structural/redaction review 2026-09-11"
+  },
+  "response": {
+    "data": [
+      {
+        "vertical": "[REDACTED_STRING]",
+        "messaging_product": "whatsapp"
+      }
+    ]
+  }
+}

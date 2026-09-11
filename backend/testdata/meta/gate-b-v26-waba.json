@@ -1,0 +1,30 @@
+{
+  "capture": {
+    "classification": "CAPTURED_SANITIZED",
+    "source": "GET https://graph.facebook.com/v26.0/{WABA-ID}",
+    "captured_at": "2026-09-11T12:21:29.875198+00:00",
+    "graph_version": "v26.0",
+    "http_status": 200,
+    "account_verified": true,
+    "token_type_observed": "SYSTEM_USER",
+    "requested_fields": [
+      "id",
+      "name",
+      "currency",
+      "timezone_id"
+    ],
+    "pagination_present": false,
+    "next_page_present": false,
+    "request_trace_ids": {
+      "x-fb-trace-id": "Ad2M13RkksM",
+      "x-fb-request-id": "AXqcN10pl90IiiaPIM_Ldt2"
+    },
+    "sanitization": "All private asset identifiers replaced with stable aliases; names, phone numbers, profile values, links and cursors redacted; original structure/types and selected non-PII provider state values preserved. Not usable as original signed bytes.",
+    "reviewer": "Codex structural/redaction review 2026-09-11"
+  },
+  "response": {
+    "id": "asset_2",
+    "name": "[REDACTED_STRING]",
+    "timezone_id": "[REDACTED_STRING]"
+  }
+}

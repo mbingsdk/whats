@@ -4,6 +4,10 @@ Historical owner override (2026-09-09): **Sprint 0 IMPLEMENTATION COMPLETE; Gate
 
 Current verification (2026-09-10): **Sprint 0 IMPLEMENTATION COMPLETE; Gate A APPROVED; Sprint 1 IMPLEMENTATION COMPLETE; HOSTED CI VERIFIED; Sprint 1 acceptance COMPLETE.** Sprint 1 was published at d4fed8ce7b50ed44f0f356e9ebea8f21695fe7bd. Run 34436595874 executed and failed in scripts/check.py because the 00002 manifest hashed CRLF working bytes while Git published LF bytes; this was a repository failure, not billing. Corrective commit 9b2c67187eea6fc2ee6b5a1929f063e76cc6797b passed the full hosted workflow in run 34437626714. Published SQL and historical manifest remain unchanged. Sprint 0 run 34356265759 attempt 1 remains a historical billing failure and attempt 3 passed only the Sprint 0 baseline. Controlled Brevo SMTP accepts all four identity emails; the operator confirms actual receipt of verification, reset, security and invitation emails. Gates B/C/D CLOSED; no Sprint 2 work. Detailed evidence is in docs/24-sprint-1-evidence.md.
 
+Phase A authorization (2026-09-10): current Meta contract and protected read-only account verification are authorized. Gate B remains CLOSED for current supported-version/webhook-contract evidence; account verification is limited to the tested GETs; Phase B is conditional and NOT STARTED. See [Gate B evidence](docs/25-gate-b-evidence.md) and [Sprint 2 status](docs/26-sprint-2-evidence.md). No outbound WhatsApp or Sprint 3 work is authorized.
+
+Gate B-only continuation (2026-09-11): operator configuration is now PRESENT; v26.0 token/WABA/phone/profile/subscription GETs passed for one supplied WABA and phone. Meta verifies SYSTEM_USER, matching App, WA/WM scopes and no BM; all target GETs pass. Token expires 2026-11-10T12:20:59Z. Verify Token is empty and current authoritative webhook/lifecycle evidence remains unresolved. Gate B CLOSED; stop for separate review before Sprint 2 even if later approved.
+
 Normal deployment serves one PT in one company Organization. The design retains organization isolation, employees in multiple teams, multiple Meta apps, WABAs and phone numbers; an organization switcher appears only for users with multiple active memberships. There is no public organization registration, SaaS subscription billing, tenant marketplace or generic onboarding wizard. Every sending path uses the same authorization, consent, service-window, pricing, approval and budget controls.
 
 ## Read this first
@@ -28,7 +32,7 @@ Normal deployment serves one PT in one company Organization. The design retains 
 
 **Design baseline, with explicit implementation gates.** Official policy, public pricing overview and Meta's official Postman examples were inspected. Many developer pages returned HTTP 429, login-only content or fetch failures. The Postman examples include old Graph versions and contradictory prose; they prove API surface, not compatibility with an untested 2026 account.
 
-No live Meta account was queried. Current rate cards, upcoming pricing changes, Graph version, permissions on the company's assets and advanced feature eligibility remain NEEDS VERIFICATION. The identity application works locally; the full WhatsApp product is not implemented or production-ready. No real prices, credentials, customers or fabricated analytics are included.
+Read-only Meta account checks now pass for the supplied WABA/phone on v26.0; see the Gate B evidence record. Current rate cards, upcoming pricing changes, Graph version, permissions on the company's assets and advanced feature eligibility remain NEEDS VERIFICATION. The identity application works locally; the full WhatsApp product is not implemented or production-ready. No real prices, credentials, customers or fabricated analytics are included.
 
 ## Implemented identity application
 

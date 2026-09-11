@@ -1,0 +1,31 @@
+{
+  "capture": {
+    "classification": "CAPTURED_SANITIZED",
+    "source": "GET https://graph.facebook.com/v26.0/{WABA-ID}/subscribed_apps",
+    "captured_at": "2026-09-11T12:21:32.701862+00:00",
+    "graph_version": "v26.0",
+    "http_status": 200,
+    "account_verified": true,
+    "token_type_observed": "SYSTEM_USER",
+    "requested_fields": [],
+    "pagination_present": false,
+    "next_page_present": false,
+    "request_trace_ids": {
+      "x-fb-trace-id": "EZTSfRWF7hQ",
+      "x-fb-request-id": "At9Metp5B_H-gKWWBt6Vbdy"
+    },
+    "sanitization": "All private asset identifiers replaced with stable aliases; names, phone numbers, profile values, links and cursors redacted; original structure/types and selected non-PII provider state values preserved. Not usable as original signed bytes.",
+    "reviewer": "Codex structural/redaction review 2026-09-11"
+  },
+  "response": {
+    "data": [
+      {
+        "whatsapp_business_api_data": {
+          "link": "[REDACTED_STRING]",
+          "name": "[REDACTED_STRING]",
+          "id": "asset_1"
+        }
+      }
+    ]
+  }
+}

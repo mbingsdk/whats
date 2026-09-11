@@ -33,7 +33,11 @@ Gate D: **CLOSED**, production: all blocking rows in doc 20 have evidence, named
 
 ## Current authorized work
 
-The focused Sprint 1 checksum correction is published and full hosted CI is verified at 9b2c671, run 34437626714. Implementation is COMPLETE. Controlled SMTP acceptance is also COMPLETE: the operator subsequently confirmed the invitation, completing actual receipt of all four messages. No Sprint 1 acceptance blocker remains. Do not start Sprint 2. The [Sprint 1 evidence record](docs/24-sprint-1-evidence.md) separates implementation checks, controlled SMTP acceptance and hosted verification. Sprint 1 acceptance is COMPLETE; do not start Sprint 2, Meta or any sending feature.
+Sprint 1 is ACCEPTED and COMPLETE, including controlled mailbox and hosted verification. The owner now authorizes Phase A: current official Meta contract plus protected read-only company-account verification. [Gate B](docs/25-gate-b-evidence.md) remains CLOSED for unresolved current version/webhook evidence; System User and limited live GETs now pass.
+
+Phase B, [Sprint 2 META INGESTION + EXISTING ASSETS](docs/26-sprint-2-evidence.md), may start only after every mandatory Gate B item passes. No outbound WhatsApp message, send capability or Sprint 3 work is authorized. Phase A never mutates subscriptions; any later subscription execution requires separate explicit target-specific operator approval.
+
+Gate B-only continuation (2026-09-11): operator configuration is now PRESENT; v26.0 token/WABA/phone/profile/subscription GETs passed for one supplied WABA and phone. Meta verifies SYSTEM_USER, matching App, WA/WM scopes and no BM; all target GETs pass. Token expires 2026-11-10T12:20:59Z. Verify Token is empty and current authoritative webhook/lifecycle evidence remains unresolved. Gate B CLOSED; stop for separate review before Sprint 2 even if later approved.
 
 ## Sprint 0 implementation record
 

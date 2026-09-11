@@ -1,0 +1,41 @@
+{
+  "capture": {
+    "classification": "CAPTURED_SANITIZED",
+    "source": "GET https://graph.facebook.com/v26.0/{WABA-ID}/phone_numbers",
+    "captured_at": "2026-09-11T12:21:30.496747+00:00",
+    "graph_version": "v26.0",
+    "http_status": 200,
+    "account_verified": true,
+    "token_type_observed": "SYSTEM_USER",
+    "requested_fields": [],
+    "pagination_present": true,
+    "next_page_present": false,
+    "request_trace_ids": {
+      "x-fb-trace-id": "BPV3mpWHwUF",
+      "x-fb-request-id": "AkF65ivovtT2bhv87LBTAU9"
+    },
+    "sanitization": "All private asset identifiers replaced with stable aliases; names, phone numbers, profile values, links and cursors redacted; original structure/types and selected non-PII provider state values preserved. Not usable as original signed bytes.",
+    "reviewer": "Codex structural/redaction review 2026-09-11"
+  },
+  "response": {
+    "data": [
+      {
+        "verified_name": "[REDACTED_STRING]",
+        "code_verification_status": "NOT_VERIFIED",
+        "display_phone_number": "[REDACTED_STRING]",
+        "quality_rating": "GREEN",
+        "platform_type": "CLOUD_API",
+        "throughput": {
+          "level": "[REDACTED_STRING]"
+        },
+        "id": "asset_3"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "[REDACTED_STRING]",
+        "after": "[REDACTED_STRING]"
+      }
+    }
+  }
+}

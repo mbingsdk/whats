@@ -30,8 +30,12 @@ Current verification (2026-09-10): **Sprint 0 IMPLEMENTATION COMPLETE; Gate A AP
 
 Optional module release requires its own evidence package; unchecked Calling/Coexistence does not block a core-only release if routes/UI/jobs remain disabled. A missing core pricing/signature/isolation gate cannot be relabeled optional to ship sending.
 
-[Sprint 0 evidence](23-sprint-0-evidence.md) is partial support for P01/P12/P17/P21 only where explicitly tested. No product release criterion above is marked passed; no account verification, production mail delivery, restore drill or messaging test has occurred.
+[Sprint 0 evidence](23-sprint-0-evidence.md) is partial support for P01/P12/P17/P21 only where explicitly tested. This historical foundation evidence does not establish Meta account verification, a restore drill or messaging readiness. Sprint 1 controlled SMTP acceptance is recorded separately below.
 
 ## Sprint 1 evidence boundary
 
 [Identity evidence](24-sprint-1-evidence.md) adds local authentication/MFA/offboarding, nine new tenant-table isolation checks, permission/concurrency tests, frontend browser flows and authenticated TLS SMTP delivery tests. P21 controlled-mailbox evidence is satisfied for Sprint 1: all four identity messages passed real verified STARTTLS/authentication/MAIL/RCPT/DATA and operator-confirmed receipt. This does not close the other production readiness requirements. Sprint 1 run 34436595874 executed and failed migration checksum validation; corrective commit 9b2c671 passed full hosted run 34437626714. The Sprint 0 baseline has actual attempt-3 hosted success; only its historical attempt 1 failed before repository steps due to billing. Neither local SMTP acceptance nor passing local tests is a hosted CI pass or production release approval; Gates B/C/D remain CLOSED.
+
+## Gate B evidence boundary
+
+P02 and P03 remain OPEN: [Phase A](25-gate-b-evidence.md) has successful v26.0 authentication/inventory/subscription GETs and four sanitized fixtures, now with verified SYSTEM_USER, but without current authoritative webhook/lifecycle contract. P04 ingestion/recovery and the Meta portions of P01/P12/P19 have no Sprint 2 implementation evidence. The conditional [Sprint 2 record](26-sprint-2-evidence.md) does not reuse Sprint 1 hosted success. Gates B/C/D remain CLOSED. No subscription mutation or WhatsApp message occurred.
