@@ -55,3 +55,9 @@ Materialize unique `(member,event,type)` records after current permission check.
 ## Gate B and conditional Sprint 2 boundary
 
 [Phase A](25-gate-b-evidence.md) now has scoped credential/asset/subscription and header-presence observations from Gate B GETs, but no implemented operational UI. Preserve the captured UTC and do not turn credential validity/phone quality/API success into an overall health claim. Official request/trace and usage-header semantics remain NEEDS VERIFICATION; do not invent a supported header set or rate quota. No Meta Health or Webhook Event Center UI has been implemented; raw payloads and secret-bearing URLs remain prohibited in logs.
+
+## Sprint 2 operational observations
+
+Meta Health separates last successful Graph read/credential access/error from valid callback requests, authentic webhook receipt and local event-state counts. READ_ACCESS_VERIFIED refers to successful reads at that timestamp, not indefinite credential validity or send readiness. Event Center exposes internal IDs, times, class, attempt/generation, parser version and sanitized error codes. QUARANTINED payloads remain inaccessible to tenant inspection.
+
+Worker failures emit fixed messages; no Graph body, token, URL query, raw envelope or exception text is logged. HTTP logging uses route templates. Sync, binding, processing, payload-inspection and replay actions append organization audit records. Alerts should cover stale successful sync, blocked credentials, due-work backlog and DEAD_LETTER counts; no arbitrary combined health score is introduced.

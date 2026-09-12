@@ -116,3 +116,11 @@ Reviewed four sanitized real fixtures, preserving source hashes privately and sa
 Operator-reported token replacement was rechecked at 12:14:43 UTC: five further GETs passed, but Meta still reports USER (expiry 14:00 UTC). No credential type was inferred from operator intent. Prior capture provenance remains intact; no repeated mutation, subscription change or send occurred.
 
 Latest System User verification, 2026-09-11 12:21 UTC: actual Meta response now confirms SYSTEM_USER, valid and matching App, with WA/WM and no BM. All five read-only checks pass; expiry 2026-11-10T12:20:59Z. Fixture metadata/hashes refreshed from the new responses, with original hashes kept privately and redaction exclusion rechecked. Earlier USER observations are historical. Token blocker is resolved; Gate B remains CLOSED for current authoritative webhook/lifecycle evidence, with Verify Token still empty. No Sprint 2 implementation or Meta mutation was performed.
+
+## Sprint 2 implementation review, 2026-09-12
+
+Gate B owner approval supersedes the earlier stop instruction. The review retains source-access failures and separates live-provider acceptance from local correctness. Added tenant migration and permissions are additive; published identity SQL/checksum history is unchanged. Raw evidence is encrypted and immutable, original routing is trusted-config-bound, callback validation fails closed, and no outbound Graph method or subscription mutation is introduced.
+
+Initial local Meta unit/PostgreSQL tests PASS, including injected storage failure through DLQ, replay dedupe, concurrency, signature byte mutation, forbidden raw modification and all nine populated-table RLS reads. Full-suite, browser, hosted commit and real callback evidence are still pending at this review stage. Evidence status is maintained in [Sprint 2 record](26-sprint-2-evidence.md).
+
+Release review update: implementation COMPLETE with full local check exit 0, identity/Meta browser tests, all-table RLS WITH CHECK and cross-organization HTTP access/replay denial. Browser verification found and fixed missing Meta permission discovery. Live runtime sync passed on the company assets; callback-only HTTPS boundary checks passed. Real Meta challenge/POST and own hosted CI remain acceptance evidence to record. New schema hashes are LF-based; old published migrations/manifests remain unchanged.

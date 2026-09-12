@@ -1,10 +1,12 @@
 # Gate B: Meta contract and account verification
 
-Latest review: 2026-09-11. **Gate B CLOSED. Read-only account probes PASS for the tested endpoints; System User verified; current authoritative webhook/lifecycle evidence remains unresolved. Sprint 2 NOT STARTED.** The owner requires a separate Gate B review even if the gate becomes approved. No WhatsApp send or Meta mutation is authorized in this run.
+Owner decision (2026-09-12, continuing the 2026-09-11 review): **Gate B APPROVED; Sprint 2 AUTHORIZED; implementation COMPLETE; Sprint 2 acceptance OPEN; Gates C/D CLOSED.** Live GET challenge and authentic real Meta POST proof are mandatory Sprint 2 acceptance evidence, not prerequisites for starting the endpoint implementation. Sprint 0/1 acceptance remains COMPLETE. No outbound WhatsApp or Sprint 3 work is authorized.
+
+The owner explicitly moves protected Verify Token configuration and real public GET/POST evidence to Sprint 2 acceptance: the endpoint did not exist at Gate B review. This clarification authorizes implementation without claiming inaccessible primary documentation was read, and without reducing signature validation. The account observations below retain their original dates.
 
 ## Configuration and token
 
-The operator configuration is now PRESENT at .local/meta-gate-b.env. META_GRAPH_VERSION and all supplied numeric identifiers passed format validation. Access-token and App Secret files are PRESENT and non-empty. The referenced webhook Verify Token file is PRESENT but empty (MISSING value); this did not prevent independent GET account probes. *_FILE values were treated as paths, including absolute Windows paths, and secrets were read only at runtime.
+The operator configuration is now PRESENT at .local/meta-gate-b.env. META_GRAPH_VERSION and all supplied numeric identifiers passed format validation. Access-token and App Secret files are PRESENT and non-empty. At the Gate B review the Verify Token file was empty. On 2026-09-12 an application-generated value was placed in that existing protected file; existing nonempty Access Token/App Secret values were preserved. This configuration is now verified by the runtime. *_FILE values were treated as paths, including absolute Windows paths, and secrets were read only at runtime.
 
 Latest Meta debug_token check at 2026-09-11T12:21:29Z returned HTTP 200, is_valid=true, matching configured App ID and type=SYSTEM_USER. Token expiry is 2026-11-10T12:20:59Z (20:20:59 WITA); data_access_expires_at=0 was observed and is not interpreted as a guarantee against revocation. App Secret was used only in the protected debug authentication context, never as Verify Token.
 
@@ -45,9 +47,9 @@ Official Postman documents the read surfaces and profile field-selection example
 
 Observed header names include x-fb-request-id, x-fb-trace-id, facebook-api-version, x-app-usage on debug, and x-business-use-case-usage on asset reads. Presence is VERIFIED_ON_COMPANY_ACCOUNT; quota meanings, resets and global availability remain NEEDS VERIFICATION. Only safe correlation IDs and header names were retained, not request headers or usage values.
 
-## Webhook contracts remain independent
+## Webhook contract provenance and acceptance
 
-GET verification uses the proposed hub.mode / hub.verify_token / hub.challenge mechanism. POST authenticity uses the proposed X-Hub-Signature-256 / HMAC-SHA256 over exact raw bytes using the App Secret. They are different mechanisms and credentials. No signature handler, callback endpoint, challenge test or live notification ingestion was implemented or exercised.
+At the 2026-09-11 Gate B-only review, GET verification used the proposed hub.mode / hub.verify_token / hub.challenge mechanism. POST authenticity uses the proposed X-Hub-Signature-256 / HMAC-SHA256 over exact raw bytes using the App Secret. They are different mechanisms and credentials. At that review no handler existed. Sprint 2 now implements and locally tests GET verification and exact-byte App Secret HMAC; real Meta callback and signed delivery evidence remain mandatory acceptance conditions.
 
 On 2026-09-11, current Graph Webhooks setup, WhatsApp overview and debug-token reference still returned HTTP 429. Official-domain indexed searches provided no usable current representation. The official Horizon page is adjacent-product evidence only; third-party mirrors were excluded as primary evidence. See M49-M51 and the follow-up M52 in the [research register](21-research-register.md#gate-b-live-read-verification-2026-09-11). Missing Verify Token is a configuration observation, not the reason that authoritative signature evidence is missing.
 
@@ -63,21 +65,23 @@ The manifest records sanitized SHA-256 values. Original raw-response SHA-256 val
 
 | Requirement | Current status |
 | --- | --- |
-| Configuration and read authentication | PASS for access token/App Secret; Verify Token empty |
+| Configuration and read authentication | PASS for all three protected files; Verify Token configured during Sprint 2 |
 | WABA / phone / profile / subscription reads | PASS for supplied WABA and its one phone; direct workflow requires no observed BM scope |
 | Complete portfolio ownership/inventory | UNVERIFIED; no portfolio query needed for supplied-WABA workflow |
 | Production token strategy | PASS for actual SYSTEM_USER type, App/scopes and target reads; expiry and rotation recorded |
 | v26.0 account compatibility | PASS for tested GETs only; authoritative lifecycle/current-contract review OPEN |
-| GET challenge / POST authenticity evidence | OPEN; current primary contract unavailable |
+| GET challenge / POST authenticity evidence | Local implementation tests PASS; real Meta delivery acceptance OPEN; primary reference remains inaccessible |
 | Sanitized account fixtures | PASS, four captures with reviewed provenance |
 | No secrets / no mutation / no sending | Maintained; twenty GETs only |
-| Gate B | CLOSED |
-| Sprint 2 | NOT STARTED; separate review required even after Gate B approval |
+| Gate B | APPROVED by product owner |
+| Sprint 2 | AUTHORIZED; implementation COMPLETE, acceptance OPEN |
 
 Historical attempts on 2026-09-10 and earlier on 2026-09-11 had missing configuration and no live requests. Those missing-file observations are superseded by this successful account probe; source access limitations remain. Accepted Sprint 1 hosted CI and SMTP evidence are unchanged and are not reused as Meta integration tests.
 
-Continue Gate B with adequate current version/webhook evidence; the intended System User credential is now verified. Keep credentials in protected files; do not print secret prefixes, put secrets in argv, broaden scopes without operation-specific need, or use a temporary USER token as the production strategy. Rotation must validate replacement scope/assets before switching protected sources and revoking the old credential; audit only actor, generation, timestamps and sanitized outcome. Any future recoverable database secret follows [ADR 006](../ADR/006-secret-encryption.md); no raw Meta token is stored in PostgreSQL.
+Gate B review is approved. Preserve current version/source limitations and complete live callback/signature evidence during Sprint 2 acceptance. Keep credentials in protected files; do not print secret prefixes, put secrets in argv, broaden scopes without operation-specific need, or use a temporary USER token as the production strategy. Rotation must validate replacement scope/assets before switching protected sources and revoking the old credential; audit only actor, generation, timestamps and sanitized outcome. Any future recoverable database secret follows [ADR 006](../ADR/006-secret-encryption.md); no raw Meta token is stored in PostgreSQL.
 
 No WhatsApp message was sent. No WABA subscription, callback override, phone registration, business profile or template was changed. Gates C/D remain CLOSED.
 
 Latest replacement check: Meta reports SYSTEM_USER. The four sanitized fixtures and manifest were refreshed from the 12:21 UTC responses with matching timestamps, type and checksums. Earlier USER-token request/provenance evidence remains in ignored operator history; no old capture is relabeled as a System User response.
+
+Sprint 2 follow-up, 2026-09-12: runtime v26.0 synchronization persisted one WABA, one CLOUD_API/GREEN/NOT_VERIFIED phone and one business profile; WABA subscription remains true. Separate GET App subscriptions returned HTTP 200 with an empty list at 03:18:18 UTC. A callback-only temporary Cloudflare HTTPS endpoint passed unauthenticated boundary checks (private API 404, missing Verify Token 403, unsigned POST 403). These are not real Meta challenge or signed-delivery proof. Target-specific callback configuration approval is pending.

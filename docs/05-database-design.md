@@ -286,3 +286,11 @@ Global mail_deliveries/mail_attempts are accessible only to the identity service
 ## Gate B and conditional Sprint 2 boundary
 
 Phase A added no migration or Meta table. The Meta schema above remains a target; published identity migrations stay immutable. [Gate B](25-gate-b-evidence.md) must pass before Sprint 2 translates verified asset/ingress contracts into RLS tables. Operator tokens remain outside PostgreSQL through the protected secret-file boundary; any later recoverable stored secret must satisfy ADR 006.
+
+## Sprint 2 implemented schema
+
+Migration 00003 adds nine tenant tables: meta_apps, wabas, phone_numbers, business_profiles, asset_sync_runs, webhook_events, webhook_facts, webhook_processing_attempts, webhook_replays. Each enforces organization RLS, FORCE RLS, composite references and limited runtime grants. External App/WABA/phone ownership is exclusive across organizations. This runtime binds the one operator-configured App/WABA topology; broader multi-App orchestration remains outside this increment.
+
+Synchronization records source version/time, subscriptions, lifecycle and sanitized error class. Successful snapshots are atomic; missing phones become NOT_OBSERVED, never deleted automatically. One partial-unique active sync per binding prevents duplicate concurrent jobs. Claimed jobs have random lease tokens and deadlines; stale completions cannot overwrite a new claim.
+
+Raw event ciphertext uses the established per-event envelope key wrapped by the protected root, with org/event/purpose/version AAD. A trigger protects original digest, receive time, request ID, ownership, retention deadline and raw evidence. Only expired ciphertext can transition to NULL. Facts/attempts/replays are append-only under runtime grants. Original transport hashes, semantic fact hashes and replay generations have distinct uniqueness constraints. Full messages, conversations, recipients and outbound jobs are not introduced.

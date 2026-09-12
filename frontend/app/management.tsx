@@ -3,7 +3,7 @@ import {useEffect,useState} from "react";
 import GrantEditor from "./grant-editor";
 import {request,allPages,type Page} from "../lib/identity-api";
 import {Field,Form,text,confirmAction,type Organization,type Row,type Act} from "./ui";
-const keys=["organization.view","members.view","members.invite","members.manage","teams.view","teams.manage","roles.view","roles.manage","roles.assign","owners.manage","audit.view"];
+const keys=["organization.view","members.view","members.invite","members.manage","teams.view","teams.manage","roles.view","roles.manage","roles.assign","owners.manage","audit.view","meta.view","meta.manage","webhooks.view","webhooks.payload.view","webhooks.replay"];
 export default function Management({screen,org,busy,act,refresh,version}:{screen:string;org:Organization;busy:boolean;act:Act;refresh:()=>Promise<void>;version:number}){
  const [rows,setRows]=useState<Row[]>([]),[roles,setRoles]=useState<Row[]>([]),[members,setMembers]=useState<Row[]>([]),[invites,setInvites]=useState<Row[]>([]),[error,setError]=useState("");
  const [cursor,setCursor]=useState<string|null>(null);

@@ -1,0 +1,32 @@
+import {chromium,expect} from "@playwright/test";
+import {spawn,spawnSync} from "node:child_process";
+import {fileURLToPath} from "node:url";
+import path from "node:path";
+import {mkdir} from "node:fs/promises";
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),".."),api=process.env.E2E_API;
+if(!api?.startsWith("http://127.0.0.1:"))throw new Error("Isolated backend required");
+const origin="http://127.0.0.1:3101";
+const frontend=spawn(process.execPath,[path.join(root,"node_modules/next/dist/bin/next"),"dev",path.join(root,"frontend"),"--hostname","127.0.0.1","--port","3101"],{cwd:root,windowsHide:true,detached:process.platform!=="win32",env:{...process.env,BACKEND_ORIGIN:api,NEXT_TELEMETRY_DISABLED:"1"},stdio:["ignore","pipe","pipe"]});
+let logs="",browser;
+for(const stream of [frontend.stdout,frontend.stderr])stream.on("data",b=>logs=(logs+b.toString()).slice(-3000));
+try{
+await expect.poll(async()=>{try{return (await fetch(origin+"/login")).status;}catch{return 0;}},{timeout:60000}).toBe(200);
+browser=await chromium.launch({headless:true});const page=await browser.newPage({viewport:{width:1440,height:960}});page.on("dialog",d=>d.accept());
+await page.goto(origin+"/login");await page.getByLabel("Email",{exact:true}).fill("owner@example.invalid");await page.getByLabel("Password",{exact:true}).fill("synthetic-password-42");await page.getByRole("button",{name:"Sign in",exact:true}).click();
+await expect(page.getByRole("heading",{name:"Account & security",exact:true})).toBeVisible();
+await page.getByRole("link",{name:"Meta",exact:true}).click();await expect(page.getByRole("cell",{name:"READ_ACCESS_VERIFIED",exact:true})).toBeVisible();
+await page.getByRole("link",{name:"WABA Accounts",exact:true}).click();await expect(page.getByRole("cell",{name:"Synthetic company",exact:true})).toBeVisible();
+await page.getByRole("link",{name:"Phone Numbers",exact:true}).click();await expect(page.getByRole("cell",{name:"NOT_VERIFIED",exact:true})).toBeVisible();
+await mkdir(path.join(root,".local"),{recursive:true});await page.screenshot({path:path.join(root,".local/sprint2-phones.png"),fullPage:true});
+await page.getByRole("link",{name:"Business Profile",exact:true}).click();await expect(page.getByRole("cell",{name:/OTHER/})).toBeVisible();
+await page.getByRole("link",{name:"Webhook Events",exact:true}).click();await expect(page.getByRole("cell",{name:"INBOUND_MESSAGE",exact:true})).toBeVisible();
+await page.getByRole("button",{name:"Inspect",exact:true}).click();await expect(page.getByRole("heading",{name:"Processing attempts",exact:true})).toBeVisible();
+await page.getByRole("button",{name:"Inspect redacted payload",exact:true}).click();await expect(page.locator("pre")).toContainText("[REDACTED]");await expect(page.locator("pre")).not.toContainText("PRIVATE TEXT");
+await page.screenshot({path:path.join(root,".local/sprint2-events.png"),fullPage:true});
+await page.getByRole("button",{name:"Replay stored event",exact:true}).click();await expect(page.getByRole("status")).toContainText("Replay queued.");await expect(page.getByRole("cell",{name:"QUEUED",exact:true})).toBeVisible();
+await page.getByRole("link",{name:"Meta Health",exact:true}).click();await expect(page.getByRole("heading",{name:"Webhook reception and local processing",exact:true})).toBeVisible();await expect(page.getByRole("cell",{name:"QUEUED",exact:true})).toBeVisible();
+await page.getByRole("button",{name:"Synchronize existing assets",exact:true}).click();await expect(page.getByRole("status")).toContainText("Sync queued.");
+await page.setViewportSize({width:390,height:844});await page.screenshot({path:path.join(root,".local/sprint2-health-mobile.png"),fullPage:true});
+const anonymous=await browser.newPage();await anonymous.goto(origin+"/webhook-events");await expect(anonymous).toHaveURL(origin+"/login");
+console.log("PASS Meta browser E2E: authenticated connection/assets/profile/health/event views, redacted payload, durable replay and sync commands, anonymous rejection, mobile navigation.");
+}catch(e){console.error("Frontend output:",logs);throw e;}finally{if(browser)await browser.close();if(frontend.pid){if(process.platform==="win32")spawnSync("taskkill",["/PID",String(frontend.pid),"/T","/F"],{windowsHide:true,stdio:"ignore"});else{try{process.kill(-frontend.pid,"SIGTERM");}catch{}}}}

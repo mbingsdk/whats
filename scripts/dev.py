@@ -86,7 +86,7 @@ def npm(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["up", "down", "migrate", "backend", "frontend", "test", "check", "e2e", "bootstrap", "mailworker"])
+    parser.add_argument("action", choices=["up", "down", "migrate", "backend", "frontend", "test", "check", "e2e", "bootstrap", "mailworker", "metaworker"])
     action = parser.parse_args().action
     if action == "up":
         prepare()
@@ -103,10 +103,11 @@ def main():
             run(["go", "run", "./cmd/migrate"], ROOT / "backend", env)
         elif action == "backend":
             run(["go", "run", "./cmd/api"], ROOT / "backend", env)
-        elif action in {"bootstrap","mailworker"}:
+        elif action in {"bootstrap","mailworker","metaworker"}:
             run(["go","run","./cmd/"+action], ROOT / "backend", env)
         elif action == "e2e":
             run(["go", "test", *(["-race"] if env.get("WABA_TEST_RACE") == "1" else []), "-tags=integration,e2e", "-count=1", "-timeout=5m", "-v", "-run", "TestBrowserIdentityE2E", "./internal/identity"], ROOT / "backend", env)
+            run(["go", "test", *(["-race"] if env.get("WABA_TEST_RACE") == "1" else []), "-tags=integration,e2e", "-count=1", "-timeout=5m", "-v", "-run", "TestBrowserMetaE2E", "./internal/meta"], ROOT / "backend", env)
         elif action == "test":
             run(["go", "test", *(["-race"] if env.get("WABA_TEST_RACE") == "1" else []), "./..."], ROOT / "backend", env)
             run(["go", "test", *(["-race"] if env.get("WABA_TEST_RACE") == "1" else []), "-tags=integration", "-count=1", "-v", "./internal/..."], ROOT / "backend", env)

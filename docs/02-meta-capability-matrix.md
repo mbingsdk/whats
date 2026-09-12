@@ -143,3 +143,9 @@ Four real sanitized GET fixtures now coexist with the unchanged SYNTHETIC multi-
 Historical credential recheck M54: operator-reported replacement still returns USER with expiry 2026-09-11T14:00:00Z; no production System User promotion. Exact v26.0 GETs remain account-verified. Verify Token is still empty; current authoritative webhook contract remains unresolved.
 
 M55 latest credential recheck, 2026-09-11 12:21:29 UTC: Meta now reports SYSTEM_USER, valid, matching App and expected WA/WM scopes. All v26.0 target GETs pass without BM. Four fixtures refreshed from this actual capture. Token-type blocker resolved; current authoritative webhook/lifecycle contract and empty Verify Token remain open. No unrelated capability or Gate B approval follows from token replacement.
+
+## Sprint 2 gate clarification
+
+Owner decision (2026-09-12, continuing the 2026-09-11 review): **Gate B APPROVED; Sprint 2 AUTHORIZED; implementation COMPLETE; Sprint 2 acceptance OPEN; Gates C/D CLOSED.** Live GET challenge and authentic real Meta POST proof are mandatory Sprint 2 acceptance evidence, not prerequisites for starting the endpoint implementation. Sprint 0/1 acceptance remains COMPLETE. No outbound WhatsApp or Sprint 3 work is authorized.
+
+The approved boundary implements the supplied existing-App/WABA GET topology and strict webhook ingestion. Approval is a delivery decision, not automatic promotion of every contract claim to VERIFIED_CURRENT_CONTRACT. Official Postman/first-party examples are DOCUMENTED_OFFICIAL_SURFACE, tested account GETs are separately VERIFIED_ON_COMPANY_ACCOUNT, and real GET/POST delivery proof is still required for Sprint 2 acceptance. Optional adapters and all outbound capabilities stay disabled.

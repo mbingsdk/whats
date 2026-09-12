@@ -66,6 +66,9 @@ errors.extend(validate_migrations(ROOT / "database/migrations"))
 # Route coverage is checked independently of the OpenAPI syntax validator.
 route_source = (ROOT / "backend/internal/identity/http.go").read_text(encoding="utf-8")
 implemented = {(method.lower(), "/api/v1" + path) for method, path in re.findall(r'\{"(GET|POST|PUT|PATCH|DELETE)", "([^"]+)"', route_source)}
+meta_source = (ROOT / "backend/internal/meta/service.go").read_text(encoding="utf-8")
+implemented |= {(m.lower(), "/api/v1"+p) for m,p in re.findall(r'\{"(GET|POST|PUT|PATCH|DELETE)", "([^"]+)"', meta_source)}
+implemented |= {(m.lower(),p) for m,p in re.findall(r'HandleFunc\("(GET|POST) (/api/v1/[^"]+)"', meta_source)}
 implemented |= {("get", "/healthz"), ("get", "/readyz"), ("get", "/api/v1/auth/csrf")}
 documented = set()
 current_path = None

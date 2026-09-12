@@ -1,9 +1,9 @@
 openapi: 3.1.0
 info:
-  title: WABA Control identity and organization API
-  version: 0.2.0
+  title: WABA Control identity and Meta ingestion API
+  version: 0.3.0
   description: >-
-    Implemented Sprint 0 health and Sprint 1 company identity/access endpoints. No public registration or Meta/product
+    Implemented Sprint 0/1 identity and Sprint 2 read-only Meta assets and signed ingestion. No outbound WhatsApp
     messaging endpoints. Cookie mutations require matching Origin, CSRF cookie/header and the session-bound CSRF digest.
     Organization IDs never establish authorization.
   license:
@@ -19,7 +19,455 @@ tags:
     description: Global company identity and own-session security.
   - name: Organization
     description: Membership-checked, permission-scoped organization operations.
+  - name: Meta
+    description: Existing assets and authenticated webhook ingestion.
 paths:
+  /api/v1/meta/connection:
+    get:
+      operationId: metaGETmetaconnection
+      summary: List configured connections
+      tags: [Meta]
+      security:
+        - SessionCookie: []
+      x-permission: meta.view
+      description: Organization is derived from the authenticated session. Mutations require verified email, recent authentication, production MFA, Origin and session-bound CSRF. No outbound Meta operation is performed.
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - name: cursor
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Accessible row cursor; up to 100 rows per response.
+      responses:
+        '200':
+          description: Successful operation or durably queued work.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaConnection'
+        '403':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: metaPOSTmetaconnection
+      summary: Bind operator-configured App to the session organization
+      tags: [Meta]
+      security:
+        - SessionCookie: []
+      x-permission: meta.manage
+      description: Organization is derived from the authenticated session. Mutations require verified email, recent authentication, production MFA, Origin and session-bound CSRF. No outbound Meta operation is performed.
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+      responses:
+        '200':
+          description: Successful operation or durably queued work.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaCommand'
+        '403':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
+  /api/v1/meta/sync:
+    post:
+      operationId: metaPOSTmetasync
+      summary: Queue a read-only asset synchronization
+      tags: [Meta]
+      security:
+        - SessionCookie: []
+      x-permission: meta.manage
+      description: Organization is derived from the authenticated session. Mutations require verified email, recent authentication, production MFA, Origin and session-bound CSRF. No outbound Meta operation is performed.
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+      responses:
+        '200':
+          description: Successful operation or durably queued work.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaCommand'
+        '403':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
+  /api/v1/meta/sync-runs:
+    get:
+      operationId: metaGETmetasyncruns
+      summary: List synchronization evidence
+      tags: [Meta]
+      security:
+        - SessionCookie: []
+      x-permission: meta.view
+      description: Organization is derived from the authenticated session. Mutations require verified email, recent authentication, production MFA, Origin and session-bound CSRF. No outbound Meta operation is performed.
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - name: cursor
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Accessible row cursor; up to 100 rows per response.
+      responses:
+        '200':
+          description: Successful operation or durably queued work.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaSync'
+        '403':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
+  /api/v1/meta/wabas:
+    get:
+      operationId: metaGETmetawabas
+      summary: List synchronized WABAs
+      tags: [Meta]
+      security:
+        - SessionCookie: []
+      x-permission: meta.view
+      description: Organization is derived from the authenticated session. Mutations require verified email, recent authentication, production MFA, Origin and session-bound CSRF. No outbound Meta operation is performed.
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - name: cursor
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Accessible row cursor; up to 100 rows per response.
+      responses:
+        '200':
+          description: Successful operation or durably queued work.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaWABA'
+        '403':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
+  /api/v1/meta/phone-numbers:
+    get:
+      operationId: metaGETmetaphonenumbers
+      summary: List synchronized phone numbers
+      tags: [Meta]
+      security:
+        - SessionCookie: []
+      x-permission: meta.view
+      description: Organization is derived from the authenticated session. Mutations require verified email, recent authentication, production MFA, Origin and session-bound CSRF. No outbound Meta operation is performed.
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - name: cursor
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Accessible row cursor; up to 100 rows per response.
+      responses:
+        '200':
+          description: Successful operation or durably queued work.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaPhone'
+        '403':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
+  /api/v1/meta/business-profiles:
+    get:
+      operationId: metaGETmetabusinessprofiles
+      summary: List synchronized business profiles
+      tags: [Meta]
+      security:
+        - SessionCookie: []
+      x-permission: meta.view
+      description: Organization is derived from the authenticated session. Mutations require verified email, recent authentication, production MFA, Origin and session-bound CSRF. No outbound Meta operation is performed.
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - name: cursor
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Accessible row cursor; up to 100 rows per response.
+      responses:
+        '200':
+          description: Successful operation or durably queued work.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaProfile'
+        '403':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
+  /api/v1/meta/health:
+    get:
+      operationId: metaGETmetahealth
+      summary: Read Meta observations and local processing counts
+      tags: [Meta]
+      security:
+        - SessionCookie: []
+      x-permission: meta.view
+      description: Organization is derived from the authenticated session. Mutations require verified email, recent authentication, production MFA, Origin and session-bound CSRF. No outbound Meta operation is performed.
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+      responses:
+        '200':
+          description: Successful operation or durably queued work.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaHealth'
+        '403':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
+  /api/v1/meta/webhook-events:
+    get:
+      operationId: metaGETmetawebhookevents
+      summary: List sanitized event diagnostics
+      tags: [Meta]
+      security:
+        - SessionCookie: []
+      x-permission: webhooks.view
+      description: Organization is derived from the authenticated session. Mutations require verified email, recent authentication, production MFA, Origin and session-bound CSRF. No outbound Meta operation is performed.
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - name: cursor
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Accessible row cursor; up to 100 rows per response.
+      responses:
+        '200':
+          description: Successful operation or durably queued work.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaEvent'
+        '403':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
+  /api/v1/meta/webhook-events/{id}:
+    get:
+      operationId: metaGETmetawebhookeventsid
+      summary: Inspect event attempts and classified facts
+      tags: [Meta]
+      security:
+        - SessionCookie: []
+      x-permission: webhooks.view
+      description: Organization is derived from the authenticated session. Mutations require verified email, recent authentication, production MFA, Origin and session-bound CSRF. No outbound Meta operation is performed.
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation or durably queued work.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaDetail'
+        '403':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
+  /api/v1/meta/webhook-events/{id}/payload:
+    get:
+      operationId: metaGETmetawebhookeventsidpayload
+      summary: Inspect audited redacted envelope structure
+      tags: [Meta]
+      security:
+        - SessionCookie: []
+      x-permission: webhooks.payload.view
+      description: Organization is derived from the authenticated session. Mutations require verified email, recent authentication, production MFA, Origin and session-bound CSRF. No outbound Meta operation is performed.
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation or durably queued work.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaPayload'
+        '403':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
+  /api/v1/meta/webhook-events/{id}/replay:
+    post:
+      operationId: metaPOSTmetawebhookeventsidreplay
+      summary: Queue the immutable stored event for replay
+      tags: [Meta]
+      security:
+        - SessionCookie: []
+      x-permission: webhooks.replay
+      description: Organization is derived from the authenticated session. Mutations require verified email, recent authentication, production MFA, Origin and session-bound CSRF. No outbound Meta operation is performed.
+      parameters:
+        - $ref: '#/components/parameters/RequestID'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/CSRF'
+        - $ref: '#/components/parameters/Origin'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+      responses:
+        '200':
+          description: Successful operation or durably queued work.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaCommand'
+        '403':
+          $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
+  /api/v1/meta/webhooks/{callback}:
+    get:
+      operationId: metaWebhookget
+      summary: Verify the configured callback
+      tags: [Meta]
+      security: []
+      description: Only subscribe mode, one exact token and one nonempty challenge are accepted. Duplicate or malformed parameters fail closed.
+      parameters:
+        - name: callback
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: hub.mode
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: hub.verify_token
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: hub.challenge
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Exact challenge string.
+          content:
+            text/plain:
+              schema:
+                type: string
+        '403':
+          description: Verification or signature rejected.
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: Rejected verification, signature, envelope, route, body limit or persistence. No success is returned for failed persistence.
+          content:
+            text/plain:
+              schema:
+                type: string
+    post:
+      operationId: metaWebhookpost
+      summary: Authenticate and durably ingest an exact-byte envelope
+      tags: [Meta]
+      security: []
+      description: App Secret HMAC-SHA256 is verified before JSON parsing and persistence. Raw encrypted evidence and transport dedupe commit before 200. Unknown asset bindings are quarantined. No unsigned mode. Application body cap is the lower of configured HTTP limit and 4 MiB.
+      parameters:
+        - name: callback
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-Hub-Signature-256
+          in: header
+          required: true
+          schema:
+            type: string
+            pattern: '^sha256=[0-9a-fA-F]{64}$'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [object, entry]
+              properties:
+                object:
+                  const: whatsapp_business_account
+                entry:
+                  type: array
+                  minItems: 1
+                  maxItems: 1000
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Durable persistence confirmed; transport retries are safe.
+          content:
+            text/plain:
+              schema:
+                type: string
+        '403':
+          description: Verification or signature rejected.
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          description: Rejected verification, signature, envelope, route, body limit or persistence. No success is returned for failed persistence.
+          content:
+            text/plain:
+              schema:
+                type: string
   /healthz:
     get:
       operationId: getLiveness
@@ -4355,6 +4803,292 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorEnvelope'
   schemas:
+    MetaConnection:
+      type: object
+      required: [items, has_more, next_cursor]
+      properties:
+        has_more:
+          type: boolean
+        next_cursor:
+          type: [string, 'null']
+          format: uuid
+        items:
+          type: array
+          maxItems: 100
+          items:
+            type: object
+            additionalProperties: false
+            required: [id, external_id, callback_key, configured_waba_id, graph_version, credential_state, last_sync_at, last_error, created_at]
+            properties:
+              id:
+                type: string
+                format: uuid
+              external_id:
+                type: string
+              callback_key:
+                type: string
+                format: uuid
+              configured_waba_id:
+                type: string
+              graph_version:
+                type: string
+              credential_state:
+                type: string
+              last_sync_at:
+                type: [string, 'null']
+                format: date-time
+              last_error:
+                type: [string, 'null']
+              created_at:
+                type: string
+                format: date-time
+    MetaSync:
+      type: object
+      required: [items, has_more, next_cursor]
+      properties:
+        has_more:
+          type: boolean
+        next_cursor:
+          type: [string, 'null']
+          format: uuid
+        items:
+          type: array
+          maxItems: 100
+          items:
+            type: object
+            additionalProperties: false
+            required: [id, app_id, state, attempt_count, error_code, graph_version, created_at, finished_at]
+            properties:
+              id:
+                type: string
+                format: uuid
+              app_id:
+                type: string
+                format: uuid
+              state:
+                type: string
+              attempt_count:
+                type: integer
+              error_code:
+                type: [string, 'null']
+              graph_version:
+                type: string
+              created_at:
+                type: string
+                format: date-time
+              finished_at:
+                type: [string, 'null']
+                format: date-time
+    MetaWABA:
+      type: object
+      required: [items, has_more, next_cursor]
+      properties:
+        has_more:
+          type: boolean
+        next_cursor:
+          type: [string, 'null']
+          format: uuid
+        items:
+          type: array
+          maxItems: 100
+          items:
+            type: object
+            additionalProperties: false
+            required: [id, external_id, name, timezone_id, subscribed, lifecycle, graph_version, synced_at]
+            properties:
+              id:
+                type: string
+                format: uuid
+              external_id:
+                type: string
+              name:
+                type: string
+              timezone_id:
+                type: string
+              subscribed:
+                type: boolean
+              lifecycle:
+                type: string
+              graph_version:
+                type: string
+              synced_at:
+                type: string
+                format: date-time
+    MetaPhone:
+      type: object
+      required: [items, has_more, next_cursor]
+      properties:
+        has_more:
+          type: boolean
+        next_cursor:
+          type: [string, 'null']
+          format: uuid
+        items:
+          type: array
+          maxItems: 100
+          items:
+            type: object
+            additionalProperties: false
+            required: [id, waba_id, external_id, name, display_number, quality, platform, code_verification_status, lifecycle, graph_version, synced_at]
+            properties:
+              id:
+                type: string
+                format: uuid
+              waba_id:
+                type: string
+                format: uuid
+              external_id:
+                type: string
+              name:
+                type: string
+              display_number:
+                type: string
+              quality:
+                type: string
+              platform:
+                type: string
+              code_verification_status:
+                type: string
+              lifecycle:
+                type: string
+              graph_version:
+                type: string
+              synced_at:
+                type: string
+                format: date-time
+    MetaProfile:
+      type: object
+      required: [items, has_more, next_cursor]
+      properties:
+        has_more:
+          type: boolean
+        next_cursor:
+          type: [string, 'null']
+          format: uuid
+        items:
+          type: array
+          maxItems: 100
+          items:
+            type: object
+            additionalProperties: false
+            required: [id, phone_id, fields, graph_version, synced_at]
+            properties:
+              id:
+                type: string
+                format: uuid
+              phone_id:
+                type: string
+                format: uuid
+              fields:
+                type: object
+              graph_version:
+                type: string
+              synced_at:
+                type: string
+                format: date-time
+    MetaEvent:
+      type: object
+      required: [items, has_more, next_cursor]
+      properties:
+        has_more:
+          type: boolean
+        next_cursor:
+          type: [string, 'null']
+          format: uuid
+        items:
+          type: array
+          maxItems: 100
+          items:
+            type: object
+            additionalProperties: false
+            required: [id, app_id, received_at, state, event_class, attempt_count, last_error, request_id, parser_version, processed_at]
+            properties:
+              id:
+                type: string
+                format: uuid
+              app_id:
+                type: string
+                format: uuid
+              received_at:
+                type: string
+                format: date-time
+              state:
+                type: string
+              event_class:
+                type: string
+              attempt_count:
+                type: integer
+              last_error:
+                type: [string, 'null']
+              request_id:
+                type: string
+              parser_version:
+                type: integer
+              processed_at:
+                type: [string, 'null']
+                format: date-time
+    MetaCommand:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        queued:
+          type: boolean
+        bound:
+          type: boolean
+        generation:
+          type: integer
+    MetaHealth:
+      type: object
+      required: [connections, processing, runtime_configured, scope]
+      properties:
+        runtime_configured:
+          type: boolean
+        scope:
+          type: string
+        connections:
+          type: array
+          items:
+            type: object
+            description: App ID, Graph version, credential state, last sync/error, valid challenge time and last authentic webhook time. Provider provenance requires separate live acceptance evidence.
+        processing:
+          type: array
+          items:
+            type: object
+            properties:
+              state:
+                type: string
+              count:
+                type: integer
+    MetaDetail:
+      type: object
+      required: [id, state, generation, payload_retained, attempts, facts]
+      properties:
+        id:
+          type: string
+          format: uuid
+        state:
+          type: string
+        generation:
+          type: integer
+        payload_retained:
+          type: boolean
+        attempts:
+          type: array
+          maxItems: 100
+          items:
+            type: object
+            description: generation, attempt_no, result, error_code, parser_version, created_at.
+        facts:
+          type: array
+          maxItems: 100
+          items:
+            type: object
+            description: event_class, internal waba_id and phone_id, uncertain_identity. No message body or customer identity.
+    MetaPayload:
+      type: object
+      description: Structural inspection only. Arbitrary keys, provider strings, contacts, IDs and content are withheld; quarantined and expired evidence is denied. Inspection is audited.
     ErrorEnvelope:
       type: object
       additionalProperties: false

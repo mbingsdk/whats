@@ -202,3 +202,16 @@ The implemented OpenAPI foundation is [contracts/openapi.yaml](../contracts/open
 ## Gate B and conditional Sprint 2 boundary
 
 Phase A added no executable endpoint or OpenAPI operation. Meta reads, synchronization, webhook GET/POST and subscription actions above remain target contracts until [Gate B](25-gate-b-evidence.md) passes. POST authenticity and GET challenge must be verified independently. No outbound send route is authorized for Sprint 2; an eventual subscription action requires explicit operator approval.
+
+## Sprint 2 runtime endpoints
+
+The executable [OpenAPI contract](../contracts/openapi.yaml) now includes:
+
+- GET/POST /api/v1/meta/connection; POST binds configured assets internally, never mutates Meta.
+- POST /api/v1/meta/sync; GET /api/v1/meta/sync-runs.
+- GET /api/v1/meta/wabas, /phone-numbers, /business-profiles, /health.
+- GET /api/v1/meta/webhook-events and /{id}; GET /{id}/payload exposes audited redacted structure only.
+- POST /api/v1/meta/webhook-events/{id}/replay accepts no arbitrary payload.
+- GET/POST /api/v1/meta/webhooks/{callback}; public authentication is Verify Token for GET and App Secret HMAC for POST.
+
+Asset access uses meta.view/manage; event access uses webhooks.view, webhooks.payload.view and webhooks.replay. Resource scope is ORG; TEAM/SELF grants cannot authorize an organization-wide asset. Organization derives from the authenticated session, never a header or arbitrary supplied ID. Existing membership locks, current grants, verified email, reauthentication and production MFA protect mutations; Origin/double-cookie/session-bound CSRF remain mandatory. List responses use accessible UUID cursors, 100 rows and has_more/next_cursor. Queued commands return 200 with queued=true, not an external delivery claim.

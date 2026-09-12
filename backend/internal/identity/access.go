@@ -178,7 +178,7 @@ func (s *Service) organization(ctx context.Context, tx pgx.Tx, v Session, action
 			return Result{}, e
 		}
 		grants := []string{}
-		for _, p := range []string{"organization.view", "members.view", "members.invite", "members.manage", "teams.view", "teams.manage", "roles.view", "roles.manage", "roles.assign", "owners.manage", "audit.view"} {
+		for _, p := range []string{"organization.view", "members.view", "members.invite", "members.manage", "teams.view", "teams.manage", "roles.view", "roles.manage", "roles.assign", "owners.manage", "audit.view", "meta.view", "meta.manage", "webhooks.view", "webhooks.payload.view", "webhooks.replay"} {
 			yes, e := permission(ctx, tx, *member, p, nil, nil)
 			if e != nil {
 				return Result{}, e

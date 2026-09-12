@@ -93,3 +93,9 @@ python scripts/dev.py check runs source links/checksums/route coverage, formatti
 ## Gate B and conditional Sprint 2 boundary
 
 [Gate B](25-gate-b-evidence.md) remains CLOSED, so no Sprint 2 integration test has executed. Gate B GETs now pass separately; four CAPTURED_SANITIZED fixtures accompany the unchanged SYNTHETIC fixture. No webhook signature or live notification test has run. After approval, required tests include Graph errors/pagination/auth/permissions, sync idempotency/disappearance/concurrency, challenge/signature rejection, duplicate/unknown events, retries/DLQ/replay, credential/payload redaction, unauthorized subscription and runtime RLS for every new tenant table. Ordinary CI must use sanitized fixtures and real PostgreSQL, never production Meta credentials. Controlled read-only/account-webhook tests stay explicit; all WhatsApp sends remain prohibited.
+
+## Sprint 2 executed test boundary
+
+The Meta package uses httptest Graph/signature fixtures and a disposable real PostgreSQL database. CI requires no live Meta credentials. Cases include auth/permission/rate/error redaction, pagination loop/foreign-host/size/version failures; coalesced concurrent snapshot persistence and non-destructive absence; exact raw signature/duplicate GET rejection; durable duplicate ACK, semantic rebatching, encrypted evidence binding, unknown/quarantine/permanent invalid states, injected SQL failure through eight retries/DLQ, replay generation/idempotency and populated-table isolation/privilege denial.
+
+Live account synchronization, real public challenge and authentic Meta POST are separate operator-controlled evidence. Locally generated HMAC requests demonstrate implementation correctness only; they cannot be relabeled as real Meta delivery. Hosted success must refer to the actual Sprint 2 commit. See [Sprint 2 evidence](26-sprint-2-evidence.md).

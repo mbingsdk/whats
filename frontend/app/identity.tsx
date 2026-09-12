@@ -7,13 +7,14 @@ import {type User,type Organization,type Act} from "./ui";
 import AuthForms from "./auth-forms";
 import Security from "./security-panel";
 import Management from "./management";
-export type Screen="login"|"forgot-password"|"reset-password"|"verify-email"|"accept-invitation"|"security"|"members"|"teams"|"roles"|"audit";
-const titles:Record<Screen,string>={login:"Sign in","forgot-password":"Request password reset","reset-password":"Set a new password","verify-email":"Verify your email","accept-invitation":"Accept your invitation",security:"Account & security",members:"Members & invitations",teams:"Teams",roles:"Roles & permissions",audit:"Audit history"};
+import MetaPanel,{metaScreens} from "./meta-panel";
+export type Screen="login"|"forgot-password"|"reset-password"|"verify-email"|"accept-invitation"|"security"|"members"|"teams"|"roles"|"audit"|"meta-connection"|"wabas"|"phone-numbers"|"business-profiles"|"webhook-events"|"meta-health";
+const titles:Record<Screen,string>={login:"Sign in","forgot-password":"Request password reset","reset-password":"Set a new password","verify-email":"Verify your email","accept-invitation":"Accept your invitation",security:"Account & security",members:"Members & invitations",teams:"Teams",roles:"Roles & permissions",audit:"Audit history","meta-connection":"Meta Connection",wabas:"WABA Accounts","phone-numbers":"Phone Numbers","business-profiles":"Business Profile","webhook-events":"Webhook Events","meta-health":"Meta Health"};
 export default function Identity({screen}:{screen:Screen}){
  const router=useRouter();
  const [user,setUser]=useState<User|null>(null),[org,setOrg]=useState<Organization|null>(null),[organizations,setOrganizations]=useState<{id:string;name:string}[]>([]);
  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[message,setMessage]=useState(""),[error,setError]=useState(""),[version,setVersion]=useState(0);
- const privateScreen=["security","members","teams","roles","audit"].includes(screen);
+ const privateScreen=["security","members","teams","roles","audit",...metaScreens].includes(screen);
  const refresh=useCallback(async()=>{
   try{
    const session=await request<{user:User;organizations:{id:string;name:string}[]}>("/api/v1/auth/session");
@@ -31,7 +32,7 @@ export default function Identity({screen}:{screen:Screen}){
  if(loading)return <main><p role="status">Loading account...</p></main>;
  const allowed=(p:string)=>org?.permissions.includes(p)??false;
  return <div className="app"><header><Link href="/security" className="brand">WABA Control</Link>{user&&<><span>{user.name} · {user.email}</span><button disabled={busy} onClick={()=>void act(async()=>{await request("/api/v1/auth/logout","POST",{});router.push("/login");})}>Sign out</button></>}</header>
- {user&&<nav aria-label="Application"><Link href="/security">Account & security</Link>{allowed("members.view")&&<Link href="/members">Members</Link>}{(allowed("teams.view")||(org?.scoped_teams.length??0)>0)&&<Link href="/teams">Teams</Link>}{allowed("roles.view")&&<Link href="/roles">Roles</Link>}{allowed("audit.view")&&<Link href="/audit">Audit</Link>}</nav>}
+ {user&&<nav aria-label="Application"><Link href="/security">Account & security</Link>{allowed("members.view")&&<Link href="/members">Members</Link>}{(allowed("teams.view")||(org?.scoped_teams.length??0)>0)&&<Link href="/teams">Teams</Link>}{allowed("roles.view")&&<Link href="/roles">Roles</Link>}{allowed("audit.view")&&<Link href="/audit">Audit</Link>}{allowed("meta.view")&&<Link href="/meta-connection">Meta</Link>}{allowed("webhooks.view")&&!allowed("meta.view")&&<Link href="/webhook-events">Webhook Events</Link>}</nav>}
  <main className={privateScreen?"workspace":"identity"}><h1>{titles[screen]}</h1>
  {error&&<p className="error" role="alert">{error}. {privateScreen&&<Link href="/security">Review authentication and permissions.</Link>}</p>}
  {message&&<p className="notice" role="status">{message}</p>}
@@ -40,5 +41,6 @@ export default function Identity({screen}:{screen:Screen}){
  {!privateScreen&&<AuthForms screen={screen} user={user} busy={busy} act={act} refresh={refresh}/>}
  {screen==="security"&&user&&<Security user={user} busy={busy} act={act} refresh={refresh} version={version}/>}
  {["members","teams","roles","audit"].includes(screen)&&org&&<Management screen={screen} org={org} busy={busy} act={act} refresh={refresh} version={version}/>}
+ {metaScreens.some(s=>s===screen)&&org&&<MetaPanel key={org.id+screen} screen={screen} org={org} busy={busy} act={act}/>}
  </main></div>;
 }

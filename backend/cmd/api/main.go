@@ -12,6 +12,7 @@ import (
 	"waba.local/control/internal/database"
 	"waba.local/control/internal/httpapi"
 	"waba.local/control/internal/identity"
+	"waba.local/control/internal/meta"
 )
 
 func run() int {
@@ -35,12 +36,18 @@ func run() int {
 		return 1
 	}
 	defer auth.Pool.Close()
+	mc, err := config.LoadMeta(os.Getenv)
+	if err != nil {
+		logger.Error("Meta configuration invalid")
+		return 1
+	}
+	metaService := meta.New(mc, pool, auth)
 	handler := httpapi.Handler(c, logger, func(ctx context.Context) error {
 		if e := database.Ready(ctx, pool); e != nil {
 			return e
 		}
 		return auth.Pool.Ping(ctx)
-	}, auth.Handler())
+	}, metaService.Handler(auth.Handler()))
 	listener, err := net.Listen("tcp", c.Listen)
 	if err != nil {
 		logger.Error("HTTP listen failed")
