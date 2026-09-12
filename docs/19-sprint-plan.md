@@ -41,4 +41,4 @@ Sprint 1 implementation is authorized and covers the identity/access scope only.
 
 Owner decision (2026-09-12, continuing the 2026-09-11 review): **Gate B APPROVED; Sprint 2 AUTHORIZED; implementation COMPLETE; Sprint 2 acceptance OPEN; Gates C/D CLOSED.** Live GET challenge and authentic real Meta POST proof are mandatory Sprint 2 acceptance evidence, not prerequisites for starting the endpoint implementation. Sprint 0/1 acceptance remains COMPLETE. No outbound WhatsApp or Sprint 3 work is authorized.
 
-See [Gate B decision](25-gate-b-evidence.md) and [Sprint 2 evidence](26-sprint-2-evidence.md) for local tests and outstanding hosted/live acceptance proof.
+See [Gate B decision](25-gate-b-evidence.md) and [Sprint 2 evidence](26-sprint-2-evidence.md) for passing local tests, hosted run [34670353309](https://github.com/mbingsdk/whats/actions/runs/34670353309) on implementation commit e0a6550, and outstanding real Meta GET/POST acceptance proof.

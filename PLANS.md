@@ -37,7 +37,7 @@ Gate D: **CLOSED**, production: all blocking rows in doc 20 have evidence, named
 
 Owner decision (2026-09-12, continuing the 2026-09-11 review): **Gate B APPROVED; Sprint 2 AUTHORIZED; implementation COMPLETE; Sprint 2 acceptance OPEN; Gates C/D CLOSED.** Live GET challenge and authentic real Meta POST proof are mandatory Sprint 2 acceptance evidence, not prerequisites for starting the endpoint implementation. Sprint 0/1 acceptance remains COMPLETE. No outbound WhatsApp or Sprint 3 work is authorized.
 
-Implement existing-asset read synchronization, durable signed webhook ingestion and operational identity-authorized surfaces. Callback/subscription mutation still requires a concrete current-versus-proposed target review, explicit operator approval and rollback information. [Sprint 2 evidence](docs/26-sprint-2-evidence.md) separates local implementation verification, hosted CI and live Meta acceptance.
+Implement existing-asset read synchronization, durable signed webhook ingestion and operational identity-authorized surfaces. Callback/subscription mutation still requires a concrete current-versus-proposed target review, explicit operator approval and rollback information. [Sprint 2 evidence](docs/26-sprint-2-evidence.md) records passing local implementation checks and hosted run [34670353309](https://github.com/mbingsdk/whats/actions/runs/34670353309) for e0a6550. Live Meta GET/POST acceptance remains OPEN; Gates C/D remain CLOSED.
 
 ## Sprint 0 implementation record
 
