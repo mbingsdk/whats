@@ -21,6 +21,25 @@ func TestChallengeFailClosed(t *testing.T) {
 	if !ok || c != "12345" {
 		t.Fatal("valid challenge rejected")
 	}
+	// Live Meta verification supplied additional query metadata. Unknown keys
+	// cannot substitute for or duplicate any of the required challenge fields.
+	withMetadata := q.Encode() + "&metadata_a=one&metadata_b=two&metadata_c=three"
+	if got, valid := verifyChallenge(withMetadata, "synthetic-verify-token"); !valid || got != "12345" {
+		t.Fatal("additional metadata rejected valid challenge")
+	}
+	for _, bad := range []string{
+		withMetadata + "&hub.verify_token=synthetic-verify-token",
+		withMetadata + "&hub.mode=subscribe",
+		withMetadata + "&hub.challenge=12345",
+		strings.Replace(withMetadata, "hub.mode=subscribe", "hub.mode=wrong", 1),
+		strings.Replace(withMetadata, "hub.verify_token=synthetic-verify-token", "hub.verify_token=wrong", 1),
+		strings.Replace(withMetadata, "hub.challenge=12345&", "", 1),
+		withMetadata + "&invalid=%zz",
+	} {
+		if _, valid := verifyChallenge(bad, "synthetic-verify-token"); valid {
+			t.Fatal("metadata bypassed required challenge validation")
+		}
+	}
 	for _, key := range []string{"hub.mode", "hub.challenge", "hub.verify_token"} {
 		copy := url.Values{}
 		for k, v := range q {

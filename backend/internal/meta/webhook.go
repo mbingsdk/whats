@@ -28,7 +28,8 @@ func validSignature(raw []byte, headers []string, secret string) bool {
 }
 func verifyChallenge(query, token string) (string, bool) {
 	q, e := url.ParseQuery(query)
-	if e != nil || len(q) != 3 {
+	// Meta can include extra verification metadata; only the three required keys carry authority.
+	if e != nil {
 		return "", false
 	}
 	for _, key := range []string{"hub.mode", "hub.verify_token", "hub.challenge"} {
