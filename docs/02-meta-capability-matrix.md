@@ -1,5 +1,9 @@
 # Meta capability matrix
 
+Owner clarification (2026-09-15): **Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; Gate D CLOSED; Sprint 3 AUTHORIZED. COMPANY META BILLING CURRENCY UNKNOWN; PAID-SEND AUTHORITY CLOSED.** Currency must not be inferred from timezone, business/phone/recipient country, available rate cards or locale. Only a currently reviewed, provably zero-cost policy can permit the single operator-triggered controlled TEXT live reply after all recipient/callback/security prerequisites. Paid/template live sends, outbound media, campaigns and Sprint 4 remain unauthorized.
+
+Earlier dated status/review entries below are historical and superseded by this owner clarification where they describe Gate C or Sprint 3 authorization.
+
 Research attempted **2026-09-08 for every row**; public pricing/policy revisited **2026-09-09**. Initial inspections had no live account verification; the 2026-09-11 read-only result below supersedes that status for tested operations. Links resolve to [source evidence](21-research-register.md), with direct official references there. M06/M07 are official Meta Postman evidence, not third-party BSP material. Old samples prove documented surface only.
 
 Contract evidence and applicability are separate:

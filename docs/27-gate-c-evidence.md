@@ -1,5 +1,17 @@
 # Gate C evidence and decision
 
+Owner clarification (2026-09-15): **Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; Gate D CLOSED; Sprint 3 AUTHORIZED. COMPANY META BILLING CURRENCY UNKNOWN; PAID-SEND AUTHORITY CLOSED.** Currency must not be inferred from timezone, business/phone/recipient country, available rate cards or locale. Only a currently reviewed, provably zero-cost policy can permit the single operator-triggered controlled TEXT live reply after all recipient/callback/security prerequisites. Paid/template live sends, outbound media, campaigns and Sprint 4 remain unauthorized.
+
+## Owner decision and hosted baseline, 2026-09-15
+
+The September 14 research is accepted. Unknown billing currency blocks paid authority, not Gate C approval or local guard implementation. Zero cost must come from independent published current policy, never a missing rate/default/unknown currency. October effective-date changes remain binding; no timeless service-free assumption is authorized. All template live sends remain CLOSED under the explicit Sprint 3 scope, including the earlier proposed second test.
+
+Completed research was published at **4bc49539745ead1f3b5e53470e7aa77671ab29cc**. Hosted [run 34840457519](https://github.com/mbingsdk/whats/actions/runs/34840457519) passed all repository, PostgreSQL, browser and dependency steps on September 14, completed 11:55:40Z. It used isolated fixtures, not live Meta. This owner-clarification documentation commit will have its own hosted result recorded before implementation begins.
+
+## Historical research assessment, 2026-09-14
+
+The following dated research preserves the original assessment. Its Gate C CLOSED/currency-blocker interpretation is superseded above; original source facts, artifacts and actual test results are unchanged.
+
 Inspection/review record: **2026-09-14**. Sprint 0, Sprint 1 and Sprint 2 implementation and acceptance are COMPLETE. Gates A/B are APPROVED. **Gate C CLOSED; Gate D CLOSED; Sprint 3 NOT STARTED.** This package is research and executable specification only. No send adapter, product UI, migration or Sprint 2 webhook change is included.
 
 Current Gate C blocker: the company's billing currency is **UNKNOWN**. An explicit v26.0 WABA currency GET omitted the field; operator confirmation from WhatsApp Manager/Meta Billing is pending. Indonesia is the initial recipient market, not proof of IDR billing. Official USD and IDR numerical evidence has been obtained, but neither is selected as company configuration. If the company uses another currency, obtain its official card and repeat validation. No zero-cost exception is approved in this review.

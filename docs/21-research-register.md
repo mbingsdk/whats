@@ -1,5 +1,9 @@
 # Research register
 
+Owner clarification (2026-09-15): **Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; Gate D CLOSED; Sprint 3 AUTHORIZED. COMPANY META BILLING CURRENCY UNKNOWN; PAID-SEND AUTHORITY CLOSED.** Currency must not be inferred from timezone, business/phone/recipient country, available rate cards or locale. Only a currently reviewed, provably zero-cost policy can permit the single operator-triggered controlled TEXT live reply after all recipient/callback/security prerequisites. Paid/template live sends, outbound media, campaigns and Sprint 4 remain unauthorized.
+
+Earlier dated status/review entries below are historical and superseded by this owner clarification where they describe Gate C or Sprint 3 authorization.
+
 Initial inspection date: **2026-09-08**; pricing/policy and focused engineering references re-inspected **2026-09-09**. No authenticated Meta account/API test was performed. Research used official developer references first, then WhatsApp's public site, then Meta's official Postman workspace. No BSP documentation is used as normative technical evidence.
 
 ## Evidence rules

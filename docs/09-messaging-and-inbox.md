@@ -1,5 +1,9 @@
 # Messaging, inbox and content operations
 
+Owner clarification (2026-09-15): **Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; Gate D CLOSED; Sprint 3 AUTHORIZED. COMPANY META BILLING CURRENCY UNKNOWN; PAID-SEND AUTHORITY CLOSED.** Currency must not be inferred from timezone, business/phone/recipient country, available rate cards or locale. Only a currently reviewed, provably zero-cost policy can permit the single operator-triggered controlled TEXT live reply after all recipient/callback/security prerequisites. Paid/template live sends, outbound media, campaigns and Sprint 4 remain unauthorized.
+
+Earlier dated status/review entries below are historical and superseded by this owner clarification where they describe Gate C or Sprint 3 authorization.
+
 ## Shared inbox behavior
 
 One persistent thread per organization/phone/contact, with separate episodes for resolution and SLA measurement. Navigation always displays organization and sender number. An agent's list is filtered by team/phone scope before counts, snippets or search results are computed. Filters: team, assignee, state, number, priority, tags, unread, window state, oldest unanswered and search. Default sort prioritizes unresponded inbound, then activity, with stable ID tie-break.
