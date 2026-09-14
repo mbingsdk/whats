@@ -3,13 +3,13 @@
 Research attempted **2026-09-08 for every row**; public pricing/policy revisited **2026-09-09**. Initial inspections had no live account verification; the 2026-09-11 read-only result below supersedes that status for tested operations. Links resolve to [source evidence](21-research-register.md), with direct official references there. M06/M07 are official Meta Postman evidence, not third-party BSP material. Old samples prove documented surface only.
 
 Contract evidence and applicability are separate:
-- **VERIFIED_CURRENT_CONTRACT**: inspected current official specification for the pinned Graph version, including exact request/response, permissions and constraints. No operation has reached this state here.
+- **VERIFIED_CURRENT_CONTRACT**: inspected current official specification for the pinned Graph version, including exact request/response, permissions and constraints. The initial September 8 table had no such operations; the bounded September 14 Gate C rows below now have current first-party contract evidence.
 - **DOCUMENTED_OFFICIAL_SURFACE**: retrieved official description, historical request or indexed example establishes a surface only; current fields, limits and version compatibility remain unverified.
 - **UNVERIFIED**: insufficient inspected evidence. **NOT_PUBLICLY_EXPOSED** requires positive evidence of absence; none is asserted here.
 - **INTERNAL_PLATFORM_FEATURE**: planned local responsibility, not completed implementation.
 - **OPTIONAL_ACCOUNT_DEPENDENT**: conditional applicability; **DEFERRED**: delivery scope, neither is evidence quality.
 
-**ACCOUNT_VERIFICATION_REQUIRED applies to each external operation. The 2026-09-11 results below establish bounded verification for specific GETs only; all other account checks remain pending.** Each adapter needs both VERIFIED_CURRENT_CONTRACT and a recorded successful probe for its target app/WABA/phone, permissions, region and supported operation before enablement. Public policy/pricing prose alone cannot satisfy an API contract gate. Table restrictions identify additional checks. A historical request never enables an adapter.
+**ACCOUNT_VERIFICATION_REQUIRED applies separately to each external operation. September 11 asset GETs and September 14 template GETs establish bounded account reads; Sprint 2 acceptance establishes genuine inbound webhook delivery. Outbound remains unprobed.** Production enablement requires the bounded current contract and successful applicable account acceptance. Gate C performs no outbound probe; any first controlled send requires separate authorization and all financial/recipient guards. Public policy/pricing prose alone cannot satisfy an API contract gate. Table restrictions identify additional checks. A historical request never enables an adapter.
 
 Permission shorthand: WM = whatsapp_business_messaging; WA = whatsapp_business_management; BM = business_management for relevant business-portfolio queries. Possessing a scope is insufficient without app access level and assigned assets. A question mark means the exact permission is unverified. Webhook names marked ? are candidates, not a subscription contract. `none` means no webhook dependency in our plan, not proof Meta emits none.
 
@@ -37,19 +37,19 @@ All outbound variants below use the common internal send gate. Approved template
 
 | Feature / API | Contract evidence / applicability | Permission; webhook | Restrictions | Implementation and limits | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| Text, image, video, audio, document / phone messages | DOCUMENTED_OFFICIAL_SURFACE | WM; messages | Free-form permission governed by service window; MIME/size limits reverify | Typed content + raw pointer; media quarantine and storage | M07, M08 |
-| Sticker | DOCUMENTED_OFFICIAL_SURFACE | WM; messages | Static/animated constraints NEEDS VERIFICATION | Typed media; reject unverified send formats | M13 |
-| Contacts | DOCUMENTED_OFFICIAL_SURFACE | WM; messages | Exact schema needs test; documentation prose inconsistent | Internal contact-card type separate from CRM contact | M11 |
-| Location | DOCUMENTED_OFFICIAL_SURFACE | WM; messages | Live-location support not established | Coordinate bounds, safe map link; no live tracking promise | M12 |
-| Reply context and reaction | DOCUMENTED_OFFICIAL_SURFACE | WM; messages | Target/age restrictions NEEDS VERIFICATION | Same-thread context checks, unresolved targets preserved | M07 |
-| Interactive list/reply buttons | DOCUMENTED_OFFICIAL_SURFACE | WM; messages | Current component limits reverify | Versioned validators; selected IDs stored distinctly from labels | M14 |
-| Approved template send | DOCUMENTED_OFFICIAL_SURFACE | WM; messages | Correct category/language/variables and status | Freeze version; fresh status and pricing checks | M06, M15 |
+| Text, image, video, audio, document / phone messages | VERIFIED_CURRENT_CONTRACT, bounded guides | WM; messages | Service-window permission; current fields/MIME/limits in doc 27; outbound ACCOUNT_VERIFICATION_REQUIRED | Typed payloads; media IDs/links require tenant and SSRF controls; NOT IMPLEMENTED | M66 |
+| Sticker | VERIFIED_CURRENT_CONTRACT, bounded guide | WM; messages | WebP static 100 KB / animated 500 KB; account path untested | No unverified optional format; NOT IMPLEMENTED | M66 |
+| Contacts | VERIFIED_CURRENT_CONTRACT, bounded guide | WM; messages | formatted_name required; current guide maximum 257; outbound account untested | Contact-card payload separate from CRM | M66 |
+| Location | VERIFIED_CURRENT_CONTRACT, bounded guide | WM; messages | Required latitude/longitude; optional name/address; service window | No live-location claim | M66 |
+| Reply context and reaction | Reaction VERIFIED_CURRENT_CONTRACT; reply-context extensions DOCUMENTED_OFFICIAL_SURFACE | WM; messages | Reaction same-thread received target, at most 30 days; only sent status; account untested | Unverified extensions/removal remain disabled | M66 |
+| Interactive list/reply buttons | VERIFIED_CURRENT_CONTRACT, bounded guides | WM; messages | Exact component/body limits in doc 27; account untested | List/reply/CTA evidence does not enable Flows/catalog | M66 |
+| Approved template send | VERIFIED_CURRENT_CONTRACT for bounded simple template fields | WM; messages | Current Meta category/status/language/parameters and price; account send untested | Safe utility candidate strategy only; no mutation/send in Gate C | M65, M66, M68 |
 | Flow interactive/template interaction | DOCUMENTED_OFFICIAL_SURFACE | WM plus WA for management; messages | Client support and template/Flow versions | Capability flag per sender, instance-token correlation | M22, M23 |
 | Orders/catalog/product interactions | DOCUMENTED_OFFICIAL_SURFACE; OPTIONAL_ACCOUNT_DEPENDENT | WM, WA; messages | Catalog linkage, commerce policy; detailed scopes UNKNOWN | Preserve inbound order subtype; commerce send adapter gated | M08, M31 |
-| Sent/delivered/read/failed observation | DOCUMENTED_OFFICIAL_SURFACE | WM; messages | Read receipts may be absent; exact error mapping reverify | Immutable facts, tolerate reorder; no fabricated read percentage | M09 |
+| Sent/delivered/read/failed observation | VERIFIED_CURRENT_CONTRACT, bounded status fields | WM; messages | May skip callbacks/reorder; real outbound lifecycle untested | Facts separate from estimates; no invented amount/read | M67 |
 | Mark inbound as read | DOCUMENTED_OFFICIAL_SURFACE | WM; messages for source ID | Separate from internal per-agent unread state | Explicit configurable team policy, idempotent effect | M07 |
-| Customer service window | DOCUMENTED_OFFICIAL_SURFACE | WM; messages | Based on last customer message; 24-hour reply rule | Backend window projection; unknown state blocks free-form | M01, M02 |
-| Free-entry pricing window | UNVERIFIED; OPTIONAL_ACCOUNT_DEPENDENT | WM; messages/referral details ? | Entry origin, timing and exact eligibility need developer verification | Track separately from service window, never grant free-form authority from pricing alone | M02, M03 |
+| Customer service window | VERIFIED_CURRENT_CONTRACT, bounded current rule | WM; messages | User messages or calls reset 24 hours; calling DEFERRED | Initial authenticated text basis; UNKNOWN blocks free-form; price independent | M62, M66, M67 |
+| Free-entry pricing window | VERIFIED_CURRENT_CONTRACT; OPTIONAL_ACCOUNT_DEPENDENT | WM; qualifying entry evidence | Qualifying mobile ad/CTA and response within 24h; 72h from response; account qualification unverified | Does not extend free-form permission | M62 |
 | Meta-facing typing indicator | UNVERIFIED | WM ?; UNKNOWN | Current API conditions unknown | Disabled until official request verified; internal agent typing is separate | M26 |
 | Customer online/typing visibility | UNVERIFIED | UNKNOWN; UNKNOWN | No current evidence inspected | Do not promise customer presence; employee presence is internal | M26 |
 | Message edit/recall/delete-for-everyone; historical chat fetch | UNVERIFIED | UNKNOWN; UNKNOWN | Do not infer from old on-premises status fields | No product API; local retention deletion is not WhatsApp recall | M26, M29 |
@@ -60,14 +60,14 @@ All outbound variants below use the common internal send gate. Approved template
 
 | Feature / API | Contract evidence / applicability | Permission; webhook | Restrictions | Implementation and limits | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| Template sync/create/edit/delete | DOCUMENTED_OFFICIAL_SURFACE | WA; message_template_status_update | Exact mutation quotas, name reuse and editable fields unresolved | Sync/read first; mutations capability-gated; never promise arbitrary edits | M15, M16, M17 |
-| Template status/rejection | DOCUMENTED_OFFICIAL_SURFACE | WA; message_template_status_update | Rejection reason may be absent | Immutable observed history; refresh on events | M17 |
-| Template quality/performance/category changes | UNVERIFIED | WA; message_template_quality_update ?, template_category_update ? | Current fields/analytics eligibility unknown | Store observations only; internal usage metrics separately labeled | M15, M21, M26 |
+| Template sync/create/edit/delete | Read DOCUMENTED_OFFICIAL_SURFACE plus VERIFIED account GET; mutations DOCUMENTED_OFFICIAL_SURFACE only | WA; message_template_status_update | Five observed approved templates; mutation constraints unresolved | Read field inventory in doc 27; no mutation authorized | M15, M16, M17, M65 |
+| Template status/rejection | Observed GET fields VERIFIED account evidence; status webhook contract remains separately gated | WA; message_template_status_update | APPROVED/rejected_reason/updated time captured; metadata may be absent | Fresh selected-template GET before dispatch | M65, M68 |
+| Template quality/performance/category changes | Category-update VERIFIED_CURRENT_CONTRACT; quality GET observed; performance UNVERIFIED | WA; template_category_update; quality subscription unverified | Quality UNKNOWN on all five; no analytics promotion | Invalidate authorization on changed category/status/components | M65, M68 |
 | Flow list/create/JSON validation/publish/preview | DOCUMENTED_OFFICIAL_SURFACE | WA for management, WM for send; messages | Exact lifecycle edits and schema versions reverify | Internal versioning and validation UI; publish only with current evidence | M22, M23 |
 | Flow deprecate/delete | DOCUMENTED_OFFICIAL_SURFACE | WA; none | Allowed source states NEEDS VERIFICATION | Disabled until verified; official historical sample has command mismatch | M23 |
 | Flow data exchange endpoint / encryption | UNVERIFIED; OPTIONAL_ACCOUNT_DEPENDENT | WA; synchronous endpoint distinct from webhook | Encryption, signatures, deadlines and keys NEEDS VERIFICATION | DEFERRED; separate threat model and endpoint specification required | M23, M26 |
 | WABA analytics | DOCUMENTED_OFFICIAL_SURFACE | WA; none/polling | Supported dimensions/date ranges must be tested | Source-labeled imported aggregates, no invoice claims | M21 |
-| Pricing metadata from statuses; exact cost/invoice API | UNVERIFIED | WM/WA as applicable; messages | Current per-message billing fields/amounts unverified | Preserve metadata; amount nullable; manual official statement reconciliation supported | M03, M09 |
+| Pricing metadata from statuses; exact cost/invoice API | Metadata VERIFIED_CURRENT_CONTRACT; exact invoice API UNVERIFIED | WM/WA as applicable; messages | Optional model/type/category/billable, no monetary amount established | Keep estimate/reservation/reconciled invoice separate | M62, M67 |
 | Calling | UNVERIFIED; OPTIONAL_ACCOUNT_DEPENDENT | UNKNOWN; UNKNOWN | Country/account, user call permission, pricing unknown | DEFERRED and disabled; no call UI or recording promise | M28 |
 | Embedded Signup | DOCUMENTED_OFFICIAL_SURFACE; OPTIONAL_ACCOUNT_DEPENDENT | BM/WA and app review per selected flow; account fields | Provider/app access requirements | DEFERRED; existing company assets can use controlled connection | M24 |
 | Business app coexistence | UNVERIFIED; OPTIONAL_ACCOUNT_DEPENDENT | UNKNOWN; history/echo fields UNKNOWN | Existing company uses Cloud API; no demonstrated need | DEFERRED; require echo/history ingestion and external-spend accounting before enablement | M29 |
@@ -149,3 +149,16 @@ M55 latest credential recheck, 2026-09-11 12:21:29 UTC: Meta now reports SYSTEM_
 Owner decision (2026-09-12, continuing the 2026-09-11 review): **Gate B APPROVED; Sprint 2 AUTHORIZED; implementation COMPLETE; Sprint 2 acceptance OPEN; Gates C/D CLOSED.** Live GET challenge and authentic real Meta POST proof are mandatory Sprint 2 acceptance evidence, not prerequisites for starting the endpoint implementation. Sprint 0/1 acceptance remains COMPLETE. No outbound WhatsApp or Sprint 3 work is authorized.
 
 The approved boundary implements the supplied existing-App/WABA GET topology and strict webhook ingestion. Approval is a delivery decision, not automatic promotion of every contract claim to VERIFIED_CURRENT_CONTRACT. Official Postman/first-party examples are DOCUMENTED_OFFICIAL_SURFACE, tested account GETs are separately VERIFIED_ON_COMPANY_ACCOUNT, and real GET/POST delivery proof is still required for Sprint 2 acceptance. Optional adapters and all outbound capabilities stay disabled.
+
+## Gate C dependency review, 2026-09-14
+
+[Gate C evidence](27-gate-c-evidence.md) supersedes initial evidence only for the outbound/window/template-read/category/status/pricing dependencies identified above. **Gate C CLOSED; Sprint 3 NOT STARTED.** No campaign, automation, Flow, catalog, calling or registration capability is promoted.
+
+| Additional dependency | Evidence / account boundary | Operational result |
+| --- | --- | --- |
+| Delivered-message pricing / October policy | VERIFIED_CURRENT_CONTRACT from latest dated developer HTML; stale Markdown export excluded | Permission and price separate; October service allowance and utility charging require effective dates |
+| Indonesia rate evidence | Official July CSV and October PDF retrieved/hashed; USD and IDR alternatives | Numeric evidence available, company billing currency UNKNOWN; draft only |
+| Registry / confirmation / budgets | INTERNAL_PLATFORM_FEATURE; 39 offline specification cases | No runtime implementation, independent approval or publication |
+| Delivery semantics | HTTP acceptance distinct from status facts and invoice amounts | UNCERTAIN retains exposure; no blind POST retry |
+
+The target WABA timezone GET maps to America/Los_Angeles, not the operator's WITA timezone. Account discounts, external usage, payment readiness and authentication variant remain unverified; no discounted/free scope is inferred from missing fields. Six Graph GETs, zero mutations/sends. Detailed fields, limits, source hashes and deferred live account checks are in doc 27.

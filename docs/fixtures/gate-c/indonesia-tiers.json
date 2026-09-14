@@ -1,0 +1,367 @@
+{
+  "scope": "PORTFOLIO_MARKET_CATEGORY_MONTH",
+  "actual_company_tier": "UNKNOWN_USE_VERIFIED_LIST_UPPER_BOUND_ONLY",
+  "october_pdf_comparison": "PASS: all 36 Indonesia tier intervals and decimal amounts match July CSV and October PDF layout-text extraction. No visual PDF verification claimed.",
+  "rows": [
+    {
+      "market": "ID",
+      "currency": "USD",
+      "category": "UTILITY",
+      "from": 0,
+      "through": 750000,
+      "rate": "0.0250",
+      "effective_local_date": "2026-07-01",
+      "source_id": "USD-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "USD",
+      "category": "AUTHENTICATION",
+      "from": 0,
+      "through": 750000,
+      "rate": "0.0250",
+      "effective_local_date": "2026-07-01",
+      "source_id": "USD-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "USD",
+      "category": "AUTHENTICATION_INTERNATIONAL",
+      "from": 0,
+      "through": 750000,
+      "rate": "0.1360",
+      "effective_local_date": "2026-07-01",
+      "source_id": "USD-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "USD",
+      "category": "UTILITY",
+      "from": 750001,
+      "through": 4000000,
+      "rate": "0.0238",
+      "effective_local_date": "2026-07-01",
+      "source_id": "USD-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "USD",
+      "category": "AUTHENTICATION",
+      "from": 750001,
+      "through": 2000000,
+      "rate": "0.0238",
+      "effective_local_date": "2026-07-01",
+      "source_id": "USD-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "USD",
+      "category": "AUTHENTICATION_INTERNATIONAL",
+      "from": 750001,
+      "through": 2000000,
+      "rate": "0.1292",
+      "effective_local_date": "2026-07-01",
+      "source_id": "USD-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "USD",
+      "category": "UTILITY",
+      "from": 4000001,
+      "through": 25000000,
+      "rate": "0.0225",
+      "effective_local_date": "2026-07-01",
+      "source_id": "USD-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "USD",
+      "category": "AUTHENTICATION",
+      "from": 2000001,
+      "through": 6000000,
+      "rate": "0.0225",
+      "effective_local_date": "2026-07-01",
+      "source_id": "USD-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "USD",
+      "category": "AUTHENTICATION_INTERNATIONAL",
+      "from": 2000001,
+      "through": 6000000,
+      "rate": "0.1224",
+      "effective_local_date": "2026-07-01",
+      "source_id": "USD-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "USD",
+      "category": "UTILITY",
+      "from": 25000001,
+      "through": 75000000,
+      "rate": "0.0213",
+      "effective_local_date": "2026-07-01",
+      "source_id": "USD-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "USD",
+      "category": "AUTHENTICATION",
+      "from": 6000001,
+      "through": 30000000,
+      "rate": "0.0213",
+      "effective_local_date": "2026-07-01",
+      "source_id": "USD-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "USD",
+      "category": "AUTHENTICATION_INTERNATIONAL",
+      "from": 6000001,
+      "through": 30000000,
+      "rate": "0.1156",
+      "effective_local_date": "2026-07-01",
+      "source_id": "USD-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "USD",
+      "category": "UTILITY",
+      "from": 75000001,
+      "through": 150000000,
+      "rate": "0.0200",
+      "effective_local_date": "2026-07-01",
+      "source_id": "USD-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "USD",
+      "category": "AUTHENTICATION",
+      "from": 30000001,
+      "through": 60000000,
+      "rate": "0.0200",
+      "effective_local_date": "2026-07-01",
+      "source_id": "USD-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "USD",
+      "category": "AUTHENTICATION_INTERNATIONAL",
+      "from": 30000001,
+      "through": 60000000,
+      "rate": "0.1088",
+      "effective_local_date": "2026-07-01",
+      "source_id": "USD-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "USD",
+      "category": "UTILITY",
+      "from": 150000001,
+      "through": null,
+      "rate": "0.0188",
+      "effective_local_date": "2026-07-01",
+      "source_id": "USD-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "USD",
+      "category": "AUTHENTICATION",
+      "from": 60000001,
+      "through": null,
+      "rate": "0.0188",
+      "effective_local_date": "2026-07-01",
+      "source_id": "USD-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "USD",
+      "category": "AUTHENTICATION_INTERNATIONAL",
+      "from": 60000001,
+      "through": null,
+      "rate": "0.1020",
+      "effective_local_date": "2026-07-01",
+      "source_id": "USD-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "IDR",
+      "category": "UTILITY",
+      "from": 0,
+      "through": 750000,
+      "rate": "356.65",
+      "effective_local_date": "2026-07-01",
+      "source_id": "IDR-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "IDR",
+      "category": "AUTHENTICATION",
+      "from": 0,
+      "through": 750000,
+      "rate": "356.65",
+      "effective_local_date": "2026-07-01",
+      "source_id": "IDR-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "IDR",
+      "category": "AUTHENTICATION_INTERNATIONAL",
+      "from": 0,
+      "through": 750000,
+      "rate": "1940.13",
+      "effective_local_date": "2026-07-01",
+      "source_id": "IDR-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "IDR",
+      "category": "UTILITY",
+      "from": 750001,
+      "through": 4000000,
+      "rate": "338.82",
+      "effective_local_date": "2026-07-01",
+      "source_id": "IDR-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "IDR",
+      "category": "AUTHENTICATION",
+      "from": 750001,
+      "through": 2000000,
+      "rate": "338.82",
+      "effective_local_date": "2026-07-01",
+      "source_id": "IDR-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "IDR",
+      "category": "AUTHENTICATION_INTERNATIONAL",
+      "from": 750001,
+      "through": 2000000,
+      "rate": "1843.12",
+      "effective_local_date": "2026-07-01",
+      "source_id": "IDR-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "IDR",
+      "category": "UTILITY",
+      "from": 4000001,
+      "through": 25000000,
+      "rate": "320.99",
+      "effective_local_date": "2026-07-01",
+      "source_id": "IDR-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "IDR",
+      "category": "AUTHENTICATION",
+      "from": 2000001,
+      "through": 6000000,
+      "rate": "320.99",
+      "effective_local_date": "2026-07-01",
+      "source_id": "IDR-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "IDR",
+      "category": "AUTHENTICATION_INTERNATIONAL",
+      "from": 2000001,
+      "through": 6000000,
+      "rate": "1746.12",
+      "effective_local_date": "2026-07-01",
+      "source_id": "IDR-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "IDR",
+      "category": "UTILITY",
+      "from": 25000001,
+      "through": 75000000,
+      "rate": "303.15",
+      "effective_local_date": "2026-07-01",
+      "source_id": "IDR-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "IDR",
+      "category": "AUTHENTICATION",
+      "from": 6000001,
+      "through": 30000000,
+      "rate": "303.15",
+      "effective_local_date": "2026-07-01",
+      "source_id": "IDR-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "IDR",
+      "category": "AUTHENTICATION_INTERNATIONAL",
+      "from": 6000001,
+      "through": 30000000,
+      "rate": "1649.11",
+      "effective_local_date": "2026-07-01",
+      "source_id": "IDR-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "IDR",
+      "category": "UTILITY",
+      "from": 75000001,
+      "through": 150000000,
+      "rate": "285.32",
+      "effective_local_date": "2026-07-01",
+      "source_id": "IDR-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "IDR",
+      "category": "AUTHENTICATION",
+      "from": 30000001,
+      "through": 60000000,
+      "rate": "285.32",
+      "effective_local_date": "2026-07-01",
+      "source_id": "IDR-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "IDR",
+      "category": "AUTHENTICATION_INTERNATIONAL",
+      "from": 30000001,
+      "through": 60000000,
+      "rate": "1552.10",
+      "effective_local_date": "2026-07-01",
+      "source_id": "IDR-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "IDR",
+      "category": "UTILITY",
+      "from": 150000001,
+      "through": null,
+      "rate": "267.49",
+      "effective_local_date": "2026-07-01",
+      "source_id": "IDR-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "IDR",
+      "category": "AUTHENTICATION",
+      "from": 60000001,
+      "through": null,
+      "rate": "267.49",
+      "effective_local_date": "2026-07-01",
+      "source_id": "IDR-tiers-1"
+    },
+    {
+      "market": "ID",
+      "currency": "IDR",
+      "category": "AUTHENTICATION_INTERNATIONAL",
+      "from": 60000001,
+      "through": null,
+      "rate": "1455.10",
+      "effective_local_date": "2026-07-01",
+      "source_id": "IDR-tiers-1"
+    }
+  ]
+}

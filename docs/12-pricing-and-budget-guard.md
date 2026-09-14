@@ -2,7 +2,7 @@
 
 ## Evidence and policy boundary
 
-Official public pricing and messaging policy were re-inspected on **2026-09-09**. Pricing describes delivered-message charging by market/category, free service messages and applicable utility replies, utility/authentication volume tiers and eligible 72-hour free entry. Messaging policy still uses legacy conversation-pricing wording. Executable billing must follow reviewed effective-dated pricing/rate evidence, not inherit that wording; policy still governs consent and messaging permission. Exact rates, eligibility/account details and future changes remain **NEEDS VERIFICATION**; no numeric Meta rates are included. [Sources and discrepancy](21-research-register.md#conflicts-that-affect-implementation).
+Official pricing and current developer contracts were re-inspected on **2026-09-14**. [Gate C evidence](27-gate-c-evidence.md) records delivered-message charging, current concessions and the announced October 1 service allowance/utility-reply change. Official Indonesia USD/IDR numerical cards are available for July and October; company billing currency is UNKNOWN, so no company rate publication exists. The latest September 10 developer HTML takes precedence over an older Markdown export/public overview that omits October changes. Gate C remains CLOSED; Sprint 3 is NOT STARTED.
 
 Default: **block dispatch when potentially chargeable cost cannot be bounded by a verified policy**. This applies to every message type, including non-template messages; a service-window permission does not itself establish zero cost. A verified zero-cost policy can pass without paid confirmation, while consent, permissions and other guards still apply. A manual administrator checkbox cannot turn unknown pricing into known pricing. To allow uncertain discounts conservatively, use a verified non-discounted upper bound and explicit approval/confirmation, not an invented price.
 
@@ -62,3 +62,15 @@ Budgets have frozen period boundaries/timezone, warning, hard stop, approval thr
 If other apps/BSPs or the Business app can send on the same WABA, local guards cannot observe/reserve their spend before dispatch. Inventory this in connection setup. Label limits **WABA Control-controlled spend** until external usage is reliably imported; apply headroom or require exclusive gateway use. Coexistence stays disabled until this limitation is accepted. Alert on uncorrelated outgoing activity and reconciliation variance.
 
 Race tests must include two senders taking the final budget unit, opt-out during campaign, expired quote in queue, changed template category, policy midnight, month boundary, duplicate settlement and uncertain-send recovery. See doc 17.
+
+## Gate C rate evidence and rehearsal
+
+The [real-artifact rehearsal](fixtures/gate-c/registry-rehearsal.json) captured 20 rate rows and 36 utility/authentication tier rows, validated their decimal structure, and compared all 36 October PDF tier intervals/amounts with July CSV. Candidate state remains DRAFT because company currency/coverage is unresolved. Diff is a preview, review is pending and no publication exists. Proposed next_review_at is 2026-09-21T00:00:00Z, requiring reviewer acceptance.
+
+[Registry state definitions](27-gate-c-evidence.md#registry-operational-rehearsal) include SUPERSEDED as a derived immutable-publication relationship, not an edit to a PUBLISHED import. Existing database/API state and locking contracts remain unchanged. Numerical evidence is not authority to use synthetic fixture approvals or budgets.
+
+Observed WABA timezone is America/Los_Angeles. The October transition is 2026-10-01T07:00:00Z. Charging occurs on delivery: verify covered conservative exposure across the possible delivery horizon, including the next policy interval, or block. Never use IDR merely from recipient country or perform implicit FX conversion.
+
+From October, service messages after the first 1,000 delivered per phone/month use the official service list rate; utility in the service window can be charged. Complete external usage/allowance reservation is required to assert free quota; otherwise use a verified paid upper bound or block a zero-cost-only request. Utility/authentication tier discounts require portfolio-wide evidence; service/marketing discount tiers are not inferred. Authentication variant and company adjustments remain UNKNOWN.
+
+The future TEST budget has no configured currency/amount or approval. One controlled recipient and one paid authorization at a time, hard stop including uncertain reservations, no batches/campaigns. Owner approves the actual maximum after currency/rates are established and approves any positive-cost live test immediately before sending.

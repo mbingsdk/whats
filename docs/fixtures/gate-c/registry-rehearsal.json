@@ -1,0 +1,52 @@
+{
+  "mode": "DOCUMENTATION_REHEARSAL_NOT_RUNTIME_REGISTRY",
+  "scope": "INDONESIA; company currency unresolved",
+  "state": "DRAFT",
+  "base_publication_id": null,
+  "publication_id": null,
+  "import": {
+    "result": "CAPTURED",
+    "source_manifest": "source-manifest.json",
+    "candidate_rates": "indonesia-rates.json",
+    "candidate_tiers": "indonesia-tiers.json"
+  },
+  "validate": {
+    "numeric_structure": "PASS",
+    "rate_rows": 20,
+    "tier_rows": 36,
+    "october_tiers_compared": 36,
+    "company_currency": "BLOCKED_NOT_RETURNED",
+    "operational_coverage": "NOT_VALIDATED"
+  },
+  "diff": {
+    "status": "PREVIEW_ONLY_NOT_DIFFED",
+    "base": "NO_EXISTING_PUBLICATION",
+    "new_categories": [
+      "SERVICE_RATE_EFFECTIVE_2026-10-01"
+    ],
+    "indonesia_template_list_rate_changes": "NONE_BETWEEN_CAPTURED_JULY_AND_OCTOBER",
+    "policy_changes": [
+      "SERVICE_1000_MONTHLY_FREE_THEN_LIST",
+      "UTILITY_IN_SERVICE_WINDOW_PAID"
+    ],
+    "cross_currency_conversion": "FORBIDDEN"
+  },
+  "review": {
+    "status": "PENDING",
+    "reviewer": null,
+    "approval": null,
+    "proposed_next_review_at": "2026-09-21T00:00:00Z"
+  },
+  "publish": {
+    "status": "BLOCKED",
+    "reason": "No company currency validation, independent review or publication authority recorded"
+  },
+  "immutable_correction": "New import/review/publication with supersedes_publication_id; no historical edits",
+  "superseded_semantics": "Derived relationship between immutable publications; PUBLISHED import remains terminal",
+  "test_budget": {
+    "currency": null,
+    "maximum": null,
+    "owner_approval": null,
+    "enabled": false
+  }
+}

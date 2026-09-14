@@ -1,0 +1,223 @@
+{
+  "retrieved_at": "2026-09-14T06:40:43.912403+00:00",
+  "organization_boundary": "ONE_CONFIGURED_COMPANY_APP_WABA",
+  "graph_version": "v26.0",
+  "complete": true,
+  "count": 5,
+  "approved_count": 5,
+  "identifiers": "Exact Meta IDs/names retained only in minimized protected operator inventory; public aliases/hashes",
+  "rows": [
+    {
+      "alias": "T1",
+      "id_sha256": "38adf0fc164e66932ca3b03183d2660bc57fdffff9cf5de4a10a3be0ad812625",
+      "name_sha256": "bb96a46be58b9f73fc02bfbe1efc2846a232d8ea64befbee46591168f3a01fec",
+      "language": "en_US",
+      "category": "MARKETING",
+      "status": "APPROVED",
+      "components": [
+        {
+          "type": "HEADER",
+          "format": "IMAGE"
+        },
+        {
+          "type": "BODY",
+          "text": {
+            "redacted": true,
+            "length": 56,
+            "sha256": "18508f2d1d3f388d494e2be5e271ac8e4c35fc96563560bed3e60649e7aea4a8",
+            "parameter_indices": []
+          }
+        },
+        {
+          "type": "FOOTER",
+          "text": {
+            "redacted": true,
+            "length": 23,
+            "sha256": "bf1b8b05c8739ad7d777ee4da53ca2a230b4d4ee62311366d88817cb15870a94",
+            "parameter_indices": []
+          }
+        },
+        {
+          "type": "BUTTONS",
+          "buttons": [
+            {
+              "type": "URL",
+              "sensitive_values_redacted": true
+            }
+          ]
+        }
+      ],
+      "quality_score": {
+        "score": "UNKNOWN",
+        "date": 1789368044
+      },
+      "rejected_reason": "NONE",
+      "last_updated_time": "2026-09-11T11:38:08+0000"
+    },
+    {
+      "alias": "T2",
+      "id_sha256": "7e49c9ae1a22c5b60a87ba7061914110e812429138f0ef87d4e6a6144f11dfdb",
+      "name_sha256": "cfbf9d65a624e5e319759d7d8caf63f91a99c335ea2366cb5e313fce6ea65b60",
+      "language": "en_US",
+      "category": "UTILITY",
+      "status": "APPROVED",
+      "components": [
+        {
+          "type": "HEADER",
+          "format": "TEXT",
+          "text": {
+            "redacted": true,
+            "length": 15,
+            "sha256": "582ee1e295c2a0ec0d561c2f3bfd22d9d909371d6bf5da298b0117635143a9eb",
+            "parameter_indices": []
+          }
+        },
+        {
+          "type": "BODY",
+          "text": {
+            "redacted": true,
+            "length": 203,
+            "sha256": "bea8cc206306041456c18f6deac107c9604a2b1f3157509de71af45355c63791",
+            "parameter_indices": [
+              "1",
+              "2",
+              "3"
+            ]
+          }
+        },
+        {
+          "type": "FOOTER",
+          "text": {
+            "redacted": true,
+            "length": 23,
+            "sha256": "bf1b8b05c8739ad7d777ee4da53ca2a230b4d4ee62311366d88817cb15870a94",
+            "parameter_indices": []
+          }
+        },
+        {
+          "type": "BUTTONS",
+          "buttons": [
+            {
+              "type": "URL",
+              "sensitive_values_redacted": true
+            }
+          ]
+        }
+      ],
+      "quality_score": {
+        "score": "UNKNOWN",
+        "date": 1789368044
+      },
+      "rejected_reason": "NONE",
+      "last_updated_time": "2026-09-11T11:38:08+0000"
+    },
+    {
+      "alias": "T3",
+      "id_sha256": "a795d4d3bea1168b9a266a40cd2c0a8e1bc9ed9d9d9a7f37ea99e8a15188ffe2",
+      "name_sha256": "1295da6d7bb4dfa32af547d7eb70c68364eccd51e7a333361fda9f55fcd869de",
+      "language": "en_US",
+      "category": "MARKETING",
+      "status": "APPROVED",
+      "components": [
+        {
+          "type": "BODY",
+          "text": {
+            "redacted": true,
+            "length": 105,
+            "sha256": "56b9c94484c1858c95d32b385cf48f3d11ad7a1a54ccf39194b76cadf42d93bb",
+            "parameter_indices": []
+          }
+        }
+      ],
+      "quality_score": {
+        "score": "UNKNOWN",
+        "date": 1789368044
+      },
+      "rejected_reason": "NONE",
+      "last_updated_time": "2026-09-11T11:38:08+0000"
+    },
+    {
+      "alias": "T4",
+      "id_sha256": "6361d1ef633cccb9448b18f67c7e32e7232546377203344faa346d834133f5cd",
+      "name_sha256": "35072c1ae546350e0bfa7ab11d49dc6f129e72ccd57ec7eb671225bbd197c8f1",
+      "language": "en_US",
+      "category": "UTILITY",
+      "status": "APPROVED",
+      "components": [
+        {
+          "type": "HEADER",
+          "format": "TEXT",
+          "text": {
+            "redacted": true,
+            "length": 11,
+            "sha256": "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e",
+            "parameter_indices": []
+          }
+        },
+        {
+          "type": "BODY",
+          "text": {
+            "redacted": true,
+            "length": 191,
+            "sha256": "15a82168553b47b6e7fa55cda3a8edf725c391716819ea7af2c1bf94fbfbc3d0",
+            "parameter_indices": []
+          }
+        },
+        {
+          "type": "FOOTER",
+          "text": {
+            "redacted": true,
+            "length": 41,
+            "sha256": "2297c68084afc72521a6a120ff6d945c1dbb67cc3549723afdf5befc25501ac9",
+            "parameter_indices": []
+          }
+        }
+      ],
+      "quality_score": {
+        "score": "UNKNOWN",
+        "date": 1789368044
+      },
+      "rejected_reason": "NONE",
+      "last_updated_time": "2026-09-11T11:38:08+0000"
+    },
+    {
+      "alias": "T5",
+      "id_sha256": "2c15b4cf9a992b4f1c1f19895b318ce7e9bdc4eeb703658926bc19ee4461e23d",
+      "name_sha256": "0b093c5224a55f1ce443880af50b22641965d9617094af73a62fddb598884b1c",
+      "language": "en_US",
+      "category": "MARKETING",
+      "status": "APPROVED",
+      "components": [
+        {
+          "type": "BODY",
+          "text": {
+            "redacted": true,
+            "length": 73,
+            "sha256": "d0aae0f4492afbf26dd53951741a872211273650e9f6b0b3a258094dbfb2348f",
+            "parameter_indices": []
+          }
+        },
+        {
+          "type": "BUTTONS",
+          "buttons": [
+            {
+              "type": "URL",
+              "sensitive_values_redacted": true
+            }
+          ]
+        },
+        {
+          "type": "CAROUSEL"
+        }
+      ],
+      "quality_score": {
+        "score": "UNKNOWN",
+        "date": 1789368044
+      },
+      "rejected_reason": "NONE",
+      "last_updated_time": "2026-09-11T11:38:08+0000"
+    }
+  ],
+  "outbound_sent": false,
+  "mutation_count": 0
+}

@@ -15,7 +15,7 @@ Tests demonstrate specified behavior, especially isolation and external-effect b
 | E2E | Go+Next+Postgres with controllable fake Meta server and reviewed test-account smoke checks; no real customer campaigns |
 | Operations | Backup restore/erasure ledger, rollback across schema versions, secret rotation, dependency outages, disk/queue saturation |
 
-Use fake clock and deterministic policy fixtures for boundaries; no sleeps to test time-dependent transitions. Use actual PostgreSQL locking, not mocked repositories, for race guarantees. Money fixtures are clearly synthetic rates and never shipped as real rate cards. Outbound mock distinguishes pre-connect failure, definite rejection, accepted-then-timeout and reordered callbacks.
+Use fake clock and deterministic policy fixtures for boundaries; no sleeps to test time-dependent transitions. Use actual PostgreSQL locking, not mocked repositories, for race guarantees. Synthetic money scenarios are labeled and never shipped as real rate cards. Gate C also retains separately labeled real official numerical evidence; these draft evidence fixtures are not published runtime configuration. Outbound mock distinguishes pre-connect failure, definite rejection, accepted-then-timeout and reordered callbacks.
 
 ## Critical scenarios and expected evidence
 
@@ -99,3 +99,11 @@ python scripts/dev.py check runs source links/checksums/route coverage, formatti
 The Meta package uses httptest Graph/signature fixtures and a disposable real PostgreSQL database. CI requires no live Meta credentials. Cases include auth/permission/rate/error redaction, pagination loop/foreign-host/size/version failures; coalesced concurrent snapshot persistence and non-destructive absence; exact raw signature/duplicate GET rejection; durable duplicate ACK, semantic rebatching, encrypted evidence binding, unknown/quarantine/permanent invalid states, injected SQL failure through eight retries/DLQ, replay generation/idempotency and populated-table isolation/privilege denial.
 
 Live account synchronization, real public challenge and authentic Meta POST are separate operator-controlled evidence. Locally generated HMAC requests demonstrate implementation correctness only; they cannot be relabeled as real Meta delivery. Hosted success must refer to the actual Sprint 2 commit. See [Sprint 2 evidence](26-sprint-2-evidence.md).
+
+## Gate C executable specification, 2026-09-14
+
+**Gate C CLOSED; Sprint 3 NOT STARTED.** Run python docs/fixtures/gate-c/check_spec.py. The [39-case fixture matrix](fixtures/gate-c/pricing-cases.json) includes A–L from the owner's request plus October allowance/charging, WABA timezone boundaries, delivery crossing policy dates, replay/future timestamps, stale/paused templates, permissions/consent, currency/coverage, budget, organization-scoped idempotency and uncertain outcomes. [Detailed evidence and expected decisions](27-gate-c-evidence.md#executable-specification-and-future-tests).
+
+Executed: 39 offline decisions PASS, 20 decimal rate rows PASS and 36 contiguous tier rows PASS. Separate original-artifact comparison confirms all 36 October PDF tier intervals/amounts match July CSV. The model makes zero network calls and imports no product code. Synthetic assumptions do not create real recipient consent, rate publication, budget or owner approval. In-memory duplicate handling is not a PostgreSQL concurrency test.
+
+Required later Sprint 3 acceptance: two-tenant runtime RLS/FK/pool tests; concurrent last-unit budget reservation; single-use confirmation/idempotency conflict; denial committed before permit authorization; template/rate publication versus queued dispatch; expiry at dispatch; post-write timeout/crash and lost provider ID; duplicate/reordered/orphan statuses and unknown pricing metadata. Keep these as unexecuted product requirements until code exists. Live tests follow the controlled recipient/budget/callback and immediate paid-test approval policy in doc 27.

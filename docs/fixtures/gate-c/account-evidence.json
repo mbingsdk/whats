@@ -1,0 +1,75 @@
+{
+  "template_operations": [
+    {
+      "at": "2026-09-14T06:40:41.092878+00:00",
+      "method": "GET",
+      "surface": "WABA/message_templates",
+      "fields": "DEFAULT",
+      "mutation": false,
+      "http_status": 200,
+      "graph_version": "v26.0",
+      "body_sha256": "a62ae172e8bc984e8c5b42c29978a349ff4a684de7d217f5144451599821d89d"
+    },
+    {
+      "at": "2026-09-14T06:40:42.747187+00:00",
+      "method": "GET",
+      "surface": "WABA",
+      "fields": "id,currency",
+      "mutation": false,
+      "http_status": 200,
+      "graph_version": "v26.0",
+      "body_sha256": "f577a9487b2cd3bc46d032c74c72415ecaa3acf6044e94d625a0076e3e21b991"
+    },
+    {
+      "at": "2026-09-14T06:40:43.311104+00:00",
+      "method": "GET",
+      "surface": "WABA/message_templates",
+      "fields": "id,name,language,status,category,quality_score,rejected_reason,last_updated_time",
+      "mutation": false,
+      "http_status": 200,
+      "graph_version": "v26.0",
+      "body_sha256": "8973e81f4d07648946d216e9a7dfa38fed6e78edc6610182353ce90ee2738d86"
+    }
+  ],
+  "billing_operations": [
+    {
+      "at": "2026-09-14T11:25:38.227841+00:00",
+      "method": "GET",
+      "surface": "WABA",
+      "field": "timezone_id",
+      "mutation": false,
+      "http_status": 200,
+      "graph_version": "v26.0",
+      "returned": true,
+      "value": "1"
+    },
+    {
+      "at": "2026-09-14T11:25:38.794909+00:00",
+      "method": "GET",
+      "surface": "WABA",
+      "field": "primary_business_location",
+      "mutation": false,
+      "http_status": 200,
+      "graph_version": "v26.0",
+      "returned": false,
+      "value": null
+    },
+    {
+      "at": "2026-09-14T11:25:39.201342+00:00",
+      "method": "GET",
+      "surface": "WABA",
+      "field": "auth_international_rate_eligibility",
+      "mutation": false,
+      "http_status": 200,
+      "graph_version": "v26.0",
+      "returned": false,
+      "value": null
+    }
+  ],
+  "currency": "NOT_RETURNED_BY_GET",
+  "currency_operator_confirmation": "PENDING",
+  "timezone_id": "1",
+  "timezone_name": "America/Los_Angeles",
+  "no_outbound": true,
+  "no_mutations": true
+}

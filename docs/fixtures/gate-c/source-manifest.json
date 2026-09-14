@@ -1,0 +1,404 @@
+{
+  "inspection_date": "2026-09-14",
+  "secrets_included": false,
+  "raw_artifacts": "Ignored local operator evidence; source bytes not rewritten",
+  "sources": [
+    {
+      "id": "audio-messages",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/audio-messages/",
+      "retrieved_at": "2026-09-14T06:43:18.517152+00:00",
+      "http_status": 200,
+      "sha256": "9ad41a630d94062ea4dea031ccc9492b0a393333a2f77c79f3c5a2ec37f4647f",
+      "title": "Audio messages | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "contacts-messages",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/contacts-messages/",
+      "retrieved_at": "2026-09-14T06:43:18.517806+00:00",
+      "http_status": 200,
+      "sha256": "698bcd5708bee4b295d1c164d52cace9145b6d0adc24c1282fc13ee7d5300d41",
+      "title": "Contacts messages | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "document-messages",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/document-messages/",
+      "retrieved_at": "2026-09-14T06:43:18.541239+00:00",
+      "http_status": 200,
+      "sha256": "d1cdca0694135f2cdb72779823329f38a75ba22bf5756a383637a93a3dd520b3",
+      "title": "Document messages | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "image-messages",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/image-messages/",
+      "retrieved_at": "2026-09-14T06:43:22.058856+00:00",
+      "http_status": 200,
+      "sha256": "6cfc7394f13a336e1b7c78b8cdfd7fb64c40dbd9c9793cd5e9e561c4a1a14f6c",
+      "title": "Image messages | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "interactive-cta-url-messages",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/interactive-cta-url-messages/",
+      "retrieved_at": "2026-09-14T06:43:22.148495+00:00",
+      "http_status": 200,
+      "sha256": "a5d977c901df4fb74c633a6848f51517286853800b8c87cc9895ef9dba900cf1",
+      "title": "Interactive Call-to-Action URL Button Messages | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "interactive-list-messages",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/interactive-list-messages/",
+      "retrieved_at": "2026-09-14T06:43:23.017437+00:00",
+      "http_status": 200,
+      "sha256": "67cdfcc1c18849bfe2f7dc6bf3c14376eef18323bd65549613bd12fc642dd4dd",
+      "title": "Interactive list messages | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "interactive-reply-buttons-messages",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/interactive-reply-buttons-messages/",
+      "retrieved_at": "2026-09-14T06:43:25.254186+00:00",
+      "http_status": 200,
+      "sha256": "705d9489a2ef82ebe5435dccee9b42f6ba82fecac1809002ce012c184503c6f5",
+      "title": "Interactive reply buttons messages | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "location-messages",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/location-messages/",
+      "retrieved_at": "2026-09-14T06:43:26.797033+00:00",
+      "http_status": 200,
+      "sha256": "6f7409c29cfcfa2a1f3c4daa28b95bdaf894c4613192999f4c6f7530bca106bb",
+      "title": "Location messages | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "reaction-messages",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/reaction-messages/",
+      "retrieved_at": "2026-09-14T06:43:28.687658+00:00",
+      "http_status": 200,
+      "sha256": "8bdea20a97bd9a4a9c0985bcd5fb0fb27c5245dfc4749f24580e1aa98a4d2a5b",
+      "title": "Reaction messages | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "send-messages",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/send-messages/",
+      "retrieved_at": "2026-09-14T06:43:34.717721+00:00",
+      "http_status": 200,
+      "sha256": "51301e5c840cb0ad2bdf6f9790d0a6c1f3b5172c9ad42b634c609a88b9b20643",
+      "title": "Service messages | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "sticker-messages",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/sticker-messages/",
+      "retrieved_at": "2026-09-14T06:43:35.256381+00:00",
+      "http_status": 200,
+      "sha256": "bbbb9414adcf5dfbb6d173f09724c4032258d1208ea33d510aea88da2d554c18",
+      "title": "Sticker messages | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "text-messages",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/text-messages/",
+      "retrieved_at": "2026-09-14T06:43:36.904500+00:00",
+      "http_status": 200,
+      "sha256": "9416d7e1e550ae38434bc064ba55cdcc3306ba9fd0adef99a477db9af477bf25",
+      "title": "Text messages | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "video-messages",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/video-messages/",
+      "retrieved_at": "2026-09-14T06:43:38.000383+00:00",
+      "http_status": 200,
+      "sha256": "6be51fe7fe000c9d83164c9bf90daa20d266e993dfeb843cabcdaf61e262642d",
+      "title": "Video Messages | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "template-per-user-limits",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/marketing-templates/per-user-limits/",
+      "retrieved_at": "2026-09-14T06:43:54.204776+00:00",
+      "http_status": 200,
+      "sha256": "fcaadf2acdf82cad7eaaca872547f269a8dc27843f2cf4c0321cbdadb855fd5c",
+      "title": "Per-user marketing template message limits | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "template-overview",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/overview/",
+      "retrieved_at": "2026-09-14T06:43:55.585826+00:00",
+      "http_status": 200,
+      "sha256": "f64fde4f8c6b530660ffc568fbce234ef5c5b071d0cd9200f5cc85e16589e9d6",
+      "title": "Template fundamentals | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "template-utility-templates",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/utility-templates/utility-templates/",
+      "retrieved_at": "2026-09-14T06:43:57.522639+00:00",
+      "http_status": 200,
+      "sha256": "e5689ef2e234d1f4433d7f7f7a3eb758194bbdfabf06be535a4f9a589d7ec4b4",
+      "title": "Utility templates | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "pricing-markdown",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing.md",
+      "retrieved_at": "2026-09-14T06:43:58.809309+00:00",
+      "http_status": 200,
+      "sha256": "8f85c91c2448d4457dc3171c6a90476f69687239cacdbad84ce507f6b1c90fba",
+      "title": "Pricing on the WhatsApp Business Platform",
+      "retrieval_quality": "READ_STALE_VARIANT_MISSING_LATEST_OCTOBER_POLICY"
+    },
+    {
+      "id": "non-template",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing/non-template-messages/",
+      "retrieved_at": "2026-09-14T06:43:59.362875+00:00",
+      "http_status": 200,
+      "sha256": "023b427cbad052d595bcd6b6a0ad4084b742087fc6427c520e44a27edf867fd9",
+      "title": "Upcoming pricing updates for Meta Business Agent, service and utility messages | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "auth-international",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing/authentication-international-rates/",
+      "retrieved_at": "2026-09-14T06:44:00.430403+00:00",
+      "http_status": 200,
+      "sha256": "18731fae9cc30d68367dc8de23210eb28bfd3c2ff0195eee4d46de3e84a779c3",
+      "title": "Authentication-international rates | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "status-webhook",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/webhooks/reference/messages/status/",
+      "retrieved_at": "2026-09-14T06:44:01.020931+00:00",
+      "http_status": 200,
+      "sha256": "8d390a047e5f01a52d88aeb6d52d59ace01c41150472876ed4bcede64dd8dd39",
+      "title": "Status messages webhook reference | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "inbound-text",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/webhooks/reference/messages/text/",
+      "retrieved_at": "2026-09-14T06:44:01.673846+00:00",
+      "http_status": 200,
+      "sha256": "7ed92d8db2aa747277a44b61d01f32ed151f916434935017dc6f412be86b45ce",
+      "title": "Text messages webhook reference | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "message-template-api",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/reference/whatsapp-business-account/message-template-api",
+      "retrieved_at": "2026-09-14T06:50:09.002080+00:00",
+      "http_status": 200,
+      "sha256": "e942dc9059eaa5fccfa073d93e3361bd823354f5c65df872386ab3f7711be709",
+      "title": "WhatsApp Cloud API - Message Template API | Meta for Developers",
+      "retrieval_quality": "SHELL_ONLY_NOT_CONTRACT"
+    },
+    {
+      "id": "template-categorization",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/template-categorization",
+      "retrieved_at": "2026-09-14T06:50:09.002743+00:00",
+      "http_status": 200,
+      "sha256": "a7792bcb825b7d35af6e4b87c3236b523805236157651104d00c9d49aa00fb03",
+      "title": "Template categorization | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "message-api",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/reference/whatsapp-business-phone-number/message-api",
+      "retrieved_at": "2026-09-14T06:50:09.003130+00:00",
+      "http_status": 200,
+      "sha256": "f3556c9c9bdfd4728cdfd928d1ad6e741f41ad0333b5fcf2798f4053ed174e6d",
+      "title": "WhatsApp Cloud API - Message API | Meta for Developers",
+      "retrieval_quality": "SHELL_ONLY_NOT_CONTRACT"
+    },
+    {
+      "id": "timezone-ids",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/timezone-ids/",
+      "retrieved_at": "2026-09-14T06:50:09.003495+00:00",
+      "http_status": 200,
+      "sha256": "2145f05dffda0d9c819eba0e23d8a5643d214a269231bd9b2a5064563e15fa3a",
+      "title": "Timezone IDs | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "template_category_update",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/webhooks/reference/template_category_update/",
+      "retrieved_at": "2026-09-14T06:50:12.013895+00:00",
+      "http_status": 200,
+      "sha256": "8d46aa56403a547aae1740cc6effe63808ca191b378b4930e8117e0abc10e281",
+      "title": "template_category_update webhook reference | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "error-codes",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "retrieved_at": "2026-09-14T06:50:12.231565+00:00",
+      "http_status": 200,
+      "sha256": "7033cebdb30216c62ae70cf7959d0bcf3096863fa9e5b76743ac986a4d96743d",
+      "title": "WhatsApp error codes | Meta for Developers",
+      "retrieval_quality": "READ_SUBSTANTIVE_CURRENT_HTML"
+    },
+    {
+      "id": "pricing",
+      "url": "https://whatsappbusiness.com/products/platform-pricing/",
+      "retrieved_at": "2026-09-14T06:41:18.411135+00:00",
+      "http_status": 200,
+      "sha256": "3a78af01c64df769e9c5c42697d63687b2ccb5fb160d63a58b4659afb84bcaf5",
+      "retrieval_quality": "READ_CURRENT_HTML"
+    },
+    {
+      "id": "developer-pricing",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing",
+      "retrieved_at": "2026-09-14T06:41:18.727268+00:00",
+      "http_status": 200,
+      "sha256": "ea440b87f09dadfc89ae21449fccf51807d2ba308da1aaf81adf080b8e22cca4",
+      "retrieval_quality": "READ_CURRENT_HTML"
+    },
+    {
+      "id": "developer-updates",
+      "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing/updates-to-pricing",
+      "retrieved_at": "2026-09-14T06:41:23.002077+00:00",
+      "http_status": 200,
+      "sha256": "3c2154d7cdda32261f3c90cb63eb7f9e25ea19eec4dd0298b128afd39789649f",
+      "retrieval_quality": "SHELL_ONLY_NOT_CONTRACT"
+    },
+    {
+      "id": "USD-rates-1",
+      "label": "Tarif USD",
+      "source_page": "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing",
+      "retrieved_at": "2026-09-14T06:45:41.807982+00:00",
+      "artifact_identity": "/v/t39.8562-6/735608455_876449615529066_702006520977041900_n.csv",
+      "http_status": 200,
+      "sha256": "9aa0fcb64bd1455aa010b5738a3eca90d290f09ae1a71a153d0d148348408ffa",
+      "bytes": 2547,
+      "format": "CSV_UTF8",
+      "parse_status": "PARSED",
+      "effective_date": "2026-07-01"
+    },
+    {
+      "id": "USD-tiers-1",
+      "label": "Tingkat volume USD",
+      "source_page": "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing",
+      "retrieved_at": "2026-09-14T06:45:41.808598+00:00",
+      "artifact_identity": "/v/t39.8562-6/737075891_1702232854373489_5701801020098956708_n.csv",
+      "http_status": 200,
+      "sha256": "7df77779621fa072b420fb4b2ea7fbe93ec4c311fb55c5dc1c34911b39eecf7e",
+      "bytes": 27481,
+      "format": "CSV_UTF8",
+      "parse_status": "PARSED",
+      "effective_date": "2026-07-01"
+    },
+    {
+      "id": "IDR-rates-1",
+      "label": "Tarif IDR",
+      "source_page": "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing",
+      "retrieved_at": "2026-09-14T06:45:41.808978+00:00",
+      "artifact_identity": "/v/t39.8562-6/736248761_4017328625226592_348718840733499952_n.csv",
+      "http_status": 200,
+      "sha256": "21e429a67aadc420eba36fc73be8bac7b10fc587303e3906bcadb0fd00c90a7c",
+      "bytes": 2605,
+      "format": "CSV_UTF8",
+      "parse_status": "PARSED",
+      "effective_date": "2026-07-01"
+    },
+    {
+      "id": "IDR-tiers-1",
+      "label": "Tingkatan volume IDR",
+      "source_page": "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing",
+      "retrieved_at": "2026-09-14T06:45:41.809285+00:00",
+      "artifact_identity": "/v/t39.8562-6/738217727_1011684251610955_29790659035043351_n.csv",
+      "http_status": 200,
+      "sha256": "1f68da2aff6e4e9c89d6ea12d5e55cc8ce3a7448528e2d47df82de375dd1ea9c",
+      "bytes": 27383,
+      "format": "CSV_UTF8",
+      "parse_status": "PARSED",
+      "effective_date": "2026-07-01"
+    },
+    {
+      "id": "USD-rates-2",
+      "label": "Tarif USD",
+      "source_page": "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing",
+      "retrieved_at": "2026-09-14T06:45:41.977733+00:00",
+      "artifact_identity": "/v/t39.8562-6/789612890_1382606183999337_7470194220917189092_n.csv",
+      "http_status": 200,
+      "sha256": "94913fa225da00935cd50a69a317373302d90afd47b57eeabb5e7cd64e78d867",
+      "bytes": 18981,
+      "format": "XLSX_ZIP_MISLABELLED_CSV",
+      "parse_status": "QUARANTINED_FORMAT_MISMATCH_PDF_USED_INSTEAD",
+      "effective_date": "2026-10-01"
+    },
+    {
+      "id": "USD-tiers-2",
+      "label": "Tingkat volume USD",
+      "source_page": "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing",
+      "retrieved_at": "2026-09-14T06:45:41.979826+00:00",
+      "artifact_identity": "/v/t39.8562-6/786354115_1797646594890310_8414709780847412526_n.csv",
+      "http_status": 200,
+      "sha256": "58545d0e37f194f16db035b9c06da474eae7c1d7c78a6339d25c512b1fd10d01",
+      "bytes": 41477,
+      "format": "XLSX_ZIP_MISLABELLED_CSV",
+      "parse_status": "QUARANTINED_FORMAT_MISMATCH_PDF_USED_INSTEAD",
+      "effective_date": "2026-10-01"
+    },
+    {
+      "id": "IDR-rates-2",
+      "label": "Tarif IDR",
+      "source_page": "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing",
+      "retrieved_at": "2026-09-14T06:45:42.012535+00:00",
+      "artifact_identity": "/v/t39.8562-6/788592723_38623693477214316_8055541768225154067_n.csv",
+      "http_status": 200,
+      "sha256": "9c0fe4bb2f952b9f64b25f1e2001f96d632c7a1fdca867aaf66ea0eeb9674dc6",
+      "bytes": 19245,
+      "format": "XLSX_ZIP_MISLABELLED_CSV",
+      "parse_status": "QUARANTINED_FORMAT_MISMATCH_PDF_USED_INSTEAD",
+      "effective_date": "2026-10-01"
+    },
+    {
+      "id": "IDR-tiers-2",
+      "label": "Tingkatan volume IDR",
+      "source_page": "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing",
+      "retrieved_at": "2026-09-14T06:45:42.027411+00:00",
+      "artifact_identity": "/v/t39.8562-6/790544474_3087547281450242_222100451689403121_n.csv",
+      "http_status": 200,
+      "sha256": "69a8465b00bde5548ad72fdb96d09ad654215681ef11cf233f1b451eeffdc552",
+      "bytes": 42138,
+      "format": "XLSX_ZIP_MISLABELLED_CSV",
+      "parse_status": "QUARANTINED_FORMAT_MISMATCH_PDF_USED_INSTEAD",
+      "effective_date": "2026-10-01"
+    },
+    {
+      "id": "USD-rates-october-pdf",
+      "source_page": "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing",
+      "artifact_identity": "/v/t39.8562-6/805027931_2131757020749275_6017678006881524861_n.pdf",
+      "retrieved_at": "2026-09-14T06:47:03.640330+00:00",
+      "http_status": 200,
+      "sha256": "10bb591ab1a0197f6f5b7258a861358cbc2e04950c8047982d8e5d0cb6502a97",
+      "bytes": 164384,
+      "pdf_magic": true,
+      "format": "PDF",
+      "parse_status": "PARSED",
+      "effective_date": "2026-10-01"
+    },
+    {
+      "id": "IDR-rates-october-pdf",
+      "source_page": "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing",
+      "artifact_identity": "/v/t39.8562-6/789612887_1347467550801012_8005390950553363571_n.pdf",
+      "retrieved_at": "2026-09-14T06:47:03.749254+00:00",
+      "http_status": 200,
+      "sha256": "1703a6c639694240c97955afa597226eecb2f5dc1705b8c1dca0495ba9bc4ea0",
+      "bytes": 165727,
+      "pdf_magic": true,
+      "format": "PDF",
+      "parse_status": "PARSED",
+      "effective_date": "2026-10-01"
+    }
+  ]
+}

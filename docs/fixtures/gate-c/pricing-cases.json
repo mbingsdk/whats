@@ -1,0 +1,536 @@
+{
+  "mode": "EXECUTABLE_SPECIFICATION_NO_NETWORK_NO_PRODUCT_IMPORTS",
+  "gate_c": "CLOSED",
+  "sprint_3_implemented": false,
+  "defaults_are_synthetic": "Permissions, recipient consent, reviewed publication, confirmation and TEST budget are assumed solely within the model; they are not actual owner approvals.",
+  "currency": "USD",
+  "cases": [
+    {
+      "id": "A",
+      "description": "User message 5 minutes ago; free-form reply before October change",
+      "inputs": {
+        "age_seconds": 300
+      },
+      "expected": {
+        "window": "ACTIVE",
+        "permission": "ALLOWED",
+        "pricing": "ZERO_SERVICE_POLICY",
+        "decision": "ALLOW_SPEC_ONLY",
+        "maximum": "0"
+      }
+    },
+    {
+      "id": "B",
+      "description": "Preflight at 23h59m; queued dispatch after expiry",
+      "inputs": {
+        "preflight_age_seconds": 86340,
+        "age_seconds": 86401
+      },
+      "expected": {
+        "window": "EXPIRED",
+        "permission": "TEMPLATE_REQUIRED",
+        "decision": "TEMPLATE_REQUIRED"
+      }
+    },
+    {
+      "id": "C",
+      "description": "User message 25 hours ago",
+      "inputs": {
+        "age_seconds": 90000
+      },
+      "expected": {
+        "permission": "TEMPLATE_REQUIRED",
+        "decision": "TEMPLATE_REQUIRED"
+      }
+    },
+    {
+      "id": "D",
+      "description": "Expired window and fresh approved Utility template",
+      "inputs": {
+        "type": "template",
+        "category": "UTILITY",
+        "age_seconds": 90000
+      },
+      "expected": {
+        "permission": "ALLOWED",
+        "pricing": "LIST_RATE",
+        "maximum": "0.0250",
+        "decision": "ALLOW_SPEC_ONLY"
+      }
+    },
+    {
+      "id": "E",
+      "description": "Marketing template inside active window is potentially paid",
+      "inputs": {
+        "type": "template",
+        "category": "MARKETING",
+        "age_seconds": 300
+      },
+      "expected": {
+        "pricing": "LIST_RATE",
+        "maximum": "0.0411",
+        "decision": "ALLOW_SPEC_ONLY"
+      }
+    },
+    {
+      "id": "F1",
+      "description": "Qualified free-entry pricing does not reopen free-form permission",
+      "inputs": {
+        "age_seconds": 90000,
+        "qualified_fep": true
+      },
+      "expected": {
+        "permission": "TEMPLATE_REQUIRED",
+        "pricing": "ZERO_FEP",
+        "decision": "TEMPLATE_REQUIRED"
+      }
+    },
+    {
+      "id": "F2",
+      "description": "Qualified free-entry with approved template outside service window",
+      "inputs": {
+        "type": "template",
+        "category": "MARKETING",
+        "age_seconds": 90000,
+        "qualified_fep": true
+      },
+      "expected": {
+        "permission": "ALLOWED",
+        "pricing": "ZERO_FEP",
+        "decision": "ALLOW_SPEC_ONLY"
+      }
+    },
+    {
+      "id": "G",
+      "description": "Missing paid rate coverage",
+      "inputs": {
+        "type": "template",
+        "category": "UTILITY",
+        "age_seconds": 90000,
+        "rate_coverage": false
+      },
+      "expected": {
+        "pricing": "UNKNOWN",
+        "decision": "PRICING_COVERAGE_MISSING"
+      }
+    },
+    {
+      "id": "H",
+      "description": "Published rate review overdue",
+      "inputs": {
+        "type": "template",
+        "category": "MARKETING",
+        "rate_review_current": false
+      },
+      "expected": {
+        "decision": "RATE_REVIEW_OVERDUE"
+      }
+    },
+    {
+      "id": "I",
+      "description": "Remote category changes after preflight",
+      "inputs": {
+        "type": "template",
+        "category": "MARKETING",
+        "approved_category": "UTILITY"
+      },
+      "expected": {
+        "decision": "TEMPLATE_CHANGED"
+      }
+    },
+    {
+      "id": "J",
+      "description": "Synthetic future price increase exceeds confirmed maximum",
+      "inputs": {
+        "type": "template",
+        "category": "UTILITY",
+        "age_seconds": 90000,
+        "synthetic_rate_override": "0.0260",
+        "confirmed_max": "0.0250"
+      },
+      "expected": {
+        "maximum": "0.0260",
+        "decision": "NEW_CONFIRMATION_REQUIRED"
+      }
+    },
+    {
+      "id": "K",
+      "description": "Same scoped idempotency key and payload, two client submissions",
+      "inputs": {
+        "kind": "idempotency",
+        "submissions": [
+          [
+            "org-a",
+            "client-1",
+            "hash-a"
+          ],
+          [
+            "org-a",
+            "client-1",
+            "hash-a"
+          ]
+        ]
+      },
+      "expected": {
+        "intents": 1,
+        "reservations": 1,
+        "network_requests": 0,
+        "conflicts": 0
+      }
+    },
+    {
+      "id": "L",
+      "description": "Timeout after request may have reached provider",
+      "inputs": {
+        "kind": "failure",
+        "observation": "WRITE_OR_ACCEPTANCE_POSSIBLE"
+      },
+      "expected": {
+        "state": "UNCERTAIN",
+        "automatic_retry": false,
+        "retain_exposure": true
+      }
+    },
+    {
+      "id": "M",
+      "description": "October service message with exclusive proved allowance remaining",
+      "inputs": {
+        "dispatch_at": "2026-10-01T00:00:01-07:00",
+        "allowance_proof": true,
+        "service_used": 999
+      },
+      "expected": {
+        "pricing": "ZERO_PROVEN_ALLOWANCE",
+        "maximum": "0",
+        "decision": "ALLOW_SPEC_ONLY"
+      }
+    },
+    {
+      "id": "N",
+      "description": "October service allowance exhausted",
+      "inputs": {
+        "dispatch_at": "2026-10-01T00:00:01-07:00",
+        "allowance_proof": true,
+        "service_used": 1000
+      },
+      "expected": {
+        "pricing": "LIST_RATE",
+        "maximum": "0.0250",
+        "decision": "ALLOW_SPEC_ONLY"
+      }
+    },
+    {
+      "id": "O",
+      "description": "Unknown other-sender usage cannot prove October zero cost",
+      "inputs": {
+        "dispatch_at": "2026-10-01T00:00:01-07:00",
+        "allowance_proof": false,
+        "zero_cost_only": true
+      },
+      "expected": {
+        "pricing": "LIST_RATE",
+        "decision": "ZERO_COST_REQUIRED"
+      }
+    },
+    {
+      "id": "P",
+      "description": "October Utility reply is paid even inside active window",
+      "inputs": {
+        "dispatch_at": "2026-10-01T00:00:01-07:00",
+        "type": "template",
+        "category": "UTILITY"
+      },
+      "expected": {
+        "pricing": "LIST_RATE",
+        "maximum": "0.0250",
+        "decision": "ALLOW_SPEC_ONLY"
+      }
+    },
+    {
+      "id": "Q",
+      "description": "Pre-October dispatch may deliver after price-policy boundary",
+      "inputs": {
+        "dispatch_at": "2026-09-30T23:59:59-07:00",
+        "delivery_upper_bound_at": "2026-10-01T00:00:30-07:00",
+        "zero_cost_only": true
+      },
+      "expected": {
+        "pricing": "LIST_RATE",
+        "decision": "ZERO_COST_REQUIRED"
+      }
+    },
+    {
+      "id": "R",
+      "description": "Exact October boundary uses WABA time, not operator time",
+      "inputs": {
+        "dispatch_at": "2026-10-01T07:00:00Z"
+      },
+      "expected": {
+        "pricing": "LIST_RATE",
+        "maximum": "0.0250"
+      }
+    },
+    {
+      "id": "S",
+      "description": "Missing trusted inbound evidence",
+      "inputs": {
+        "age_seconds": null
+      },
+      "expected": {
+        "window": "UNKNOWN",
+        "decision": "TEMPLATE_REQUIRED"
+      }
+    },
+    {
+      "id": "T",
+      "description": "Future-dated inbound must not extend permission",
+      "inputs": {
+        "age_seconds": -30
+      },
+      "expected": {
+        "window": "UNKNOWN",
+        "decision": "TEMPLATE_REQUIRED"
+      }
+    },
+    {
+      "id": "U",
+      "description": "Status event alone does not reset window",
+      "inputs": {
+        "age_seconds": 300,
+        "qualifying_user_message": false
+      },
+      "expected": {
+        "window": "UNKNOWN",
+        "decision": "TEMPLATE_REQUIRED"
+      }
+    },
+    {
+      "id": "V",
+      "description": "Replay preserves original 25-hour age",
+      "inputs": {
+        "age_seconds": 90000,
+        "replay_processing_age_seconds": 0
+      },
+      "expected": {
+        "window": "EXPIRED",
+        "decision": "TEMPLATE_REQUIRED"
+      }
+    },
+    {
+      "id": "W",
+      "description": "Warning state and five-second dispatch safety margin",
+      "inputs": {
+        "age_seconds": 86396
+      },
+      "expected": {
+        "window": "EXPIRING_SOON",
+        "decision": "TEMPLATE_REQUIRED"
+      }
+    },
+    {
+      "id": "X",
+      "description": "Stale remote template evidence",
+      "inputs": {
+        "type": "template",
+        "template_fresh": false
+      },
+      "expected": {
+        "decision": "TEMPLATE_EVIDENCE_STALE"
+      }
+    },
+    {
+      "id": "Y",
+      "description": "Paused template invalidates eligibility",
+      "inputs": {
+        "type": "template",
+        "template_status": "PAUSED"
+      },
+      "expected": {
+        "decision": "TEMPLATE_INELIGIBLE"
+      }
+    },
+    {
+      "id": "Z",
+      "description": "Currency cannot be inferred from recipient market",
+      "inputs": {
+        "type": "template",
+        "currency": null
+      },
+      "expected": {
+        "decision": "CURRENCY_UNKNOWN"
+      }
+    },
+    {
+      "id": "AA",
+      "description": "Same idempotency key with changed payload conflicts",
+      "inputs": {
+        "kind": "idempotency",
+        "submissions": [
+          [
+            "org-a",
+            "client-1",
+            "hash-a"
+          ],
+          [
+            "org-a",
+            "client-1",
+            "hash-b"
+          ]
+        ]
+      },
+      "expected": {
+        "intents": 1,
+        "reservations": 1,
+        "conflicts": 1,
+        "network_requests": 0
+      }
+    },
+    {
+      "id": "AB",
+      "description": "Idempotency keys are organization scoped",
+      "inputs": {
+        "kind": "idempotency",
+        "submissions": [
+          [
+            "org-a",
+            "client-1",
+            "hash-a"
+          ],
+          [
+            "org-b",
+            "client-1",
+            "hash-a"
+          ]
+        ]
+      },
+      "expected": {
+        "intents": 2,
+        "reservations": 2,
+        "conflicts": 0,
+        "network_requests": 0
+      }
+    },
+    {
+      "id": "AC",
+      "description": "Proven pre-connect failure requires all guards on retry",
+      "inputs": {
+        "kind": "failure",
+        "observation": "PROVEN_ZERO_REQUEST_BYTES"
+      },
+      "expected": {
+        "state": "RETRY_ELIGIBLE_AFTER_REAUTHORIZATION",
+        "automatic_retry": false,
+        "retain_exposure": false
+      }
+    },
+    {
+      "id": "AD",
+      "description": "Unclassified HTTP 5xx is not proof of rejection",
+      "inputs": {
+        "kind": "failure",
+        "observation": "UNCLASSIFIED_5XX"
+      },
+      "expected": {
+        "state": "UNCERTAIN",
+        "automatic_retry": false,
+        "retain_exposure": true
+      }
+    },
+    {
+      "id": "AE",
+      "description": "Success response without usable provider ID is uncertain",
+      "inputs": {
+        "kind": "failure",
+        "observation": "ACCEPTED_WITHOUT_ID"
+      },
+      "expected": {
+        "state": "UNCERTAIN",
+        "automatic_retry": false,
+        "retain_exposure": true
+      }
+    },
+    {
+      "id": "AF",
+      "description": "Definitely rejected invalid request is terminal",
+      "inputs": {
+        "kind": "failure",
+        "observation": "DEFINITE_INVALID_REJECTION"
+      },
+      "expected": {
+        "state": "FAILED",
+        "automatic_retry": false,
+        "retain_exposure": false
+      }
+    },
+    {
+      "id": "AG",
+      "description": "Insufficient TEST budget blocks even with confirmation",
+      "inputs": {
+        "type": "template",
+        "category": "MARKETING",
+        "budget_remaining": "0.0400"
+      },
+      "expected": {
+        "decision": "BUDGET_EXCEEDED"
+      }
+    },
+    {
+      "id": "AH",
+      "description": "Revoked scoped agent permission blocks a free reply",
+      "inputs": {
+        "actor_authorized": false
+      },
+      "expected": {
+        "decision": "PERMISSION_DENIED"
+      }
+    },
+    {
+      "id": "AI",
+      "description": "Consent revoked blocks any price class",
+      "inputs": {
+        "consent": false
+      },
+      "expected": {
+        "decision": "CONSENT_REQUIRED"
+      }
+    },
+    {
+      "id": "AJ",
+      "description": "A referral object alone does not establish free-entry pricing",
+      "inputs": {
+        "type": "template",
+        "category": "MARKETING",
+        "referral_observed": true,
+        "qualified_fep": false
+      },
+      "expected": {
+        "pricing": "LIST_RATE",
+        "maximum": "0.0411"
+      }
+    },
+    {
+      "id": "AK",
+      "description": "No verified location/eligibility for authentication variant",
+      "inputs": {
+        "type": "template",
+        "category": "AUTHENTICATION",
+        "age_seconds": 90000,
+        "auth_variant_verified": false
+      },
+      "expected": {
+        "decision": "AUTH_VARIANT_UNKNOWN"
+      }
+    },
+    {
+      "id": "AL",
+      "description": "Rate coverage missing after October rollover",
+      "inputs": {
+        "dispatch_at": "2026-10-01T00:00:00-07:00",
+        "rate_coverage": false
+      },
+      "expected": {
+        "decision": "PRICING_COVERAGE_MISSING"
+      }
+    }
+  ]
+}

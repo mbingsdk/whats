@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	"unicode/utf8"
 	"waba.local/control/internal/identity"
 )
 
@@ -24,7 +25,12 @@ func run() int {
 		fmt.Fprintln(os.Stderr, "BOOTSTRAP_PASSWORD_FILE required.")
 		return 1
 	}
-	in := identity.Input{Email: os.Getenv("BOOTSTRAP_EMAIL"), Password: strings.TrimRight(string(password), "\r\n"), Name: os.Getenv("BOOTSTRAP_NAME"), Slug: os.Getenv("BOOTSTRAP_ORGANIZATION_SLUG"), Timezone: os.Getenv("BOOTSTRAP_TIMEZONE")}
+	passwordText := strings.TrimRight(string(password), "\r\n")
+	if !utf8.ValidString(passwordText) || utf8.RuneCountInString(passwordText) < 12 || utf8.RuneCountInString(passwordText) > 256 {
+		fmt.Fprintln(os.Stderr, "Bootstrap password must contain 12-256 UTF-8 characters; update the file referenced by BOOTSTRAP_PASSWORD_FILE.")
+		return 1
+	}
+	in := identity.Input{Email: os.Getenv("BOOTSTRAP_EMAIL"), Password: passwordText, Name: os.Getenv("BOOTSTRAP_NAME"), Slug: os.Getenv("BOOTSTRAP_ORGANIZATION_SLUG"), Timezone: os.Getenv("BOOTSTRAP_TIMEZONE")}
 	if value := os.Getenv("BOOTSTRAP_ORGANIZATION_ID"); value != "" {
 		org, e := uuid.Parse(value)
 		if e != nil {

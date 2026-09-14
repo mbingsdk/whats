@@ -7,6 +7,7 @@ import secrets
 import shutil
 import subprocess
 import sys
+from operator_env import load_operator_env
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCAL = ROOT / ".local"
@@ -54,10 +55,11 @@ def prepare_identity():
         root.write_text(base64.b64encode(secrets.token_bytes(32)).decode(), encoding="utf-8")
         root.chmod(0o600)
 
-def backend_env(purpose="runtime"):
+def backend_env(purpose="runtime", overrides=None):
     prepare()
     prepare_identity()
     env = os.environ.copy()
+    env.update(overrides or {})
     for key in list(env):
         if key.startswith("TEST_") or key.startswith("MIGRATION_DATABASE_URL") or key == "DATABASE_URL" or (key.startswith("BOOTSTRAP_") and purpose != "bootstrap"):
             env.pop(key)
@@ -87,7 +89,16 @@ def npm(args):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=["up", "down", "migrate", "backend", "frontend", "test", "check", "e2e", "bootstrap", "mailworker", "metaworker"])
-    action = parser.parse_args().action
+    parser.add_argument("--env-file", action="append", default=[], metavar="PATH",
+                        help="Explicit operator config for bootstrap/backend/mailworker/metaworker; repeat to merge files.")
+    args = parser.parse_args()
+    action = args.action
+    if args.env_file and action not in {"bootstrap", "backend", "mailworker", "metaworker"}:
+        parser.error("--env-file is only supported for bootstrap/backend/mailworker/metaworker")
+    try:
+        overrides = load_operator_env(args.env_file)
+    except ValueError as error:
+        parser.error(str(error))
     if action == "up":
         prepare()
         prepare_identity()
@@ -98,7 +109,7 @@ def main():
     elif action == "frontend":
         npm(["run", "dev", "--workspace", "frontend"])
     else:
-        env = backend_env("test" if action in {"test", "check", "e2e"} else "migration" if action == "migrate" else "bootstrap" if action == "bootstrap" else "runtime")
+        env = backend_env("test" if action in {"test", "check", "e2e"} else "migration" if action == "migrate" else "bootstrap" if action == "bootstrap" else "runtime", overrides)
         if action == "migrate":
             run(["go", "run", "./cmd/migrate"], ROOT / "backend", env)
         elif action == "backend":
