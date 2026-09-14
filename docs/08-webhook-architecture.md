@@ -95,7 +95,7 @@ The identity mail outbox uses a restricted identity worker and mail_deliveries l
 
 Rate validation/diff jobs remain organization-scoped durable jobs. Capture import ID/revision/source checksum/base publication, calculate bounded reports, then compare the current revision under import lock before committing the state/report; stale work is discarded visibly and requires a new operation. They never publish rates. Explicit authorized publish is the atomic DB command in docs 05/06/12; its outbox event refreshes estimates/UI and alerts affected scheduled runs. Dispatch independently rechecks the head, so consumer delay cannot authorize stale prices. Reminder jobs alert before coverage/next_review_at; they do not scrape, extend validity or auto-approve.
 
-## Gate B and conditional Sprint 2 boundary
+## Historical pre-approval Gate B boundary
 
 Current official GET/POST references returned HTTP 429 during [Gate B research](25-gate-b-evidence.md). The signature candidate above remains unimplemented and cannot open the gate. Conditional Sprint 2 classifies message/status/asset/template/unknown events, with durable encrypted ingress and safe replay; full Inbox persistence, media downloads and every outbound effect remain outside the authorized implementation boundary. No webhook was received or tested live.
 
@@ -106,3 +106,9 @@ The owner's Gate B clarification authorizes implementation from inspected first-
 Raw SHA-256 transport dedupe precedes ACK after database commit. Minimal routing checks every entry WABA and metadata phone against the bound App/organization. Foreign/unknown asset envelopes are quarantined and unavailable to ordinary payload inspection/replay. Known-asset unknown fields persist and classify UNKNOWN. Missing message IDs/invalid known structures classify INVALID. No Inbox persistence or media fetch is performed.
 
 Claims use SKIP LOCKED, lease tokens and completion fencing. Processing attempts are bounded to eight; internal failures retry, exhausted failures become DEAD_LETTER. Successful local fact writes and attempt/state audit commit atomically. Replay adds evidence/generation and reuses original fact keys. Raw seven-day retention is enforced by the worker; replay refuses expired evidence. This is at-least-once delivery with idempotent local facts, not exactly-once network delivery. Body size is bounded by the configured HTTP cap (default 1 MiB) and ingress 4 MiB ceiling; these are application limits, not an asserted Meta maximum.
+
+## Observed live GET metadata, 2026-09-12
+
+The approved live Meta callback verification sent six query keys. Requiring exactly three total keys rejected a valid challenge; the narrow correction accepts extra query metadata without granting it authority. Each of hub.mode, hub.verify_token and hub.challenge must still occur exactly once and be nonempty; mode/token, challenge bounds and malformed-query checks remain fail-closed. Additional metadata cannot replace or duplicate a required field.
+
+The corrected endpoint passed the real GET configuration flow, followed by an authentic exact-byte App Secret HMAC POST, durable processing and audited idempotent replay. [The acceptance record](26-sprint-2-evidence.md) contains timestamps, bounded account evidence, regression/hosted results and the approved callback rollback. This observation does not promote inaccessible official references to VERIFIED_CURRENT_CONTRACT or change the production architecture. The temporary tunnel was closed.

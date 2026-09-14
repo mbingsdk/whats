@@ -1,6 +1,6 @@
 # Delivery plan
 
-Owner decision (2026-09-12, continuing the 2026-09-11 review): **Gate B APPROVED; Sprint 2 AUTHORIZED; implementation COMPLETE; Sprint 2 acceptance OPEN; Gates C/D CLOSED.** Live GET challenge and authentic real Meta POST proof are mandatory Sprint 2 acceptance evidence, not prerequisites for starting the endpoint implementation. Sprint 0/1 acceptance remains COMPLETE. No outbound WhatsApp or Sprint 3 work is authorized.
+Acceptance review (2026-09-14; live evidence captured 2026-09-12): **Gate B APPROVED; Sprint 2 implementation COMPLETE; Sprint 2 acceptance COMPLETE; Gates C/D CLOSED.** Real Meta GET challenge, authentic signed POST, durable ingestion, processing, authorized Event Center and replay evidence are verified. Sprint 0/1 acceptance remains COMPLETE. No outbound WhatsApp or Sprint 3 work is authorized.
 
 Historical owner override (2026-09-09): **Sprint 0 IMPLEMENTATION COMPLETE; Gate A APPROVED; Sprint 1 AUTHORIZED. Hosted CI verification PENDING - EXTERNAL BLOCKER.** Run 34356265759 was attempted and failed before repository steps because GitHub reported an account billing lock. Accepted local evidence closes implementation, not hosted verification. CI requirements remain intact; rerun hosted CI when available, record the real result and fix any repository failures. Gates B/C/D remain CLOSED.
 
@@ -39,6 +39,6 @@ Sprint 1 implementation is authorized and covers the identity/access scope only.
 
 ## Sprint 2 execution status
 
-Owner decision (2026-09-12, continuing the 2026-09-11 review): **Gate B APPROVED; Sprint 2 AUTHORIZED; implementation COMPLETE; Sprint 2 acceptance OPEN; Gates C/D CLOSED.** Live GET challenge and authentic real Meta POST proof are mandatory Sprint 2 acceptance evidence, not prerequisites for starting the endpoint implementation. Sprint 0/1 acceptance remains COMPLETE. No outbound WhatsApp or Sprint 3 work is authorized.
+Acceptance review (2026-09-14; live evidence captured 2026-09-12): **Gate B APPROVED; Sprint 2 implementation COMPLETE; Sprint 2 acceptance COMPLETE; Gates C/D CLOSED.** Real Meta GET challenge, authentic signed POST, durable ingestion, processing, authorized Event Center and replay evidence are verified. Sprint 0/1 acceptance remains COMPLETE. No outbound WhatsApp or Sprint 3 work is authorized.
 
-See [Gate B decision](25-gate-b-evidence.md) and [Sprint 2 evidence](26-sprint-2-evidence.md) for passing local tests, hosted run [34670353309](https://github.com/mbingsdk/whats/actions/runs/34670353309) on implementation commit e0a6550, and outstanding real Meta GET/POST acceptance proof.
+See [Gate B decision](25-gate-b-evidence.md) and [Sprint 2 evidence](26-sprint-2-evidence.md) for passing local tests, hosted run [34670353309](https://github.com/mbingsdk/whats/actions/runs/34670353309) on implementation commit e0a6550, and verified real Meta GET/POST, durable processing, authorized Event Center, duplicate/replay and approved cleanup evidence. The live GET metadata correction also has its own passing hosted run, recorded there. Sprint 2 acceptance is COMPLETE; Sprint 3 is not authorized.

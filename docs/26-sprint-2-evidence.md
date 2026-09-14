@@ -1,6 +1,6 @@
 # Sprint 2 implementation and evidence
 
-Owner decision (2026-09-12, continuing the 2026-09-11 review): **Gate B APPROVED; Sprint 2 AUTHORIZED; implementation COMPLETE; Sprint 2 acceptance OPEN; Gates C/D CLOSED.** Live GET challenge and authentic real Meta POST proof are mandatory Sprint 2 acceptance evidence, not prerequisites for starting the endpoint implementation. Sprint 0/1 acceptance remains COMPLETE. No outbound WhatsApp or Sprint 3 work is authorized.
+Acceptance review (2026-09-14; live evidence captured 2026-09-12): **Gate B APPROVED; Sprint 2 implementation COMPLETE; Sprint 2 acceptance COMPLETE; Gates C/D CLOSED.** Real Meta GET challenge, authentic signed POST, durable ingestion, processing, authorized Event Center and replay evidence are verified. Sprint 0/1 acceptance remains COMPLETE. No outbound WhatsApp or Sprint 3 work is authorized.
 
 ## Implemented scope
 
@@ -10,7 +10,7 @@ One configured Meta App and target WABA are bound explicitly to the authenticate
 
 The API queues coalesced asset-sync jobs. Worker snapshots WABA, all phone pages, selected profile fields and current subscriptions; complete snapshots commit atomically. Absence marks NOT_OBSERVED, preserving records/profile history; failed snapshots do not delete assets. Concurrent workers use row claims, leases and completion fences. Eight attempts bound transient reads; authentication/permission/domain errors are terminal. An already subscribed App is never automatically resubscribed.
 
-GET verifies exact single mode/token/challenge parameters with a constant-time token-digest comparison. POST rejects missing, malformed, wrong-algorithm, duplicate or wrong signatures using App Secret HMAC-SHA256 over raw bytes. JSON whitespace mutations invalidate an unchanged signature. After authentication, known asset routing and encrypted raw persistence precede ACK. Unknown/foreign asset envelopes enter restricted quarantine. Ordinary payload inspection never exposes message text, customer identifiers or arbitrary provider fields.
+GET requires exactly one nonempty value for each mode/token/challenge parameter, with a constant-time token-digest comparison. Additional query metadata is ignored for authorization; malformed encoding and duplicate required keys remain rejected. POST rejects missing, malformed, wrong-algorithm, duplicate or wrong signatures using App Secret HMAC-SHA256 over raw bytes. JSON whitespace mutations invalidate an unchanged signature. After authentication, known asset routing and encrypted raw persistence precede ACK. Unknown/foreign asset envelopes enter restricted quarantine. Ordinary payload inspection never exposes message text, customer identifiers or arbitrary provider fields.
 
 Raw transport digest is unique per org/App. Classification produces inbound-message and changed-status facts without full Inbox storage. Stable phone/message and status-fact hashes survive rebatching/replay. Unknown and insufficiently identified events explicitly retain uncertain identity. Replay references original evidence, adds a generation and audit row, preserves ciphertext, and reuses fact keys. Processing uses bounded retries, terminal DEAD_LETTER, permanent INVALID and safe UNKNOWN states. Raw evidence expires after seven days; expired/quarantined evidence cannot be replayed through ordinary tenant APIs.
 
@@ -30,22 +30,68 @@ Frontend routes: /meta-connection, /wabas, /phone-numbers, /business-profiles, /
 
 ## Live acceptance evidence
 
+Evidence captured 2026-09-12; closure reviewed 2026-09-14. This is bounded verification on the supplied v26.0 App/WABA/phone, separate from official contract evidence quality and production readiness.
+
 | Condition | Status |
 | --- | --- |
-| Company account GET inventory | PASS via the implemented client/worker; one WABA/phone/profile, subscription true, observed 2026-09-12 |
-| Protected Verify Token | Configured in the existing protected file; runtime configuration PASS |
-| Public HTTPS callback | Historical controlled probe PASS at 2026-09-12T03:17:53Z; valid TLS and unauthenticated rejection checks; listener expired and tunnel stopped, no active callback target |
-| Real Meta GET challenge | PENDING |
-| Real Meta signed POST, durable storage and classification | PENDING |
-| Signature rejection tests | PASS locally |
-| Hosted Sprint 2 commit | Published e0a65503e56727041a00899b9663878a86c8eb39; own run [34670353309](https://github.com/mbingsdk/whats/actions/runs/34670353309) PASS |
-| Sprint 2 implementation | COMPLETE |
-| Sprint 2 acceptance | OPEN |
+| Company account GET inventory | PASS via implemented client/worker; supplied WABA/phone/profile and existing App subscription |
+| Protected Verify Token | Configured; matched during real Meta verification; value not logged |
+| Public HTTPS callback | TEMPORARY_ACCEPTANCE_TUNNEL; only the required webhook route exposed; approved callback rolled back and tunnel stopped |
+| Real Meta GET challenge | VERIFIED, HTTP 200 and correct challenge, 2026-09-12T14:03:24.6444842Z |
+| Real Meta signed POST | VERIFIED, HTTP 200, 2026-09-12T14:04:02.9038397Z |
+| Durable ingestion | VERIFIED, exact raw body encrypted and committed before ACK |
+| Processing | VERIFIED, one event and one INBOUND_MESSAGE fact, PROCESSED |
+| Authorized Event Center | VERIFIED through existing UI/session/permissions; timestamp, context, attempts and redacted inspection |
+| Duplicate and replay | VERIFIED, one event/fact retained; two authorized replays and two replay audit rows; original raw unchanged |
+| Signature rejection tests | PASS locally and in hosted CI |
+| Hosted correction commit | cd4d9d9be0678e91a945ea0b7fc915aa8444c661; own [run 34813315965](https://github.com/mbingsdk/whats/actions/runs/34813315965) PASS |
+| No outbound WhatsApp | VERIFIED; only operator-originated inbound traffic and local captured-event replay |
+| Sprint 2 implementation / acceptance | COMPLETE / COMPLETE |
 | Gate C / D | CLOSED / CLOSED |
+
+### Callback inventory, approval and rollback
+
+Before mutation, GET App subscriptions returned HTTP 200 with an empty list at 2026-09-12T13:50:05Z. GET WABA subscribed_apps returned HTTP 200 at 13:50:06Z with one matching App subscription and no next page. The WABA-specific override field was NOT_RETURNED_BY_GET; absence of an override was not established. No existing App callback URL was observable.
+
+The operator explicitly approved the exact temporary HTTPS target and CURRENT / PROPOSED / EFFECT / ROLLBACK plan: configure only App object whatsapp_business_account, field messages, then delete that newly created object callback to restore the observed empty App state. The disclosed effect included other subscribed WABAs without overrides; unknown assets remained quarantined. The exact temporary URL, approval and before/after operation audit are retained privately and are not permanent deployment configuration. The application runtime still has no Graph mutation adapter.
+
+After evidence capture, the approved App-only DELETE succeeded at 2026-09-12T14:06:41.423281Z. Readback at 14:06:42.047692Z confirmed App subscriptions empty. WABA readback at 14:06:42.823388Z confirmed the target App still subscribed, with the override field still not returned. No WABA unsubscribe/resubscribe, phone registration, profile or template mutation occurred. Cleanup recorded at 14:10:35.752457Z confirms the tunnel and acceptance-only frontend stopped and ports 8092/8093 closed. The temporary callback is not left active.
+
+### Real GET and narrowly required correction
+
+Two approved configuration attempts at 13:56:48Z and 14:01:11Z failed with Graph HTTP 400/code 2200 after callback HTTP 403. The listener observed six query keys, including exactly one correct required mode/token/challenge value. The implementation incorrectly required exactly three total keys. A local diagnostic GET at 13:59:26Z passed but is explicitly LOCAL_DIAGNOSTIC_NOT_META_ACCEPTANCE.
+
+The correction removes only the total-key-count restriction. Required keys remain single and nonempty, mode must be subscribe, token comparison remains constant-time, and challenge bounds/control-character and malformed-query rejection remain intact. Regression tests cover extra metadata plus duplicate required fields, wrong mode/token, missing challenge and malformed encoding. POST signature behavior is unchanged. No new product feature or migration was added.
+
+The subsequent approved Graph configuration flow succeeded with HTTP 200 and matching readback. Its observed ingress GET at 14:03:24.6444842Z received subscribe, matched the protected token and returned the exact challenge with HTTP 200; the response write succeeded. Request ID: 01a095ee-1a4e-71f7-9019-770449582918. Correlation with the successful Meta configuration flow establishes provider provenance; the earlier local diagnostic is not substituted for it.
+
+### Authentic POST, durable processing and Event Center
+
+The operator confirmed one inbound message from their controlled WhatsApp account. At 14:04:02.9038397Z the public listener received X-Hub-Signature-256 and verified HMAC-SHA256 over the exact HTTP body bytes with the configured App Secret using hmac.Equal. The signature matched before acceptance. Encrypted raw evidence committed before HTTP 200 ACK; response writing succeeded. No decode/reencode was used for authenticity.
+
+Event ID: 01a095ee-afc8-7e03-8963-a8f4771cef49. Request ID: 01a095ee-afc8-7617-900a-cdeb0c807b56. The worker produced one INBOUND_MESSAGE fact with WABA/phone context and final state PROCESSED. Decrypting the stored ciphertext with the actual protected root and organization/event AAD reproduced the captured raw bytes.
+
+At 14:06:37.294Z, a browser check of the existing Event Center passed using an authenticated, authorized synthetic Owner in the isolated acceptance database. List/detail/payload API calls returned 200. The real event's timestamp, class, processing state, request identifier and processing generations 0/1/2 were visible; WABA/phone context was verified and masked in the screenshot. Ordinary payload inspection showed redacted values without the message body. This exercised the actual frontend and existing session/permission checks; no production user identity or authorization shortcut was added.
+
+### Captured-event duplicate, replay and audit
+
+Re-submitting the captured raw body and original signature locally returned HTTP 200 while retaining one durable event and one fact. Two authorized replay API calls returned HTTP 200, produced two append-only replay records and two replay audit rows, and completed processing generations 1 and 2. Fact count remained one; the original ciphertext and raw digest were unchanged. This is idempotent local processing, not a claim of exactly-once network delivery. No additional WhatsApp message was needed.
+
+The controlled wrapper disabled raw request/query logging. A scan for all three configured Meta secret values in acceptance logs passed. The sanitized evidence bundle, masked Event Center screenshot, operation audit and encrypted original archive are retained under ignored local storage; neither raw plaintext nor credentials are published.
+
+### Closure verification and review
+
+On 2026-09-14, python scripts/dev.py up and python scripts/dev.py check completed successfully with exit 0 after starting Docker. The check executed source/link/migration validation, 12 Python tests, Go formatting/vet/unit/build and explicit real PostgreSQL integration tests, frontend lint/typecheck/five tests, OpenAPI validation and production build. The interrupted prior session's missing process exit was not treated as new completion evidence. Targeted challenge/signature and real PostgreSQL Meta regressions had also passed on 2026-09-12.
+
+Corrective commit cd4d9d9be0678e91a945ea0b7fc915aa8444c661 passed the complete unchanged hosted workflow in [run 34813315965](https://github.com/mbingsdk/whats/actions/runs/34813315965), including Linux race-enabled integration tests, Identity/Meta browser E2E and dependency review. This run verifies the correction independently of the earlier e0a6550/1b15244 runs. Existing unrelated local bootstrap/operator-file changes are excluded from this correction and acceptance publication. Published migrations/checksums remain unchanged.
+
+Review outcome: all requested live acceptance conditions are VERIFIED and Sprint 2 acceptance is COMPLETE under the owner's conditional closure instruction. Gate B remains APPROVED; Gates C/D remain CLOSED. No production deployment or Sprint 3 authorization follows.
+
+### Historical earlier acceptance window
 
 GET App subscriptions returned 200/empty at 2026-09-12T03:18:18Z. The existing WABA App subscription remains true. A concrete temporary callback, messages field and rollback-to-empty plan were presented to the owner; no target-specific approval was received before the listener expired. That proposal is no longer an active target. A new live target must be prepared and explicitly approved before any callback mutation; the earlier tunnel-only permission is not callback-configuration approval.
 
-Callback configuration remains a separate target-specific operator decision. Before mutation record current callback/subscription state, proposed public target, explicit approval, audit and rollback. No callback/subscription mutation has been made by this implementation.
+That earlier unapproved target/window is historical and is superseded by the separately approved successful flow above. Future callback mutations still require target-specific operator review and rollback.
 
 ## Source limitations and phone state
 
@@ -59,6 +105,6 @@ code_verification_status=NOT_VERIFIED is preserved as observed. Official Postman
 
 No outbound WhatsApp message was sent. No profile/template mutation, phone registration, campaign, automation send or Sprint 3 implementation is included. The accepted Sprint 0/1 evidence and CI requirements remain intact.
 
-The first controlled local listener ended when its database connection became unavailable; it had received zero webhook events and supplied no delivery evidence. The isolated listener was restarted at 2026-09-12T03:16:17Z and the live GET snapshot passed again. No failed local listener run is labeled real Meta acceptance.
+Historical unsuccessful windows: the first controlled local listener ended when its database connection became unavailable; it had received zero webhook events and supplied no delivery evidence. The isolated listener was restarted at 2026-09-12T03:16:17Z and the live GET snapshot passed again. No failed local listener run is labeled real Meta acceptance.
 
 The second controlled window ended normally after 90 minutes. Its final report at 2026-09-12T04:46:19Z records runtime_sync=SUCCEEDED, zero durable/processed events, and null last_valid_challenge_at/last_authentic_post_at. The harness PASS records a completed test window only; it is not real Meta acceptance. The remaining tunnel was stopped during the 2026-09-12 closure review. No provider-side rollback was needed because no Meta mutation occurred.
