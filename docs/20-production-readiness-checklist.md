@@ -2,7 +2,7 @@
 
 ## Sprint 3 implementation review, 2026-09-15
 
-Gates A/B/C APPROVED; Sprints 0/1/2 COMPLETE. Sprint 3 code is implemented and final verification is in progress; implementation closure is OPEN until its own hosted CI passes. Live acceptance is OPEN. Company billing currency UNKNOWN; paid/template authority and Gate D CLOSED. Sprint 4 unauthorized. See [Sprint 3 evidence](28-sprint-3-evidence.md).
+Gates A/B/C APPROVED; Sprints 0/1/2 COMPLETE. Sprint 3 implementation COMPLETE: local checks and its own hosted CI passed for commit a498471 (run 34970609872). Live acceptance is OPEN. Company billing currency UNKNOWN; paid/template authority and Gate D CLOSED. Sprint 4 unauthorized. See [Sprint 3 evidence](28-sprint-3-evidence.md).
 
 Owner clarification (2026-09-15): **Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; Gate D CLOSED; Sprint 3 AUTHORIZED. COMPANY META BILLING CURRENCY UNKNOWN; PAID-SEND AUTHORITY CLOSED.** Currency must not be inferred from timezone, business/phone/recipient country, available rate cards or locale. Only a currently reviewed, provably zero-cost policy can permit the single operator-triggered controlled TEXT live reply after all recipient/callback/security prerequisites. Paid/template live sends, outbound media, campaigns and Sprint 4 remain unauthorized.
 
@@ -67,7 +67,7 @@ The October 1 service/utility change and observed America/Los_Angeles WABA timez
 ## Sprint 3 release evidence boundary
 
 - Gate C approval and documentation-baseline hosted PASS: recorded.
-- Implementation closure: OPEN pending final local checks and its own hosted result.
+- Implementation closure: COMPLETE. Local full checks, all three browser suites and own hosted run 34970609872 PASS, including Linux Go race verification.
 - Controlled TEST recipient: not yet designated for Sprint 3.
 - Callback: last verified empty after Sprint 2 rollback; no new callback change performed.
 - Real Service delivery horizon: UNVERIFIED; fail-closed guard active.

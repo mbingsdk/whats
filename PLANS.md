@@ -2,7 +2,7 @@
 
 ## Sprint 3 implementation review, 2026-09-15
 
-Gates A/B/C APPROVED; Sprints 0/1/2 COMPLETE. Sprint 3 code is implemented and final verification is in progress; implementation closure is OPEN until its own hosted CI passes. Live acceptance is OPEN. Company billing currency UNKNOWN; paid/template authority and Gate D CLOSED. Sprint 4 unauthorized. See [Sprint 3 evidence](docs/28-sprint-3-evidence.md).
+Gates A/B/C APPROVED; Sprints 0/1/2 COMPLETE. Sprint 3 implementation COMPLETE: local checks and its own hosted CI passed for commit a498471 (run 34970609872). Live acceptance is OPEN. Company billing currency UNKNOWN; paid/template authority and Gate D CLOSED. Sprint 4 unauthorized. See [Sprint 3 evidence](docs/28-sprint-3-evidence.md).
 
 Owner clarification (2026-09-15): **Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; Gate D CLOSED; Sprint 3 AUTHORIZED. COMPANY META BILLING CURRENCY UNKNOWN; PAID-SEND AUTHORITY CLOSED.** Currency must not be inferred from timezone, business/phone/recipient country, available rate cards or locale. Only a currently reviewed, provably zero-cost policy can permit the single operator-triggered controlled TEXT live reply after all recipient/callback/security prerequisites. Paid/template live sends, outbound media, campaigns and Sprint 4 remain unauthorized.
 
@@ -55,8 +55,8 @@ Gate A approval accepts D2 (50 members, 25 concurrent agents, 5 WABAs/20 numbers
 
 Sprint 0 accepted local evidence and the attempted hosted run are preserved in [the Sprint 0 record](docs/23-sprint-0-evidence.md). The external billing restriction is not a repository test failure. Rerun hosted CI when account access is restored and repair any real test failures before claiming hosted verification.
 
-## Sprint 3 remaining verification
+## Sprint 3 live acceptance remaining
 
-Complete final checks and publish the implementation with its own hosted result. Gate C baseline efe31864e5ed0c090d12c292f269eec22941bfb6 passed run 34879123286; this is not Sprint 3 verification. Keep live acceptance OPEN until the operator designates one TEST recipient, approves current callback/rollback, supplies fresh signed inbound and personally triggers one provably free reply. A verified Service delivery/pricing horizon is still missing; synthetic delivery bounds or Direct Send categories cannot replace it.
+Implementation is published at a49847151bb6ea3592856d9989201375102eca40 with its own passing hosted run 34970609872. Gate C baseline efe31864e5ed0c090d12c292f269eec22941bfb6 passed run 34879123286; this is not Sprint 3 verification. Keep live acceptance OPEN until the operator designates one TEST recipient, approves current callback/rollback, supplies fresh signed inbound and personally triggers one provably free reply. A verified Service delivery/pricing horizon is still missing; synthetic delivery bounds or Direct Send categories cannot replace it.
 
 Currency/paid-template authority are separate future owner decisions, not prerequisites for local guard implementation. No paid/template test is performed or required for the accepted free-reply scope. Gate D and Sprint 4 remain closed.

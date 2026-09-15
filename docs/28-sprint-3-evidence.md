@@ -4,7 +4,7 @@ Owner clarification (2026-09-15): Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; 
 
 ## Status
 
-Implementation closure: OPEN pending its own hosted CI. Local full repository check PASS. Acceptance: OPEN. No Sprint 3 real outbound Meta request or callback mutation has been performed. No Sprint 4, campaign, automation, CRM import, template mutation/send or outbound media is included.
+Implementation: COMPLETE. Local full repository checks and Sprint 3's own hosted CI PASS. Live acceptance: OPEN. No Sprint 3 real outbound Meta request or callback mutation has been performed. No Sprint 4, campaign, automation, CRM import, template mutation/send or outbound media is included.
 
 ## Baseline before implementation
 
@@ -53,13 +53,17 @@ UI routes /inbox and /pricing are implemented. Inbox is the root operational des
 | Inbox browser E2E | PASS on isolated API/PostgreSQL with fake sender, including lost submit response plus recovery outage: composer remains locked, same intent recovered, one provider attempt |
 | Combined identity/Meta/Inbox E2E | PASS: python scripts/dev.py e2e, all three suites, exit 0 |
 | Dependency checks | PASS: go mod verify; pinned govulncheck v1.8.0 reports zero reachable vulnerabilities; npm audit reports zero vulnerabilities. One unimported-module advisory is recorded below |
-| Sprint 3 hosted CI | PENDING; implementation publication not yet performed |
+| Sprint 3 hosted CI | PASS: implementation commit a49847151bb6ea3592856d9989201375102eca40, [run 34970609872](https://github.com/mbingsdk/whats/actions/runs/34970609872); all repository, PostgreSQL, browser and dependency steps executed |
 
 The first full check found the foundation test still expected three migrations. That assertion was updated to four; repeated migration remains tested as zero changes. Earlier browser failures exposed missing Inbox permission discovery, inaccessible select labels and stale revision handling after delivery; fixes were retested. An additional direct npm invocation used the terminal's Node 22.13.1 and failed to load TypeScript tests; the supported runner and repeat use pinned Node 24.21.0. No failing repository test was bypassed.
 
 Dependency review: govulncheck reports [GO-2026-5932](https://pkg.go.dev/vuln/GO-2026-5932) for the unmaintained golang.org/x/crypto/openpgp package in the required x/crypto v0.57.0 module, with no fixed version listed. No imported package or reachable application symbol is affected according to the scanner; the application uses argon2, not openpgp. This is a module-level finding, not a claim that every dependency has no known advisory.
 
-Windows local runs did not use Go race instrumentation because a C compiler was unavailable. Hosted workflow retains WABA_TEST_RACE=1 for Linux verification. No production performance claim is based on synthetic test timing.
+Windows local runs did not use Go race instrumentation because a C compiler was unavailable. Hosted run 34970609872 executed the unchanged WABA_TEST_RACE=1 workflow successfully on Linux. No production performance claim is based on synthetic test timing.
+
+## Published implementation verification
+
+[Commit a498471](https://github.com/mbingsdk/whats/commit/a49847151bb6ea3592856d9989201375102eca40) contains Sprint 3 implementation and initial evidence. Its own [hosted run 34970609872](https://github.com/mbingsdk/whats/actions/runs/34970609872) passed every required step. Baseline runs are not reused as implementation verification. This evidence-only reconciliation is published separately; it does not alter executable code or immutable migration 00004.
 
 ## Live acceptance
 
@@ -79,4 +83,4 @@ No paid/template live test is authorized or required for this free-reply accepta
 
 ## Review record
 
-Affected architecture, API, database, UI, security, deployment, observability, testing, sprint/readiness and research documents are reconciled. Existing dated Gate B/C restrictions are historical where superseded by September 15 owner approval. Final implementation status must be updated only after its own hosted CI result; live acceptance stays OPEN until real evidence above exists.
+Affected architecture, API, database, UI, security, deployment, observability, testing, sprint/readiness and research documents are reconciled. Existing dated Gate B/C restrictions are historical where superseded by September 15 owner approval. Implementation closure is COMPLETE based on published a498471 and its own successful hosted run 34970609872. All three browser suites, migration repeat/checksums, OpenAPI, lint/typecheck/build, real PostgreSQL and Go race checks passed. Live acceptance stays OPEN until real evidence above exists. Paid authority and Gate D remain CLOSED.
