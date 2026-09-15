@@ -69,7 +69,7 @@ Windows local runs did not use Go race instrumentation because a C compiler was 
 
 Controlled TEST recipient: NOT DESIGNATED for Sprint 3 at this checkpoint. Prior Sprint 2 inbound evidence is not designation. Callback: last verified restored to empty after Sprint 2 acceptance; not rechecked or changed in this pass. No permanent ingress is inferred.
 
-Real Service delivery/pricing horizon: UNVERIFIED. [M73](21-research-register.md#m73-service-delivery-horizon-review-2026-09-15) records first-party Direct Send TTL scope and source hash. That surface does not establish a bound for ordinary Service text. Because the reviewed source announces an October pricing change, a September dispatch with unbounded possible delivery cannot be assumed free. LoadLive provides no delivery-horizon override; preflight returns DELIVERY_PRICING_HORIZON_UNVERIFIED. One-minute bounds exist only in clearly synthetic tests.
+Historical September 15 result, superseded by the focused review below: real Service delivery/pricing horizon UNVERIFIED. [M73](21-research-register.md#m73-service-delivery-horizon-review-2026-09-15) records first-party Direct Send TTL scope and source hash. That surface does not establish a bound for ordinary Service text. Because the reviewed source announces an October pricing change, a September dispatch with unbounded possible delivery cannot be assumed free. LoadLive provides no delivery-horizon override; preflight returns DELIVERY_PRICING_HORIZON_UNVERIFIED. One-minute bounds exist only in clearly synthetic tests.
 
 Before any live acceptance:
 1. Resolve the selected Service subtype's delivery/pricing evidence and review any necessary policy update. Do not infer company currency or convert the send into Direct Send/template.
@@ -84,3 +84,19 @@ No paid/template live test is authorized or required for this free-reply accepta
 ## Review record
 
 Affected architecture, API, database, UI, security, deployment, observability, testing, sprint/readiness and research documents are reconciled. Existing dated Gate B/C restrictions are historical where superseded by September 15 owner approval. Implementation closure is COMPLETE based on published a498471 and its own successful hosted run 34970609872. All three browser suites, migration repeat/checksums, OpenAPI, lint/typecheck/build, real PostgreSQL and Go race checks passed. Live acceptance stays OPEN until real evidence above exists. Paid authority and Gate D remain CLOSED.
+
+## M73 focused acceptance review, 2026-09-16
+
+Implementation remains COMPLETE. Acceptance remains OPEN. [M73 follow-up](21-research-register.md#m73-focused-follow-up-2026-09-16) records current first-party HTML URLs, UTC retrieval times, original hashes, quality, scope and unresolved checks.
+
+General Cloud API Service TTL is now documented as 30 days with drop-on-expiry behavior. Retention is independently documented and is not the basis for that finding. Current delivered-message pricing plus October's WABA-timezone transition does not establish send/acceptance-time grandfathering. A September 16 acceptance plus even an optimistic 30-day interval reaches October 16. It cannot fit the existing zero policy ending October 1, and no shorter ordinary Service contract was verified.
+
+No executable code, published migration, policy or runtime configuration changes. DELIVERY_PRICING_HORIZON_UNVERIFIED remains active because the complete safe acceptance/pricing proof is not established. The hypothetical tests also show PRICING_DELIVERY_COVERAGE_MISSING if a 30-day latest-delivery calculation is supplied. M73 is partially resolved as contract research, not passed as authority for this live test.
+
+Controlled TEST recipient remains NOT DESIGNATED. Current callback was not probed or changed; last verified state is the empty Sprint 2 rollback. No tunnel/listener, authentic new inbound, live window, live preflight ALLOW, provider attempt, outbound ID/status or rollback result is claimed for this pass. No live dispatch configuration, paid/template request, media send or Sprint 4 work occurred. No operator approval was requested for dependent live operations because the pricing prerequisite does not pass.
+
+Safe alternatives are recorded in M73: precise first-party clock/transition clarification, full-horizon zero-policy evidence, or separately authorized billing/exposure review. No message or support request was sent to Meta or anyone else.
+
+Verification for this evidence commit: two added M73 unit tests (six transition subcases plus runtime fail-closed assertion) PASS. python scripts/dev.py up and the repeated full python scripts/dev.py check PASS (exit 0), including 24 Inbox unit/integration tests, 17 real PostgreSQL scenarios, frontend lint/typecheck/eight tests/build, OpenAPI, migration checksums and 183 local links. The first full attempt passed Go/PostgreSQL but npm ci failed with Windows EPERM because the running local frontend held the SWC binary. Only that frontend was stopped temporarily; the unchanged full check was rerun successfully and the frontend restarted. Hosted CI for this published evidence/test commit is PENDING at this edit. Earlier implementation and evidence commits remain tied to passing runs 34970609872 and 34971097556.
+
+Review record: the six requested status/evidence documents and the focused regression tests are the only changes. Company billing currency UNKNOWN; paid/template authority CLOSED; Gate C APPROVED; Gate D CLOSED.

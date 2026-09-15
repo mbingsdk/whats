@@ -1,5 +1,9 @@
 # Production readiness evidence
 
+## M73 acceptance evidence review, 2026-09-16
+
+M73 follow-up (2026-09-16): general Cloud API Service delivery TTL of 30 days is now documented, independently of retention. A current send's possible delivery crosses October pricing; exact acceptance-clock/rate-lock proof remains incomplete. Safe zero-cost acceptance remains OPEN and the runtime guard is unchanged. No live recipient/callback/send setup was performed.
+
 ## Sprint 3 implementation review, 2026-09-15
 
 Gates A/B/C APPROVED; Sprints 0/1/2 COMPLETE. Sprint 3 implementation COMPLETE: local checks and its own hosted CI passed for commit a498471 (run 34970609872). Live acceptance is OPEN. Company billing currency UNKNOWN; paid/template authority and Gate D CLOSED. Sprint 4 unauthorized. See [Sprint 3 evidence](28-sprint-3-evidence.md).
@@ -70,7 +74,7 @@ The October 1 service/utility change and observed America/Los_Angeles WABA timez
 - Implementation closure: COMPLETE. Local full checks, all three browser suites and own hosted run 34970609872 PASS, including Linux Go race verification.
 - Controlled TEST recipient: not yet designated for Sprint 3.
 - Callback: last verified empty after Sprint 2 rollback; no new callback change performed.
-- Real Service delivery horizon: UNVERIFIED; fail-closed guard active.
+- General Service delivery TTL: 30 days documented. Safe acceptance/pricing coverage remains UNVERIFIED; fail-closed guard active.
 - Live free text/status evidence: OPEN; no real outbound request made.
 - Company billing currency UNKNOWN; paid/template authority CLOSED.
 - Gate D CLOSED. Local/temporary evidence does not establish production deployment, retention, backup/restore or operational acceptance.

@@ -1,5 +1,9 @@
 # Work plan and phase gates
 
+## M73 acceptance evidence review, 2026-09-16
+
+M73 follow-up (2026-09-16): general Cloud API Service delivery TTL of 30 days is now documented, independently of retention. A current send's possible delivery crosses October pricing; exact acceptance-clock/rate-lock proof remains incomplete. Safe zero-cost acceptance remains OPEN and the runtime guard is unchanged. No live recipient/callback/send setup was performed.
+
 ## Sprint 3 implementation review, 2026-09-15
 
 Gates A/B/C APPROVED; Sprints 0/1/2 COMPLETE. Sprint 3 implementation COMPLETE: local checks and its own hosted CI passed for commit a498471 (run 34970609872). Live acceptance is OPEN. Company billing currency UNKNOWN; paid/template authority and Gate D CLOSED. Sprint 4 unauthorized. See [Sprint 3 evidence](docs/28-sprint-3-evidence.md).
@@ -57,6 +61,6 @@ Sprint 0 accepted local evidence and the attempted hosted run are preserved in [
 
 ## Sprint 3 live acceptance remaining
 
-Implementation is published at a49847151bb6ea3592856d9989201375102eca40 with its own passing hosted run 34970609872. Gate C baseline efe31864e5ed0c090d12c292f269eec22941bfb6 passed run 34879123286; this is not Sprint 3 verification. Keep live acceptance OPEN until the operator designates one TEST recipient, approves current callback/rollback, supplies fresh signed inbound and personally triggers one provably free reply. A verified Service delivery/pricing horizon is still missing; synthetic delivery bounds or Direct Send categories cannot replace it.
+Implementation is published at a49847151bb6ea3592856d9989201375102eca40 with its own passing hosted run 34970609872. Gate C baseline efe31864e5ed0c090d12c292f269eec22941bfb6 passed run 34879123286; this is not Sprint 3 verification. Keep live acceptance OPEN until the operator designates one TEST recipient, approves current callback/rollback, supplies fresh signed inbound and personally triggers one provably free reply. A general 30-day Service delivery TTL is now verified, but usable acceptance/pricing coverage remains missing; synthetic bounds or Direct Send categories cannot replace it.
 
 Currency/paid-template authority are separate future owner decisions, not prerequisites for local guard implementation. No paid/template test is performed or required for the accepted free-reply scope. Gate D and Sprint 4 remain closed.

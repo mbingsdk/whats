@@ -143,3 +143,64 @@ func TestTypedMessagesAndActualDiff(t *testing.T) {
 		t.Fatal("bot handoff allowed")
 	}
 }
+
+func TestM73ThirtyDayTTLAndOctoberCoverage(t *testing.T) {
+	// M73: the general Service messages guide documents a 30-day delivery TTL.
+	// This hypothetical deadline tests coverage only; it is not a runtime
+	// acceptance-to-expiry mapping, provider observation or permission to send.
+	cutoff := time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)
+	start := time.Date(2026, 7, 1, 0, 0, 0, 0, time.UTC)
+	review := time.Date(2026, 9, 21, 0, 0, 0, 0, time.UTC)
+	ttl := 30 * 24 * time.Hour
+	cases := []struct {
+		name     string
+		now      time.Time
+		policyTo time.Time
+		currency string
+		want     string
+	}{
+		{"whole horizon before conservative cutoff", cutoff.Add(-ttl - time.Nanosecond), cutoff, "UNKNOWN", "ZERO_COST_SERVICE"},
+		{"delivery exactly at cutoff is not covered", cutoff.Add(-ttl), cutoff, "UNKNOWN", "PRICING_DELIVERY_COVERAGE_MISSING"},
+		{"delivery beyond cutoff is not covered", cutoff.Add(-ttl + time.Second), cutoff, "UNKNOWN", "PRICING_DELIVERY_COVERAGE_MISSING"},
+		{"September acceptance can cross October", time.Date(2026, 9, 16, 0, 0, 0, 0, time.UTC), cutoff, "UNKNOWN", "PRICING_DELIVERY_COVERAGE_MISSING"},
+		{"known currency cannot fill future policy gap", time.Date(2026, 9, 16, 0, 0, 0, 0, time.UTC), cutoff, "VERIFIED", "PRICING_DELIVERY_COVERAGE_MISSING"},
+		{"policy expires before complete provider period", time.Date(2026, 8, 15, 0, 0, 0, 0, time.UTC), time.Date(2026, 9, 1, 0, 0, 0, 0, time.UTC), "UNKNOWN", "PRICING_DELIVERY_COVERAGE_MISSING"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			in := baseGuard()
+			in.Now = tc.now
+			expiry := tc.now.Add(23 * time.Hour)
+			latest := tc.now.Add(ttl)
+			in.WindowExpiry = &expiry
+			in.PolicyFrom, in.PolicyTo, in.ReviewAt = start, tc.policyTo, review
+			in.DeliveryLatest = &latest
+			in.CurrencyState = tc.currency
+			got := Evaluate(in)
+			if got.Code != tc.want || got.Allowed != (tc.want == "ZERO_COST_SERVICE") {
+				t.Fatalf("unexpected coverage decision: %+v", got)
+			}
+			if got.Allowed && (got.FinancialReservationRequired || got.ConfirmationRequired) {
+				t.Fatal("zero policy created monetary authority")
+			}
+		})
+	}
+}
+
+func TestM73ResearchDoesNotEnableLiveDeliveryAssumption(t *testing.T) {
+	c, err := LoadLive(func(string) string { return "" })
+	if err != nil || c.Enabled || c.DeliveryBound != 0 {
+		t.Fatal("research enabled runtime dispatch")
+	}
+	in := baseGuard()
+	in.Now = time.Date(2026, 9, 16, 0, 0, 0, 0, time.UTC)
+	expiry := in.Now.Add(time.Hour)
+	in.WindowExpiry = &expiry
+	in.PolicyFrom = in.Now.Add(-time.Hour)
+	in.PolicyTo = time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)
+	in.ReviewAt = time.Date(2026, 9, 21, 0, 0, 0, 0, time.UTC)
+	in.DeliveryLatest = nil
+	if got := Evaluate(in); got.Allowed || got.Code != "DELIVERY_PRICING_HORIZON_UNVERIFIED" {
+		t.Fatalf("missing runtime evidence stopped failing closed: %+v", got)
+	}
+}
