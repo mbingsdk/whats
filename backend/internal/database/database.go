@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-const SchemaVersion int64 = 3
+const SchemaVersion int64 = 4
 
 var ErrAccessDenied = errors.New("organization access denied")
 

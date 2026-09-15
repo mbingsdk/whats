@@ -1,5 +1,9 @@
 # Delivery plan
 
+## Sprint 3 implementation review, 2026-09-15
+
+Gates A/B/C APPROVED; Sprints 0/1/2 COMPLETE. Sprint 3 code is implemented and final verification is in progress; implementation closure is OPEN until its own hosted CI passes. Live acceptance is OPEN. Company billing currency UNKNOWN; paid/template authority and Gate D CLOSED. Sprint 4 unauthorized. See [Sprint 3 evidence](28-sprint-3-evidence.md).
+
 Owner clarification (2026-09-15): **Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; Gate D CLOSED; Sprint 3 AUTHORIZED. COMPANY META BILLING CURRENCY UNKNOWN; PAID-SEND AUTHORITY CLOSED.** Currency must not be inferred from timezone, business/phone/recipient country, available rate cards or locale. Only a currently reviewed, provably zero-cost policy can permit the single operator-triggered controlled TEXT live reply after all recipient/callback/security prerequisites. Paid/template live sends, outbound media, campaigns and Sprint 4 remain unauthorized.
 
 Earlier dated status/review entries below are historical and superseded by this owner clarification where they describe Gate C or Sprint 3 authorization.
@@ -47,8 +51,12 @@ Acceptance review (2026-09-14; live evidence captured 2026-09-12): **Gate B APPR
 
 See [Gate B decision](25-gate-b-evidence.md) and [Sprint 2 evidence](26-sprint-2-evidence.md) for passing local tests, hosted run [34670353309](https://github.com/mbingsdk/whats/actions/runs/34670353309) on implementation commit e0a6550, and verified real Meta GET/POST, durable processing, authorized Event Center, duplicate/replay and approved cleanup evidence. The live GET metadata correction also has its own passing hosted run, recorded there. Sprint 2 acceptance is COMPLETE; Sprint 3 is not authorized.
 
-## Gate C-only execution status, 2026-09-14
+## Historical Gate C-only execution status, 2026-09-14 (superseded)
 
 Sprint 0/1/2 implementation and acceptance COMPLETE; Gates A/B APPROVED; **Gate C CLOSED; Gate D CLOSED; Sprint 3 NOT STARTED**. The owner authorized only Gate C research/specification. [Evidence and review](27-gate-c-evidence.md) records current first-party outbound/window/pricing/status contracts, five template observations, official Indonesia rate artifacts and 39 passing offline cases.
 
 Immediate Gate C blocker: company billing currency omitted by GET and awaiting operator confirmation; USD/IDR alternatives cannot be selected by recipient country. No zero-cost exception was approved. Registry review/publication, safe selected template/recipient, exact TEST ceiling and immediate paid-test approval, account payment/usage readiness and approved reachable callback are subsequent live-acceptance conditions. No outbound, template/registration mutation, campaign or Sprint 3 product code is included.
+
+## Sprint 3 execution record
+
+GUARDED INBOX + MESSAGE DOMAIN + OUTBOUND SAFETY is implemented behind live guards; [Sprint 3 evidence](28-sprint-3-evidence.md) records closure status. Numeric artifacts can be validated/reviewed without selecting the company's unknown currency. Implementation correctness, its own hosted CI and live acceptance are separate evidence tracks. Only one human-triggered provably free text reply is live-authorized after prerequisites. No Sprint 4, media send, template mutation/send, CRM import, Broadcast or Automation work is included.

@@ -1,5 +1,9 @@
 # Production readiness evidence
 
+## Sprint 3 implementation review, 2026-09-15
+
+Gates A/B/C APPROVED; Sprints 0/1/2 COMPLETE. Sprint 3 code is implemented and final verification is in progress; implementation closure is OPEN until its own hosted CI passes. Live acceptance is OPEN. Company billing currency UNKNOWN; paid/template authority and Gate D CLOSED. Sprint 4 unauthorized. See [Sprint 3 evidence](28-sprint-3-evidence.md).
+
 Owner clarification (2026-09-15): **Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; Gate D CLOSED; Sprint 3 AUTHORIZED. COMPANY META BILLING CURRENCY UNKNOWN; PAID-SEND AUTHORITY CLOSED.** Currency must not be inferred from timezone, business/phone/recipient country, available rate cards or locale. Only a currently reviewed, provably zero-cost policy can permit the single operator-triggered controlled TEXT live reply after all recipient/callback/security prerequisites. Paid/template live sends, outbound media, campaigns and Sprint 4 remain unauthorized.
 
 Earlier dated status/review entries below are historical and superseded by this owner clarification where they describe Gate C or Sprint 3 authorization.
@@ -52,10 +56,21 @@ Gate B approval supersedes the historical CLOSED statements above. Sprint 2 impl
 
 These results support the tested portions of P01/P02/P03/P04/P12/P19 for the supplied App/WABA and bounded ingestion scope. They do not establish every provider contract, other account capabilities or completion of the production checklist. The public endpoint was a TEMPORARY_ACCEPTANCE_TUNNEL; the approved App callback was deleted back to the observed empty state, the existing WABA subscription retained, and the tunnel/listeners stopped. No permanent production callback is claimed. Gates C/D remain CLOSED; production deployment, restore and operations requirements remain separate. No outbound WhatsApp or Sprint 3 work is authorized.
 
-## Gate C evidence review, 2026-09-14
+## Historical Gate C evidence review, 2026-09-14 (superseded)
 
 [Gate C decision](27-gate-c-evidence.md): **CLOSED**, immediate blocker company billing currency UNKNOWN. Sprint 0/1/2 acceptance remains COMPLETE; Gates A/B APPROVED; Gate D CLOSED; Sprint 3 NOT STARTED.
 
 P03 now has bounded current message-type/status contract evidence and six successful read-only Graph GETs, not outbound account acceptance. P05/P06 have explicit no-blind-retry/window decisions and offline boundary fixtures, not implemented send-path tests. P07 has actual official current/future Indonesia USD/IDR artifacts and a DRAFT Registry rehearsal; it does not have an approved company rate publication. P08 has a defined TEST hard-stop/confirmation policy, not executed database budget races or an owner-approved amount. These production criteria are not marked passed from documentation alone.
 
 The October 1 service/utility change and observed America/Los_Angeles WABA timezone are part of rate coverage. Proposed source review deadline: 2026-09-21T00:00:00Z, pending reviewer acceptance. Currency, external usage/payment details, safe recipient/template selection, exact spending authority and approved callback remain explicit before applicable live tests. Sprint 2's callback was restored to empty; a temporary tunnel is not a permanent endpoint. No sends or account mutations occurred in Gate C.
+
+## Sprint 3 release evidence boundary
+
+- Gate C approval and documentation-baseline hosted PASS: recorded.
+- Implementation closure: OPEN pending final local checks and its own hosted result.
+- Controlled TEST recipient: not yet designated for Sprint 3.
+- Callback: last verified empty after Sprint 2 rollback; no new callback change performed.
+- Real Service delivery horizon: UNVERIFIED; fail-closed guard active.
+- Live free text/status evidence: OPEN; no real outbound request made.
+- Company billing currency UNKNOWN; paid/template authority CLOSED.
+- Gate D CLOSED. Local/temporary evidence does not establish production deployment, retention, backup/restore or operational acceptance.

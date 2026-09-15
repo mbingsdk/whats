@@ -1,5 +1,9 @@
 # Work plan and phase gates
 
+## Sprint 3 implementation review, 2026-09-15
+
+Gates A/B/C APPROVED; Sprints 0/1/2 COMPLETE. Sprint 3 code is implemented and final verification is in progress; implementation closure is OPEN until its own hosted CI passes. Live acceptance is OPEN. Company billing currency UNKNOWN; paid/template authority and Gate D CLOSED. Sprint 4 unauthorized. See [Sprint 3 evidence](docs/28-sprint-3-evidence.md).
+
 Owner clarification (2026-09-15): **Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; Gate D CLOSED; Sprint 3 AUTHORIZED. COMPANY META BILLING CURRENCY UNKNOWN; PAID-SEND AUTHORITY CLOSED.** Currency must not be inferred from timezone, business/phone/recipient country, available rate cards or locale. Only a currently reviewed, provably zero-cost policy can permit the single operator-triggered controlled TEXT live reply after all recipient/callback/security prerequisites. Paid/template live sends, outbound media, campaigns and Sprint 4 remain unauthorized.
 
 Earlier dated status/review entries below are historical and superseded by this owner clarification where they describe Gate C or Sprint 3 authorization.
@@ -37,7 +41,7 @@ Historical Gate C interpretation (superseded 2026-09-15): **CLOSED**, enable pai
 
 Gate D: **CLOSED**, production: all blocking rows in doc 20 have evidence, named owners and dates; D1–D7 resolved where relevant; restore drill meets accepted recovery targets; offboarding, replay, suppression and uncertain-send drills pass; production account capability probes pass; operations owner accepts residual risks. A checked box without evidence is not completion.
 
-## Current authorized work
+## Historical Sprint 2 authorization and acceptance
 
 Acceptance review (2026-09-14; live evidence captured 2026-09-12): **Gate B APPROVED; Sprint 2 implementation COMPLETE; Sprint 2 acceptance COMPLETE; Gates C/D CLOSED.** Real Meta GET challenge, authentic signed POST, durable ingestion, processing, authorized Event Center and replay evidence are verified. Sprint 0/1 acceptance remains COMPLETE. No outbound WhatsApp or Sprint 3 work is authorized.
 
@@ -50,3 +54,9 @@ Gate A approval accepts D2 (50 members, 25 concurrent agents, 5 WABAs/20 numbers
 
 
 Sprint 0 accepted local evidence and the attempted hosted run are preserved in [the Sprint 0 record](docs/23-sprint-0-evidence.md). The external billing restriction is not a repository test failure. Rerun hosted CI when account access is restored and repair any real test failures before claiming hosted verification.
+
+## Sprint 3 remaining verification
+
+Complete final checks and publish the implementation with its own hosted result. Gate C baseline efe31864e5ed0c090d12c292f269eec22941bfb6 passed run 34879123286; this is not Sprint 3 verification. Keep live acceptance OPEN until the operator designates one TEST recipient, approves current callback/rollback, supplies fresh signed inbound and personally triggers one provably free reply. A verified Service delivery/pricing horizon is still missing; synthetic delivery bounds or Direct Send categories cannot replace it.
+
+Currency/paid-template authority are separate future owner decisions, not prerequisites for local guard implementation. No paid/template test is performed or required for the accepted free-reply scope. Gate D and Sprint 4 remain closed.

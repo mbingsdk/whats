@@ -1,3 +1,4 @@
+import {invalidateDrafts} from "./inbox-drafts.ts";
 export class IdentityError extends Error {
  code:string;status:number;
  constructor(code:string,status:number){super(code.replaceAll("_"," ").toLowerCase());this.code=code;this.status=status;}
@@ -13,7 +14,7 @@ export async function request<T>(path:string,method="GET",body?:unknown,revision
  }
  const response=await fetch(path,{method,headers,credentials:"same-origin",cache:"no-store",body:body===undefined?undefined:JSON.stringify(body)});
  const result=await response.json();
- if(!response.ok)throw new IdentityError(result.error?.code??"REQUEST_FAILED",response.status);
+ if(!response.ok){if(response.status===401)invalidateDrafts();throw new IdentityError(result.error?.code??"REQUEST_FAILED",response.status);}
  return result as T;
 }
 

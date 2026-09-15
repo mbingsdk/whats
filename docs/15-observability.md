@@ -61,3 +61,9 @@ Materialize unique `(member,event,type)` records after current permission check.
 Meta Health separates last successful Graph read/credential access/error from valid callback requests, authentic webhook receipt and local event-state counts. READ_ACCESS_VERIFIED refers to successful reads at that timestamp, not indefinite credential validity or send readiness. Event Center exposes internal IDs, times, class, attempt/generation, parser version and sanitized error codes. QUARANTINED payloads remain inaccessible to tenant inspection.
 
 Worker failures emit fixed messages; no Graph body, token, URL query, raw envelope or exception text is logged. HTTP logging uses route templates. Sync, binding, processing, payload-inspection and replay actions append organization audit records. Alerts should cover stale successful sync, blocked credentials, due-work backlog and DEAD_LETTER counts; no arbitrary combined health score is introduced.
+
+## Sprint 3 evidence
+
+Inbox audit records IDs/actions for state/assignment changes, note creation/edit/redaction, policy, registry lifecycle, budgets, intent creation and dispatch authorization/result/denial/recovery. No message/note body, token, raw payload or pricing authorization is logged. Immutable provider status facts retain allowlisted pricing metadata; amount-like fields are discarded.
+
+Interpret intent, attempt, materialization and delivery states separately. API ACCEPTED is not SENT/DELIVERED. Missing status is neither failure nor free charge. DISPATCHING older than one minute becomes UNCERTAIN without resend. Expired raw source becomes UNAVAILABLE, never fabricated content. Sprint 2 Event Center remains the authorized ingress/replay evidence surface. Test durations are not production performance claims.

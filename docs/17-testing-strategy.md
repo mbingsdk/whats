@@ -111,3 +111,11 @@ Live account synchronization, real public challenge and authentic Meta POST are 
 Executed: 39 offline decisions PASS, 20 decimal rate rows PASS and 36 contiguous tier rows PASS. Separate original-artifact comparison confirms all 36 October PDF tier intervals/amounts match July CSV. The model makes zero network calls and imports no product code. Synthetic assumptions do not create real recipient consent, rate publication, budget or owner approval. In-memory duplicate handling is not a PostgreSQL concurrency test.
 
 Required later Sprint 3 acceptance: two-tenant runtime RLS/FK/pool tests; concurrent last-unit budget reservation; single-use confirmation/idempotency conflict; denial committed before permit authorization; template/rate publication versus queued dispatch; expiry at dispatch; post-write timeout/crash and lost provider ID; duplicate/reordered/orphan statuses and unknown pricing metadata. Keep these as unexecuted product requirements until code exists. Live tests follow the controlled recipient/budget/callback and immediate paid-test approval policy in doc 27.
+
+## Sprint 3 executable verification
+
+dev.py check includes Inbox unit/PostgreSQL tests, version-4/repeated migration checks, frontend draft tests and route/OpenAPI coverage. dev.py e2e runs identity, Meta and Inbox suites. Hosted CI retains Linux race detection and dependency review, without live Meta/SMTP credentials.
+
+Tests cover typed/unknown/replayed inbound, window timestamps, unread, signed pipeline, scope/CSRF/session rejection, competing idempotency/authorization, independent agents/epochs, callback proof, committed deny contention, UNCERTAIN recovery, orphan/out-of-order statuses, immutable publication/review/base CAS, final-budget-unit contention and audit redaction. All 21 new tables contain fixtures before cross-tenant SELECT and WITH CHECK tests under both roles.
+
+Browser tests use isolated real API/PostgreSQL and an injected fake sender. They exercise assignment, presence, notes, restored drafts, active/expired windows, unknown-currency paid block, one synthetic zero-cost attempt, pricing UI, mobile rendering, logout purge and anonymous denial. This does not replace operator-triggered live evidence. Paid quote-above-max execution remains unavailable because paid dispatch is closed; policy changes invalidate queued authorizations.

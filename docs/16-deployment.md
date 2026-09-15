@@ -91,3 +91,11 @@ Account recovery uses saved one-use recovery codes or an already authenticated r
 Hosted GitHub CI is a separate verification track. The historical billing restriction was resolved and Sprint 1/Sprint 2 hosted results are recorded in their evidence files. For later changes, run the workflow for the reviewed commit, inspect actual steps/results and fix repository failures. Neither local success nor an earlier hosted run proves a later commit passed.
 
 The manually opted-in Go test uses -tags=integration,controlledsmtp -run TestControlledSMTPMailbox with the protected SMTP environment and CONTROLLED_SMTP_RECIPIENT. It never runs in ordinary CI. It sends four real identity messages only to the approved address, consumes proofs in disposable accounts and records sanitized relay evidence. Operator confirmation of actual mailbox receipt is still required. Local private *_FILE values must be file paths, not embedded URLs; keep real provider configuration separate from generated development database credentials.
+
+## Sprint 3 Inbox operations
+
+Apply migration 00004 before schema-version-4 binaries. Start separate backend, metaworker and inboxworker commands with the same protected --env-file where applicable. Mailworker stays separate. UI routes are /inbox and permission-protected /pricing. Continue using the exact configured public Origin.
+
+INBOX_LIVE_ACCEPTANCE_ENABLED defaults false. Keep it false until [live prerequisites](28-sprint-3-evidence.md#live-acceptance) are resolved. INBOX_TEST_RECIPIENT_FILE holds one designated number; INBOX_LIVE_ACCEPTANCE_NOT_BEFORE is the approved setup start in RFC3339. Restart API/Inbox worker together after changes. Fresh challenge and authentic inbound must follow that boundary. These variables do not install a callback or establish delivery pricing coverage.
+
+Disable proxy buffering for /api/v1/inbox/events and permit its bounded 24-second stream. REST refresh is required on reconnect. Lost presence cannot lose messages. DISPATCHING recovery never retries a possible provider send. No permanent callback or production deployment is claimed by local testing.

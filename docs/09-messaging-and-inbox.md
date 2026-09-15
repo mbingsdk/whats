@@ -97,3 +97,15 @@ Message permission and price are independent. Current service/utility-reply conc
 For templates, Meta-observed category/status and exact components govern. Proposed final selected-template GET age is at most 30 seconds, with a permit at most 5 seconds and shorter window/price limits taking precedence. Bind ID/language/category/status/component hash; material drift invalidates authorization, unavailable/stale evidence blocks. A remote change after GET remains possible and must be visible in rejection/reconciliation. T4 is only a simple utility test candidate, pending safe content review and consent; no template is owner-selected for sending.
 
 [Status and uncertain-send semantics](27-gate-c-evidence.md#status-money-and-uncertain-sends) preserve the existing domain states: HTTP acceptance is not delivery, metadata is not an invoice, and an ambiguous POST retains exposure without automatic retry. Future controlled tests need an explicitly approved reachable callback because Sprint 2 restored the App callback to empty.
+
+## Implemented Sprint 3 boundary
+
+The September 15 owner scope narrows the broader target above. Runtime supports one organization/phone/WA_ID thread, all 12 requested message classifications, 100-message history pages, full-text/name/identity search, status/priority/unread filters and scoped team/member/phone query filters. Sender number, assignment revision, human handoff foundation, member read watermarks, resolve/reopen/snooze, notes with authorized mentions, edit/redaction, drafts and delivery/processing state are implemented.
+
+Media displays safe metadata only. No media download/send, CRM import, campaign history or bot engine is implied. CONTACTS is a message payload, not an import. Unknown/invalid types retain protected source linkage without opening a window. Notes cannot enter the Meta send path. Mention indicators require current thread authorization.
+
+Only authenticated TEXT advances the window, using the earlier valid provider/first-ingress instant and a monotone maximum. Source message, basis, confidence, 24-hour expiry and policy are retained. Business sends, notes, statuses and replay processing time do not extend it. Two human intents can share a handoff epoch; a separate one-attempt TEST-phone slot enforces the owner's live acceptance cap.
+
+Presence uses expiring PostgreSQL rows (20-second expiry, ten-second composing heartbeat), permitted by the latest owner scope. It is advisory, never a compose lock. [ADR 012](../ADR/012-sprint-3-inbox-runtime.md) records this refinement.
+
+Drafts are keyed by session/user/organization/conversation/composer mode, expire after 24 hours and restore only after authorized thread retrieval. They contain text and idempotency metadata only. Logout, 401, scope loss and organization switch purge them; cross-tab invalidation carries no content. Session keepalive uses the existing session endpoint. Pricing authorization stays in memory and is refreshed on explicit Send.

@@ -198,3 +198,9 @@ M60, 2026-09-12: live implemented v26.0 sync succeeded in an isolated controlled
 Retrieval discrepancy review: some browser paths failed while direct first-party HTML/artifact GETs succeeded. October downloads labeled CSV contained XLSX bytes and were quarantined for format mismatch; extraction used official PDF alternatives. Latest dated HTML governs over stale Markdown/public overview omissions. Generic reference shells establish no exact schema. No unavailable/stale/format-mismatched response becomes verified contract evidence.
 
 Executable evidence: 39 offline scenarios, 20 rate rows and 36 contiguous tier rows PASS; these are documentation fixtures, not product or database-concurrency tests. Candidate remains DRAFT, without independent approval/publication or TEST amount. Immediate Gate C blocker is company billing currency; subsequent live prerequisites are separately listed in doc 27. No outbound WhatsApp message was sent.
+
+## M73: Service delivery horizon review, 2026-09-15
+
+Inspected [Meta Direct Send TTL](https://developers.facebook.com/documentation/business-messaging/whatsapp/direct-send/configure-message-ttl/) at 2026-09-14T18:20:27Z (September 15 WITA). Original HTML SHA-256: 34e8142078edcf5e7e4065c242e56640224b081e325d21b8ed5637c044b340cb. Substantive first-party content establishes utility/authentication Direct Send TTL and rejection on non-Direct Send. Classification: VERIFIED_CURRENT_CONTRACT for that limited surface. Direct Send delivery scope is DEFERRED; ACCOUNT_VERIFICATION_REQUIRED would still apply to a future adapter.
+
+A delivery bound or charge-effective guarantee for ordinary Service text remains UNVERIFIED. Do not copy the utility TTL/default, change category to utility, or infer delivery certainty from the recipient being online. This is a separate live zero-cost evidence blocker; it does not reverse Gate C approval or prevent architecture implementation. Currency remains UNKNOWN.

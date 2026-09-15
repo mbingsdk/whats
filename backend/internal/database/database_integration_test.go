@@ -84,7 +84,7 @@ func TestPostgresFoundation(t *testing.T) {
 		if e != nil {
 			t.Fatal(e)
 		}
-		if count != 3 {
+		if count != 4 {
 			t.Fatalf("got %d initial migrations", count)
 		}
 		count, e = migrate.Up(ctx, migrationDSN, files)

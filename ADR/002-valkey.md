@@ -7,3 +7,5 @@ Redis is viable if it is the company's supported operational standard. Valkey is
 Losing Valkey loses presence, not messages or campaign progress. Durable workers rediscover DB rows. If distributed throttle capacity cannot be enforced during outage, pause affected sends or use an explicitly tested conservative DB fallback. Never reconstruct budget balances from an ephemeral cache.
 
 Revisit if a required supported client/managed platform materially favors Redis. No Valkey cluster initially.
+
+Sprint 3 refinement: [ADR 012](012-sprint-3-inbox-runtime.md) uses bounded PostgreSQL presence within the owner-permitted minimum scope. Valkey remains the future disposable-state choice; no Valkey runtime dependency or measured performance is claimed.

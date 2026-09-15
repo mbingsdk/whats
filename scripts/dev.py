@@ -88,13 +88,13 @@ def npm(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["up", "down", "migrate", "backend", "frontend", "test", "check", "e2e", "bootstrap", "mailworker", "metaworker"])
+    parser.add_argument("action", choices=["up", "down", "migrate", "backend", "frontend", "test", "check", "e2e", "bootstrap", "mailworker", "metaworker", "inboxworker"])
     parser.add_argument("--env-file", action="append", default=[], metavar="PATH",
-                        help="Explicit operator config for bootstrap/backend/mailworker/metaworker; repeat to merge files.")
+                        help="Explicit operator config for bootstrap/backend/mailworker/metaworker/inboxworker; repeat to merge files.")
     args = parser.parse_args()
     action = args.action
-    if args.env_file and action not in {"bootstrap", "backend", "mailworker", "metaworker"}:
-        parser.error("--env-file is only supported for bootstrap/backend/mailworker/metaworker")
+    if args.env_file and action not in {"bootstrap", "backend", "mailworker", "metaworker", "inboxworker"}:
+        parser.error("--env-file is only supported for bootstrap/backend/mailworker/metaworker/inboxworker")
     try:
         overrides = load_operator_env(args.env_file)
     except ValueError as error:
@@ -114,11 +114,12 @@ def main():
             run(["go", "run", "./cmd/migrate"], ROOT / "backend", env)
         elif action == "backend":
             run(["go", "run", "./cmd/api"], ROOT / "backend", env)
-        elif action in {"bootstrap","mailworker","metaworker"}:
+        elif action in {"bootstrap","mailworker","metaworker","inboxworker"}:
             run(["go","run","./cmd/"+action], ROOT / "backend", env)
         elif action == "e2e":
             run(["go", "test", *(["-race"] if env.get("WABA_TEST_RACE") == "1" else []), "-tags=integration,e2e", "-count=1", "-timeout=5m", "-v", "-run", "TestBrowserIdentityE2E", "./internal/identity"], ROOT / "backend", env)
             run(["go", "test", *(["-race"] if env.get("WABA_TEST_RACE") == "1" else []), "-tags=integration,e2e", "-count=1", "-timeout=5m", "-v", "-run", "TestBrowserMetaE2E", "./internal/meta"], ROOT / "backend", env)
+            run(["go", "test", *(["-race"] if env.get("WABA_TEST_RACE") == "1" else []), "-tags=integration,e2e", "-count=1", "-timeout=5m", "-v", "-run", "TestBrowserInboxE2E", "./internal/inbox"], ROOT / "backend", env)
         elif action == "test":
             run(["go", "test", *(["-race"] if env.get("WABA_TEST_RACE") == "1" else []), "./..."], ROOT / "backend", env)
             run(["go", "test", *(["-race"] if env.get("WABA_TEST_RACE") == "1" else []), "-tags=integration", "-count=1", "-v", "./internal/..."], ROOT / "backend", env)

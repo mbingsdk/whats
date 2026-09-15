@@ -6,7 +6,7 @@ Owner clarification (2026-09-15): **Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED
 
 The September 14 research is accepted. Unknown billing currency blocks paid authority, not Gate C approval or local guard implementation. Zero cost must come from independent published current policy, never a missing rate/default/unknown currency. October effective-date changes remain binding; no timeless service-free assumption is authorized. All template live sends remain CLOSED under the explicit Sprint 3 scope, including the earlier proposed second test.
 
-Completed research was published at **4bc49539745ead1f3b5e53470e7aa77671ab29cc**. Hosted [run 34840457519](https://github.com/mbingsdk/whats/actions/runs/34840457519) passed all repository, PostgreSQL, browser and dependency steps on September 14, completed 11:55:40Z. It used isolated fixtures, not live Meta. This owner-clarification documentation commit will have its own hosted result recorded before implementation begins.
+Completed research was published at **4bc49539745ead1f3b5e53470e7aa77671ab29cc**. Hosted [run 34840457519](https://github.com/mbingsdk/whats/actions/runs/34840457519) passed all repository, PostgreSQL, browser and dependency steps on September 14, completed 11:55:40Z. It used isolated fixtures, not live Meta. Owner-clarification baseline **efe31864e5ed0c090d12c292f269eec22941bfb6** is published and [run 34879123286](https://github.com/mbingsdk/whats/actions/runs/34879123286) **PASS** on all repository/PostgreSQL/browser/dependency steps. The result was recorded before Sprint 3 implementation began.
 
 ## Historical research assessment, 2026-09-14
 
@@ -211,3 +211,9 @@ Sprint 2's temporary tunnel callback was rolled back to the prior **empty App ca
 Currency is the immediate Gate C evidence blocker. Authentication variant can remain excluded from initial text/simple-utility tests; unknown discounts require conservative verified coverage. Independent publication, selected safe template/recipient, exact TEST cap and immediate paid-test approval, payment readiness and an approved reachable callback are subsequent live-acceptance conditions. They do not authorize sends in this run or justify fabricated production operations.
 
 Review changes are confined to the requested seven documents, this evidence document and offline fixtures. Existing unrelated bootstrap/environment edits are preserved. Six authorized Graph GETs and **zero Graph mutations/outbound WhatsApp sends** were performed. Sprint 2 webhook code and migrations are untouched. Source/documentation/migration-integrity checks are recorded with their actual results in the [fixture README](fixtures/gate-c/README.md). Prior hosted success is baseline evidence only, not CI verification of this unpublished Gate C package.
+
+## Sprint 3 implementation handoff, 2026-09-15
+
+The owner-approved documentation baseline and hosted PASS above precede product changes. Sprint 3 uses reviewed artifacts as controlled Registry inputs and separate zero policy evidence. It does not auto-publish numeric rates or infer currency. [Sprint 3 evidence](28-sprint-3-evidence.md) owns subsequent verification.
+
+[M73](21-research-register.md#m73-service-delivery-horizon-review-2026-09-15) records why the inspected Direct Send TTL contract cannot bound ordinary Service text delivery. Real Service pricing coverage remains UNVERIFIED/fail-closed. Synthetic bounded-delivery tests are not account or live evidence. Gate C APPROVED; paid/template authority and Gate D CLOSED.

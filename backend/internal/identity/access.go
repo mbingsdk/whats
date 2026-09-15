@@ -178,7 +178,25 @@ func (s *Service) organization(ctx context.Context, tx pgx.Tx, v Session, action
 			return Result{}, e
 		}
 		grants := []string{}
-		for _, p := range []string{"organization.view", "members.view", "members.invite", "members.manage", "teams.view", "teams.manage", "roles.view", "roles.manage", "roles.assign", "owners.manage", "audit.view", "meta.view", "meta.manage", "webhooks.view", "webhooks.payload.view", "webhooks.replay"} {
+		permissionRows, e := tx.Query(ctx, "SELECT key FROM app.permissions ORDER BY key")
+		if e != nil {
+			return Result{}, e
+		}
+		permissionKeys, e := pgx.CollectRows(permissionRows, pgx.RowTo[string])
+		if e != nil {
+			return Result{}, e
+		}
+		selfGrants := []string{}
+		for _, p := range permissionKeys {
+			yes, e := permission(ctx, tx, *member, p, nil, member)
+			if e != nil {
+				return Result{}, e
+			}
+			if yes {
+				selfGrants = append(selfGrants, p)
+			}
+		}
+		for _, p := range permissionKeys {
 			yes, e := permission(ctx, tx, *member, p, nil, nil)
 			if e != nil {
 				return Result{}, e
@@ -197,15 +215,8 @@ func (s *Service) organization(ctx context.Context, tx pgx.Tx, v Session, action
 		}
 		scoped := []map[string]any{}
 		for _, tid := range ids {
-			view, e := permission(ctx, tx, *member, "teams.view", &tid, nil)
-			if e != nil {
-				return Result{}, e
-			}
-			if !view {
-				continue
-			}
 			keys := []string{}
-			for _, key := range []string{"teams.view", "teams.manage", "roles.assign"} {
+			for _, key := range permissionKeys {
 				yes, e := permission(ctx, tx, *member, key, &tid, nil)
 				if e != nil {
 					return Result{}, e
@@ -214,9 +225,11 @@ func (s *Service) organization(ctx context.Context, tx pgx.Tx, v Session, action
 					keys = append(keys, key)
 				}
 			}
-			scoped = append(scoped, map[string]any{"id": tid, "permissions": keys})
+			if len(keys) > 0 {
+				scoped = append(scoped, map[string]any{"id": tid, "permissions": keys})
+			}
 		}
-		return stringResult(map[string]any{"id": org, "name": name, "timezone": timezone, "revision": revision, "permissions": grants, "member_id": member, "scoped_teams": scoped}), nil
+		return stringResult(map[string]any{"id": org, "name": name, "timezone": timezone, "revision": revision, "permissions": grants, "self_permissions": selfGrants, "member_id": member, "scoped_teams": scoped}), nil
 	case "org.members.list":
 		return s.page(ctx, tx, in, action, v.UserID, org, `SELECT m.id,m.organization_id,u.display_name,u.canonical_email,m.status,m.revision,m.access_revision,
  coalesce((SELECT jsonb_agg(jsonb_build_object('role_id',mr.role_id,'scope',mr.scope_kind,'team_id',mr.team_id)) FROM app.member_roles mr WHERE mr.member_id=m.id),'[]'::jsonb) AS grants

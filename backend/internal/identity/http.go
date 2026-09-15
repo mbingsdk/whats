@@ -55,6 +55,10 @@ func fail(w http.ResponseWriter, r *http.Request, e error) {
 			break
 		}
 	}
+	var domain interface{ DomainCode() string }
+	if errors.As(e, &domain) {
+		code, status = domain.DomainCode(), 409
+	}
 	var pg *pgconn.PgError
 	if errors.As(e, &pg) && (pg.Code == "23505" || pg.Code == "23503") {
 		code, status = "RESOURCE_CONFLICT", 409

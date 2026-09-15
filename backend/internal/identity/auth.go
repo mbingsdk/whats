@@ -66,7 +66,7 @@ func (s *Service) Bootstrap(ctx context.Context, in Input) error {
 	if e = exec(ctx, tx, "INSERT INTO app.organization_members(id,organization_id,user_id,activated_at) VALUES($1,$2,$3,now())", member, org, user); e != nil {
 		return e
 	}
-	keys := []string{"organization.view", "members.view", "members.invite", "members.manage", "teams.view", "teams.manage", "roles.view", "roles.manage", "roles.assign", "owners.manage", "audit.view", "meta.view", "meta.manage", "webhooks.view", "webhooks.payload.view", "webhooks.replay"}
+	keys := []string{"organization.view", "members.view", "members.invite", "members.manage", "teams.view", "teams.manage", "roles.view", "roles.manage", "roles.assign", "owners.manage", "audit.view", "meta.view", "meta.manage", "webhooks.view", "webhooks.payload.view", "webhooks.replay", "inbox.view", "messages.send", "conversations.manage", "conversations.assign", "notes.write", "notes.redact", "pricing.view", "pricing.registry.import", "pricing.registry.review", "pricing.registry.publish", "budgets.manage", "sending.manage"}
 	for _, preset := range []string{"Owner", "Admin", "Agent"} {
 		role := id()
 		if e = exec(ctx, tx, "INSERT INTO app.roles(id,organization_id,name) VALUES($1,$2,$3)", role, org, preset); e != nil {

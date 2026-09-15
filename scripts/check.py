@@ -69,6 +69,8 @@ implemented = {(method.lower(), "/api/v1" + path) for method, path in re.findall
 meta_source = (ROOT / "backend/internal/meta/service.go").read_text(encoding="utf-8")
 implemented |= {(m.lower(), "/api/v1"+p) for m,p in re.findall(r'\{"(GET|POST|PUT|PATCH|DELETE)", "([^"]+)"', meta_source)}
 implemented |= {(m.lower(),p) for m,p in re.findall(r'HandleFunc\("(GET|POST) (/api/v1/[^"]+)"', meta_source)}
+inbox_source = (ROOT / "backend/internal/inbox/service.go").read_text(encoding="utf-8")
+implemented |= {(m.lower(), "/api/v1"+p) for m,p in re.findall(r'\{"(GET|POST|PUT|PATCH|DELETE)", "([^"]+)"', inbox_source)}
 implemented |= {("get", "/healthz"), ("get", "/readyz"), ("get", "/api/v1/auth/csrf")}
 documented = set()
 current_path = None

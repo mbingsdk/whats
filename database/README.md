@@ -15,3 +15,7 @@ Integration tests create random disposable databases, apply the same reviewed mi
 Initial Owner provisioning is an audited operator command, not a migration seed or web signup. Follow the [bootstrap/SMTP runbook](../docs/16-deployment.md#sprint-1-identity-operations). The singleton prevents duplicate bootstrap. Global suspension/auth revisions and membership access revisions invalidate sessions without deleting identity/audit history. Local Docker volume persistence is not a backup.
 
 Publication erratum: the Sprint 1 00002 manifest was computed from CRLF working bytes before Git normalized the published SQL to LF. Both published files remain unchanged. checksum-corrections.json pins the exact published LF artifact with source-commit provenance; source validation requires that digest and rejects CRLF or changed SQL. See the [CI correction evidence](../docs/24-sprint-1-evidence.md#published-sprint-1-ci-correction-2026-09-10). New migrations still require their own manifest entry.
+
+## Sprint 3 schema version 4
+
+Migration 00004_guarded_inbox.sql adds 21 domain/Registry/budget tables and 12 permissions described in [the schema record](../docs/05-database-design.md#implemented-sprint-3-schema). Every new organization table FORCE RLS with populated read/write denial tests under both roles. Prior SQL/checksums remain immutable. Apply this forward migration before starting version-4 API/Inbox worker.

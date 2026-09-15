@@ -1,5 +1,9 @@
 # WABA Control
 
+## Sprint 3 implementation review, 2026-09-15
+
+Gates A/B/C APPROVED; Sprints 0/1/2 COMPLETE. Sprint 3 code is implemented and final verification is in progress; implementation closure is OPEN until its own hosted CI passes. Live acceptance is OPEN. Company billing currency UNKNOWN; paid/template authority and Gate D CLOSED. Sprint 4 unauthorized. See [Sprint 3 evidence](docs/28-sprint-3-evidence.md).
+
 Owner clarification (2026-09-15): **Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; Gate D CLOSED; Sprint 3 AUTHORIZED. COMPANY META BILLING CURRENCY UNKNOWN; PAID-SEND AUTHORITY CLOSED.** Currency must not be inferred from timezone, business/phone/recipient country, available rate cards or locale. Only a currently reviewed, provably zero-cost policy can permit the single operator-triggered controlled TEXT live reply after all recipient/callback/security prerequisites. Paid/template live sends, outbound media, campaigns and Sprint 4 remain unauthorized.
 
 Earlier dated status/review entries below are historical and superseded by this owner clarification where they describe Gate C or Sprint 3 authorization.
@@ -38,7 +42,7 @@ Normal deployment serves one PT in one company Organization. The design retains 
 
 **Design baseline, with explicit implementation gates.** Official policy, public pricing overview and Meta's official Postman examples were inspected. Many developer pages returned HTTP 429, login-only content or fetch failures. The Postman examples include old Graph versions and contradictory prose; they prove API surface, not compatibility with an untested 2026 account.
 
-Read-only Meta account checks now pass for the supplied WABA/phone on v26.0; see the Gate B evidence record. Current rate cards, upcoming pricing changes, Graph version, permissions on the company's assets and advanced feature eligibility remain NEEDS VERIFICATION. The identity application works locally; the full WhatsApp product is not implemented or production-ready. No real prices, credentials, customers or fabricated analytics are included.
+Read-only Meta account checks now pass for the supplied WABA/phone on v26.0; see the Gate B evidence record. Gate B records the verified Graph/account boundary and Gate C records reviewed public rate artifacts and upcoming pricing changes. Company billing currency, the Service delivery/pricing horizon and advanced feature eligibility remain explicitly unverified. Identity, Meta ingestion and the guarded Inbox are implemented; production and live Sprint 3 acceptance remain open. Reviewed public rates are included as evidence; credentials and customer data are excluded. No fabricated analytics are included.
 
 ## Implemented identity application
 
@@ -56,7 +60,7 @@ python scripts/dev.py backend
 
 In another terminal run npm ci with the pinned Node version, then python scripts/dev.py frontend. Open http://localhost:3000; /healthz and /readyz go to the Go backend through the development proxy. Run python scripts/dev.py test for Go/unit/real-PostgreSQL tests, or python scripts/dev.py check for the complete local validation sequence including frontend production build and OpenAPI. Stop PostgreSQL with python scripts/dev.py down; its volume remains.
 
-The runner generates ignored local credentials. Never copy them to production. The API receives the limited runtime URL plus the dedicated identity-service URL and root-key file; it receives no migration/setup-administrator credentials; test setup uses separate disposable-database administrative access. SMTP configuration names are in [.env.example](.env.example). Go does not automatically load .env files. For local bootstrap/backend/mailworker/metaworker, pass --env-file with the protected operator file; values are loaded explicitly into that server process. The local runner preserves its generated development database credentials and root key.
+The runner generates ignored local credentials. Never copy them to production. The API receives the limited runtime URL plus the dedicated identity-service URL and root-key file; it receives no migration/setup-administrator credentials; test setup uses separate disposable-database administrative access. SMTP configuration names are in [.env.example](.env.example). Go does not automatically load .env files. For local bootstrap/backend/mailworker/metaworker/inboxworker, pass --env-file with the protected operator file; values are loaded explicitly into that server process. The local runner preserves its generated development database credentials and root key.
 
 Use python scripts/dev.py bootstrap --env-file .local/operator.env with your protected operator inputs to initialize the first Owner (replace the example path with your actual file), and python scripts/dev.py mailworker to process identity mail. See the exact [bootstrap and mail procedure](docs/16-deployment.md#sprint-1-identity-operations). Browser verification uses npx playwright install chromium followed by python scripts/dev.py e2e against a disposable database and local TLS SMTP server.
 
@@ -65,3 +69,11 @@ Use python scripts/dev.py bootstrap --env-file .local/operator.env with your pro
 ## Sprint 2 Meta operations
 
 Read-only asset sync and signed webhook ingestion pass local implementation verification. Hosted Sprint 2 CI passed for implementation commit e0a6550 in run [34670353309](https://github.com/mbingsdk/whats/actions/runs/34670353309). Real Meta GET/POST acceptance is VERIFIED; the required GET metadata correction passed its own hosted [run 34813315965](https://github.com/mbingsdk/whats/actions/runs/34813315965). The temporary acceptance callback was rolled back and the tunnel stopped. See [Sprint 2 evidence](docs/26-sprint-2-evidence.md). Set the protected Meta variables in [.env.example](.env.example), bind the configured App using Meta Connection, and run python scripts/dev.py metaworker alongside the API. Startup never changes a Meta subscription or callback. The worker performs GET asset reads and local event processing only.
+
+## Sprint 3 guarded Inbox
+
+Open /inbox for conversations, unread, search/filtering, assignment, notes, drafts, presence and window state. /pricing exposes zero policies, controlled artifact imports, distinct review/publication and budget foundations. No template, media or campaign send control is enabled.
+
+Run python scripts/dev.py migrate, then backend and python scripts/dev.py inboxworker --env-file .local/operator.env alongside metaworker (substitute your protected operator file). API and Inbox worker require matching Meta/acceptance configuration. The Inbox worker materializes processed signed evidence and dispatches eligible text intents; startup/migration never sends or changes callback/subscriptions.
+
+Live acceptance defaults disabled. TEST file and acceptance-start settings do not establish callback/pricing proof. The real Service delivery horizon remains UNVERIFIED, so live preflight stays blocked even if other settings are filled. See [live prerequisites](docs/28-sprint-3-evidence.md#live-acceptance).

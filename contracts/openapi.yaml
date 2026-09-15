@@ -1,10 +1,10 @@
 openapi: 3.1.0
 info:
-  title: WABA Control identity and Meta ingestion API
-  version: 0.3.0
+  title: WABA Control identity Meta ingestion and guarded Inbox API
+  version: 0.4.0
   description: >-
-    Implemented Sprint 0/1 identity and Sprint 2 read-only Meta assets and signed ingestion. No outbound WhatsApp
-    messaging endpoints. Cookie mutations require matching Origin, CSRF cookie/header and the session-bound CSRF digest.
+    Implemented identity, read-only Meta assets, signed ingestion, scoped Inbox and guarded text intents.
+    Paid/template sends remain unauthorized. Cookie mutations require matching Origin, CSRF cookie/header and the session-bound CSRF digest.
     Organization IDs never establish authorization.
   license:
     name: Proprietary
@@ -21,7 +21,229 @@ tags:
     description: Membership-checked, permission-scoped organization operations.
   - name: Meta
     description: Existing assets and authenticated webhook ingestion.
+  - name: Inbox
+    description: Scoped conversations, reviewed pricing and controlled text intents.
 paths:
+  /api/v1/inbox:
+    get:
+      operationId: "inboxGETinbox"
+      summary: "Load scoped Inbox workspace"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}]
+      x-permission: "inbox.view"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED."
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InboxSetup"}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+  /api/v1/conversations:
+    get:
+      operationId: "inboxGETconversations"
+      summary: "Search authorized conversations"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}, {"name": "q", "in": "query", "schema": {"type": "string"}, "description": "Scope is applied before search and pagination."}, {"name": "status", "in": "query", "schema": {"type": "string"}, "description": "Scope is applied before search and pagination."}, {"name": "cursor", "in": "query", "schema": {"type": "string"}, "description": "Scope is applied before search and pagination."}, {"name": "priority", "in": "query", "schema": {"type": "string"}, "description": "Optional narrowing within current authorized scope."}, {"name": "unread", "in": "query", "schema": {"type": "string"}, "description": "Optional narrowing within current authorized scope."}, {"name": "team_id", "in": "query", "schema": {"type": "string"}, "description": "Optional narrowing within current authorized scope."}, {"name": "member_id", "in": "query", "schema": {"type": "string"}, "description": "Optional narrowing within current authorized scope."}, {"name": "phone_id", "in": "query", "schema": {"type": "string"}, "description": "Optional narrowing within current authorized scope."}]
+      x-permission: "inbox.view"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED."
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ConversationPage"}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+  /api/v1/conversations/{id}:
+    get:
+      operationId: "inboxGETconversationsid"
+      summary: "Read scoped thread and presence"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}, {"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}, {"name": "before", "in": "query", "schema": {"type": "string"}, "description": "Optional narrowing within current authorized scope."}]
+      x-permission: "inbox.view"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED."
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InboxThread"}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+    patch:
+      operationId: "inboxPATCHconversationsid"
+      summary: "Change status priority or human handoff"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}, {"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}, {"$ref": "#/components/parameters/CSRF"}, {"$ref": "#/components/parameters/Origin"}]
+      x-permission: "conversations.manage"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED."
+      requestBody: {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ConversationPatch"}}}}
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InboxCommand"}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+  /api/v1/conversations/{id}/assignment:
+    put:
+      operationId: "inboxPUTconversationsidassignment"
+      summary: "Replace assignment with revision check"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}, {"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}, {"$ref": "#/components/parameters/CSRF"}, {"$ref": "#/components/parameters/Origin"}]
+      x-permission: "conversations.assign"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED."
+      requestBody: {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/AssignmentInput"}}}}
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InboxCommand"}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+  /api/v1/conversations/{id}/read:
+    post:
+      operationId: "inboxPOSTconversationsidread"
+      summary: "Advance own unread watermark"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}, {"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}, {"$ref": "#/components/parameters/CSRF"}, {"$ref": "#/components/parameters/Origin"}]
+      x-permission: "inbox.view"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED."
+      requestBody: {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ReadInput"}}}}
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InboxCommand"}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+  /api/v1/conversations/{id}/notes:
+    post:
+      operationId: "inboxPOSTconversationsidnotes"
+      summary: "Create internal note and scoped mentions"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}, {"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}, {"$ref": "#/components/parameters/CSRF"}, {"$ref": "#/components/parameters/Origin"}]
+      x-permission: "notes.write"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED."
+      requestBody: {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/NoteInput"}}}}
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InboxCommand"}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+  /api/v1/notes/{id}:
+    patch:
+      operationId: "inboxPATCHnotesid"
+      summary: "Edit own internal note"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}, {"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}, {"$ref": "#/components/parameters/CSRF"}, {"$ref": "#/components/parameters/Origin"}]
+      x-permission: "notes.write"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED."
+      requestBody: {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/NoteEdit"}}}}
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InboxCommand"}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+  /api/v1/notes/{id}/redact:
+    post:
+      operationId: "inboxPOSTnotesidredact"
+      summary: "Redact internal note with recent MFA"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}, {"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}, {"$ref": "#/components/parameters/CSRF"}, {"$ref": "#/components/parameters/Origin"}]
+      x-permission: "notes.redact"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED."
+      requestBody: {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RevisionInput"}}}}
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InboxCommand"}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+  /api/v1/conversations/{id}/presence:
+    post:
+      operationId: "inboxPOSTconversationsidpresence"
+      summary: "Renew advisory presence for 20 seconds"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}, {"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}, {"$ref": "#/components/parameters/CSRF"}, {"$ref": "#/components/parameters/Origin"}]
+      x-permission: "inbox.view"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED."
+      requestBody: {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/EmptyInput"}}}}
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InboxCommand"}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+  /api/v1/inbox/events:
+    get:
+      operationId: "inboxGETinboxevents"
+      summary: "Stream scoped invalidations with bounded reconnect"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}]
+      x-permission: "inbox.view"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED. Invalidation events contain only scoped IDs and event types, never message text. REST is authoritative; clients refresh on connect and each event. Stream revalidates every four seconds and reconnects after 24 seconds; gaps trigger REST refresh, not cursor assumptions."
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"text/event-stream": {"schema": {"type": "string"}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+  /api/v1/pricing/preflight:
+    post:
+      operationId: "inboxPOSTpricingpreflight"
+      summary: "Evaluate finalizable text eligibility"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}, {"$ref": "#/components/parameters/CSRF"}, {"$ref": "#/components/parameters/Origin"}]
+      x-permission: "messages.send"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED."
+      requestBody: {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/PreflightInput"}}}}
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SendPreflight"}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+  /api/v1/outbound-intents:
+    post:
+      operationId: "inboxPOSToutboundintents"
+      summary: "Create immutable idempotent text intent"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}, {"$ref": "#/components/parameters/CSRF"}, {"$ref": "#/components/parameters/Origin"}]
+      x-permission: "messages.send"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED. The worker rechecks authorization before one network attempt. UNCERTAIN is never automatically resent. GET recovery returns only the current actor/session matching the client key."
+      requestBody: {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SubmitIntentInput"}}}}
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InboxCommand"}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+    get:
+      operationId: "inboxGEToutboundintents"
+      summary: "Recover own session intent by client key"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}, {"name": "client_key", "in": "query", "required": true, "schema": {"type": "string", "minLength": 16, "maxLength": 128}}]
+      x-permission: "inbox.view"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED. The worker rechecks authorization before one network attempt. UNCERTAIN is never automatically resent. GET recovery returns only the current actor/session matching the client key."
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/OutboundIntent"}}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+  /api/v1/outbound-intents/{id}:
+    get:
+      operationId: "inboxGEToutboundintentsid"
+      summary: "Read scoped intent outcome"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}, {"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}]
+      x-permission: "inbox.view"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED."
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/OutboundIntent"}}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+  /api/v1/pricing:
+    get:
+      operationId: "inboxGETpricing"
+      summary: "Inspect rate registry and independent zero-cost policy"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}]
+      x-permission: "pricing.view"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED."
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/PricingRegistry"}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+  /api/v1/rate-cards/imports:
+    post:
+      operationId: "inboxPOSTratecardsimports"
+      summary: "Import reviewed independent rate artifacts"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}, {"$ref": "#/components/parameters/CSRF"}, {"$ref": "#/components/parameters/Origin"}]
+      x-permission: "pricing.registry.import"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED."
+      requestBody: {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RateImportInput"}}}}
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InboxCommand"}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+  /api/v1/rate-cards/imports/{id}/{action}:
+    post:
+      operationId: "inboxPOSTratecardsimportsidaction"
+      summary: "Advance reviewed registry lifecycle"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}, {"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}, {"name": "action", "in": "path", "required": true, "schema": {"type": "string", "enum": ["validate", "diff", "submit", "review", "revise", "publish"]}}, {"$ref": "#/components/parameters/CSRF"}, {"$ref": "#/components/parameters/Origin"}]
+      x-permission: "action-specific registry permission"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED."
+      requestBody: {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RegistryActionInput"}}}}
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InboxCommand"}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+  /api/v1/budgets:
+    get:
+      operationId: "inboxGETbudgets"
+      summary: "Read currency-qualified budget exposure"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}]
+      x-permission: "pricing.view"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED."
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/BudgetExposure"}}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+    post:
+      operationId: "inboxPOSTbudgets"
+      summary: "Create budget with verified account currency"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}, {"$ref": "#/components/parameters/CSRF"}, {"$ref": "#/components/parameters/Origin"}]
+      x-permission: "budgets.manage"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED."
+      requestBody: {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/BudgetInput"}}}}
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InboxCommand"}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
+  /api/v1/inbox/settings:
+    patch:
+      operationId: "inboxPATCHinboxsettings"
+      summary: "Change sending switch and policy revision"
+      tags: ["Inbox"]
+      security: [{"SessionCookie": []}]
+      parameters: [{"$ref": "#/components/parameters/RequestID"}, {"$ref": "#/components/parameters/CSRF"}, {"$ref": "#/components/parameters/Origin"}]
+      x-permission: "sending.manage"
+      description: "Session-derived organization and current resource scope are checked on every call. Writes require verified email, matching Origin and session-bound CSRF. Registry, budget creation, note redaction and sending settings require recent reauthentication and confirmed MFA. Paid/template authority remains CLOSED."
+      requestBody: {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SendingSettingsInput"}}}}
+      responses: {"200": {"description": "Scoped operation result; a queued or accepted intent is not delivery proof.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InboxCommand"}}}}, "403": {"$ref": "#/components/responses/Error"}, "409": {"$ref": "#/components/responses/Error"}, "default": {"$ref": "#/components/responses/Error"}}
   /api/v1/meta/connection:
     get:
       operationId: metaGETmetaconnection
@@ -4803,6 +5025,31 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorEnvelope'
   schemas:
+    InboxCommand: {"type": "object", "properties": {"saved": {"type": "boolean"}, "id": {"type": "string", "format": "uuid"}, "state": {"type": "string"}, "reused": {"type": "boolean"}}, "additionalProperties": false}
+    InboxConversation: {"type": "object", "properties": {"id": {"type": "string"}, "phone_id": {"type": "string"}, "display_name": {"type": "string"}, "identity_value": {"type": "string"}, "sending_phone": {"type": "string"}, "status": {"type": "string"}, "priority": {"type": "string"}, "handoff_state": {"type": "string"}, "window_confidence": {"type": "string"}, "assigned_team_id": {"type": ["string", "null"], "format": "uuid"}, "assigned_member_id": {"type": ["string", "null"], "format": "uuid"}, "revision": {"type": "integer", "format": "int64", "minimum": 0}, "assignment_revision": {"type": "integer", "format": "int64", "minimum": 0}, "inbound_sequence": {"type": "integer", "format": "int64", "minimum": 0}, "unread_count": {"type": "integer", "format": "int64", "minimum": 0}, "manual_unread": {"type": "boolean"}, "window_expires_at": {"type": ["string", "null"], "format": "date-time"}, "server_now": {"type": "string", "format": "date-time"}}}
+    InboxMessage: {"type": "object", "properties": {"id": {"type": "string", "format": "uuid"}, "provider_id": {"type": ["string", "null"]}, "direction": {"type": "string", "enum": ["INBOUND", "OUTBOUND"]}, "message_type": {"type": "string", "enum": ["TEXT", "IMAGE", "VIDEO", "AUDIO", "DOCUMENT", "STICKER", "CONTACTS", "LOCATION", "REACTION", "INTERACTIVE", "TEMPLATE", "UNKNOWN"]}, "content": {"type": "object", "additionalProperties": true}, "text_body": {"type": "string"}, "provider_at": {"type": ["string", "null"], "format": "date-time"}, "received_at": {"type": "string", "format": "date-time"}, "inbound_sequence": {"type": ["integer", "null"]}, "delivery_state": {"type": "string", "enum": ["RECEIVED", "PENDING_LOCAL", "ACCEPTED", "SENT", "DELIVERED", "READ", "FAILED", "UNCERTAIN", "UNKNOWN_CONFLICT"]}, "processing_state": {"type": "string"}, "error_code": {"type": ["string", "null"]}, "revision": {"type": "integer", "format": "int64", "minimum": 0}}}
+    InternalNote: {"type": "object", "properties": {"id": {"type": "string", "format": "uuid"}, "author_member_id": {"type": "string", "format": "uuid"}, "body": {"type": "string", "maxLength": 8000}, "revision": {"type": "integer", "format": "int64", "minimum": 0}, "created_at": {"type": "string", "format": "date-time"}, "updated_at": {"type": "string", "format": "date-time"}, "redacted_at": {"type": ["string", "null"], "format": "date-time"}, "mentioned_me": {"type": "boolean"}}}
+    OutboundIntent: {"type": "object", "properties": {"id": {"type": "string", "format": "uuid"}, "conversation_id": {"type": "string", "format": "uuid"}, "state": {"type": "string", "enum": ["QUEUED", "RESERVED", "DISPATCHING", "ACCEPTED", "BLOCKED", "FAILED", "UNCERTAIN"]}, "error_code": {"type": ["string", "null"]}, "provider_id": {"type": ["string", "null"]}, "created_at": {"type": "string", "format": "date-time"}, "finished_at": {"type": ["string", "null"], "format": "date-time"}}}
+    SendDecision: {"type": "object", "properties": {"allowed": {"type": "boolean"}, "code": {"type": "string"}, "window": {"type": "string", "enum": ["ACTIVE", "EXPIRING_SOON", "EXPIRED", "UNKNOWN"]}, "category": {"type": "string"}, "pricing": {"type": "string"}, "billing_currency_state": {"type": "string", "enum": ["UNKNOWN", "VERIFIED"]}, "confirmation_required": {"type": "boolean"}, "financial_reservation_required": {"type": "boolean"}}, "required": ["allowed", "code"], "additionalProperties": false}
+    SendPreflight: {"type": "object", "properties": {"decision": {"$ref": "#/components/schemas/SendDecision"}, "authorization": {"type": "string", "minLength": 43, "maxLength": 43, "description": "Opaque single-use token; keep only in memory. Bound to actor/session/org/recipient/phone/text/assignment/policy."}, "expires_at": {"type": "string", "format": "date-time"}, "server_now": {"type": "string", "format": "date-time"}, "policy_id": {"type": "string", "format": "uuid"}, "window_expires_at": {"type": ["string", "null"], "format": "date-time"}, "policy_basis": {"type": "string"}, "paid_authority": {"type": "string", "enum": ["CLOSED"]}}, "required": ["decision"], "additionalProperties": false}
+    PreflightInput: {"type": "object", "properties": {"conversation_id": {"type": "string", "format": "uuid"}, "assignment_revision": {"type": "integer", "format": "int64", "minimum": 0}, "text": {"type": "string", "minLength": 1, "maxLength": 4096}, "message_type": {"type": "string", "default": "TEXT"}, "category": {"type": "string", "default": "SERVICE"}}, "required": ["conversation_id", "assignment_revision", "text"], "additionalProperties": false}
+    SubmitIntentInput: {"type": "object", "properties": {"conversation_id": {"type": "string", "format": "uuid"}, "assignment_revision": {"type": "integer", "format": "int64", "minimum": 0}, "text": {"type": "string", "minLength": 1, "maxLength": 4096}, "message_type": {"type": "string", "default": "TEXT"}, "category": {"type": "string", "default": "SERVICE"}, "client_idempotency_key": {"type": "string", "minLength": 16, "maxLength": 128}, "authorization": {"type": "string", "minLength": 43, "maxLength": 43}}, "required": ["conversation_id", "assignment_revision", "text", "client_idempotency_key", "authorization"], "additionalProperties": false}
+    ConversationPatch: {"type": "object", "properties": {"revision": {"type": "integer", "format": "int64", "minimum": 0}, "status": {"type": "string", "enum": ["OPEN", "RESOLVED", "SNOOZED"]}, "priority": {"type": "string", "enum": ["LOW", "NORMAL", "HIGH", "URGENT"]}, "handoff_state": {"type": "string", "enum": ["HUMAN", "WAITING_AGENT"]}, "snoozed_until": {"type": "string", "format": "date-time"}}, "required": ["revision"], "additionalProperties": false}
+    AssignmentInput: {"type": "object", "properties": {"assignment_revision": {"type": "integer", "format": "int64", "minimum": 0}, "team_id": {"type": ["string", "null"], "format": "uuid"}, "member_id": {"type": ["string", "null"], "format": "uuid"}}, "required": ["assignment_revision"], "additionalProperties": false}
+    ReadInput: {"type": "object", "properties": {"watermark": {"type": "integer", "format": "int64", "minimum": 0}, "manual_unread": {"type": "boolean"}}, "required": ["watermark"], "additionalProperties": false}
+    NoteInput: {"type": "object", "properties": {"body": {"type": "string", "minLength": 1, "maxLength": 8000}, "mentions": {"type": "array", "items": {"type": "string", "format": "uuid"}}}, "required": ["body"], "additionalProperties": false}
+    NoteEdit: {"type": "object", "properties": {"revision": {"type": "integer", "format": "int64", "minimum": 0}, "body": {"type": "string", "minLength": 1, "maxLength": 8000}}, "required": ["revision", "body"], "additionalProperties": false}
+    RevisionInput: {"type": "object", "properties": {"revision": {"type": "integer", "format": "int64", "minimum": 0}}, "required": ["revision"], "additionalProperties": false}
+    RegistryActionInput: {"type": "object", "properties": {"revision": {"type": "integer", "format": "int64", "minimum": 0}, "approve": {"type": "boolean"}}, "required": ["revision"], "additionalProperties": false}
+    RateImportInput: {"type": "object", "properties": {"source": {"type": "string", "enum": ["GATE_C_20260914"]}, "correction_reason": {"type": "string", "maxLength": 1000, "description": "Required for a correction when an active publication exists; retained with the reviewed import."}}, "required": ["source"], "additionalProperties": false}
+    SendingSettingsInput: {"type": "object", "properties": {"sending_enabled": {"type": "boolean"}, "revision": {"type": "integer", "format": "int64", "minimum": 0}}, "required": ["sending_enabled", "revision"], "additionalProperties": false}
+    BudgetInput: {"type": "object", "properties": {"Name": {"type": "string", "minLength": 1, "maxLength": 80}, "Currency": {"type": "string", "pattern": "^[A-Z]{3}$"}, "Maximum": {"type": "string", "pattern": "^[0-9]{1,16}(\\.[0-9]{1,8})?$"}, "Starts": {"type": "string", "format": "date-time"}, "Ends": {"type": "string", "format": "date-time"}}, "required": ["Name", "Currency", "Maximum", "Starts", "Ends"], "additionalProperties": false}
+    InboxSetup: {"type": "object", "properties": {"member_id": {"type": "string", "format": "uuid"}, "session_id": {"type": "string", "format": "uuid"}, "settings": {"type": "array", "items": {"type": "object", "properties": {"sending_enabled": {"type": "boolean"}, "billing_currency_state": {"type": "string"}, "billing_currency": {"type": ["string", "null"]}, "policy_revision": {"type": "integer", "format": "int64", "minimum": 0}}, "additionalProperties": false}}, "teams": {"type": "array", "items": {"type": "object", "properties": {"id": {"type": "string", "format": "uuid"}, "name": {"type": "string"}}, "additionalProperties": false}}, "members": {"type": "array", "items": {"type": "object", "properties": {"id": {"type": "string", "format": "uuid"}, "name": {"type": "string"}, "team_id": {"type": ["string", "null"], "format": "uuid"}}, "additionalProperties": false}}, "live_test_configured": {"type": "boolean"}, "paid_authority": {"type": "string", "enum": ["CLOSED"]}, "template_send": {"type": "string", "enum": ["DISABLED"]}}, "additionalProperties": false}
+    ConversationPage: {"type": "object", "properties": {"items": {"type": "array", "items": {"$ref": "#/components/schemas/InboxConversation"}}, "has_more": {"type": "boolean"}, "next_cursor": {"type": ["string", "null"], "format": "uuid"}}, "required": ["items", "has_more", "next_cursor"], "additionalProperties": false}
+    InboxThread: {"type": "object", "properties": {"conversation": {"type": "array", "items": {"$ref": "#/components/schemas/InboxConversation"}}, "messages": {"type": "array", "items": {"$ref": "#/components/schemas/InboxMessage"}}, "notes": {"type": "array", "items": {"$ref": "#/components/schemas/InternalNote"}}, "presence": {"type": "array", "items": {"type": "object", "properties": {"member_id": {"type": "string", "format": "uuid"}, "name": {"type": "string"}, "expires_at": {"type": "string", "format": "date-time"}}, "additionalProperties": false}}, "permissions": {"type": "array", "items": {"type": "string"}}, "message_has_more": {"type": "boolean"}, "message_next_cursor": {"type": ["string", "null"], "format": "uuid"}}, "additionalProperties": false}
+    PricingRegistry: {"type": "object", "properties": {"imports": {"type": "array", "items": {"type": "object", "properties": {"id": {"type": "string", "format": "uuid"}, "state": {"type": "string", "enum": ["DRAFT", "VALIDATED", "DIFFED", "IN_REVIEW", "CHANGES_REQUIRED", "APPROVED", "PUBLISHED"]}, "revision": {"type": "integer", "format": "int64", "minimum": 0}, "source_url": {"type": "string", "format": "uri"}, "source_sha256": {"type": "string"}, "retrieved_at": {"type": "string", "format": "date-time"}, "import_hash": {"type": "string"}, "validation_report": {"type": ["object", "null"]}, "diff_report": {"type": ["object", "null"]}, "base_publication_id": {"type": ["string", "null"], "format": "uuid"}, "reviewer_member_id": {"type": ["string", "null"], "format": "uuid"}, "next_review_at": {"type": "string", "format": "date-time"}, "correction_reason": {"type": "string"}}}}, "publications": {"type": "array", "items": {"type": "object", "properties": {"id": {"type": "string", "format": "uuid"}, "snapshot_hash": {"type": "string"}, "source_sha256": {"type": "string"}, "published_at": {"type": "string", "format": "date-time"}, "next_review_at": {"type": "string", "format": "date-time"}, "supersedes_publication_id": {"type": ["string", "null"], "format": "uuid"}}}}, "policies": {"type": "array", "items": {"type": "object", "properties": {"id": {"type": "string", "format": "uuid"}, "version": {"type": "string"}, "kind": {"type": "string"}, "effective_from": {"type": "string", "format": "date-time"}, "effective_to": {"type": "string", "format": "date-time"}, "next_review_at": {"type": "string", "format": "date-time"}, "source_url": {"type": "string", "format": "uri"}, "source_sha256": {"type": "string"}, "review_evidence": {"type": "string"}}}}, "settings": {"type": "array", "items": {"type": "object", "properties": {"billing_currency_state": {"type": "string"}, "billing_currency": {"type": ["string", "null"]}, "active_rate_publication_id": {"type": ["string", "null"], "format": "uuid"}}, "additionalProperties": false}}, "paid_authority": {"type": "string", "enum": ["CLOSED"]}}, "additionalProperties": false}
+    BudgetExposure: {"type": "object", "properties": {"id": {"type": "string", "format": "uuid"}, "name": {"type": "string"}, "currency": {"type": "string"}, "starts_at": {"type": "string", "format": "date-time"}, "ends_at": {"type": "string", "format": "date-time"}, "hard_limit": {"type": "string"}, "exposure": {"type": "string"}, "revision": {"type": "integer", "format": "int64", "minimum": 0}}, "additionalProperties": false}
+    EmptyInput: {"type": "object", "properties": {}, "additionalProperties": false}
     MetaConnection:
       type: object
       required: [items, has_more, next_cursor]

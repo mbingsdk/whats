@@ -140,3 +140,11 @@ Verification: all 12 Python regression tests passed (including five operator-con
 ## Local Owner login origin diagnosis, 2026-09-12
 
 The operator reported PERMISSION_DENIED immediately on login and confirmed using http://127.0.0.1:3000/login. The configured public origin is http://localhost:3000. Bounded probes confirmed that a valid CSRF cookie/header on the 127.0.0.1 origin is rejected with 403 before authentication; the localhost origin reaches authentication. The Owner is active with the expected ORG-scoped owners.manage grant. Actual protected-credential login on localhost returned 200, followed by successful session lookup, organization selection and permission discovery; only the diagnostic session was logged out. No role grant, password, verification flag or Origin/CSRF security rule was changed. The deployment runbook now explains the exact-origin requirement. This operational check is not a new hosted CI result.
+
+## Sprint 3 implementation review, 2026-09-15
+
+Reconciled Gate C approval with UNKNOWN billing currency and closed paid authority. Added migration 00004, scoped identity boundary, signed-ingress materialization, guarded text intents, durable uncertainty, operational Inbox and controlled-artifact Registry lifecycle. Published SQL/checksums remain unchanged.
+
+Review fixed stale permission discovery, ambiguous-submit recovery, sender/recipient lock gaps, nullable currency proof, actual diff/review binding and frozen window evidence. Foundation expects four migrations and still verifies repeat is a no-op. Populated RLS and contention tests exercise both runtime roles and committed deny races.
+
+[ADR 012](../ADR/012-sprint-3-inbox-runtime.md) records bounded SSE/REST and PostgreSQL presence; earlier cursor/Valkey target remains future design. [Sprint 3 evidence](28-sprint-3-evidence.md) separates local, hosted and live results. No production, paid/template, campaign or Sprint 4 approval is implied.

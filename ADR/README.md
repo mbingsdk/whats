@@ -17,3 +17,5 @@ Status for all records: **accepted architecture baseline for Sprint 0**, product
 | [011](011-identity-runtime.md) | Sprint 1 identity privileges, session invalidation and mail execution |
 
 Revisit on evidence: sustained queue contention, unacceptable restore/downtime, required realtime bidirectional signaling, cross-tenant Meta app sharing, regulated key custody, or materially larger media/search workload. None alone justifies automatic adoption of distributed infrastructure.
+
+[ADR 012](012-sprint-3-inbox-runtime.md) records implemented worker, bounded SSE/REST and advisory-presence refinements under the September 15 owner scope.

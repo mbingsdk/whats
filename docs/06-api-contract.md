@@ -215,3 +215,11 @@ The executable [OpenAPI contract](../contracts/openapi.yaml) now includes:
 - GET/POST /api/v1/meta/webhooks/{callback}; public authentication is Verify Token for GET and App Secret HMAC for POST.
 
 Asset access uses meta.view/manage; event access uses webhooks.view, webhooks.payload.view and webhooks.replay. Resource scope is ORG; TEAM/SELF grants cannot authorize an organization-wide asset. Organization derives from the authenticated session, never a header or arbitrary supplied ID. Existing membership locks, current grants, verified email, reauthentication and production MFA protect mutations; Origin/double-cookie/session-bound CSRF remain mandatory. List responses use accessible UUID cursors, 100 rows and has_more/next_cursor. Queued commands return 200 with queued=true, not an external delivery claim.
+
+## Sprint 3 implemented endpoints
+
+[OpenAPI](../contracts/openapi.yaml) describes 21 Inbox method/path pairs. GET /inbox supplies scoped setup; /conversations searches and filters before pagination; GET/PATCH /conversations/{id} reads history or changes status/priority/handoff. Assignment, own unread, notes, presence, preflight, immutable intents, registry and budgets are workflow commands. No generic Meta POST proxy exists.
+
+GET /outbound-intents?client_key=... recovers only the current actor/session's intent without a new authorization. GET by ID requires current conversation access. Changed immutable scope cannot reuse a key. Ambiguous submit retains the client key without silently starting a replacement.
+
+Writes use established Origin and cookie/header/session-bound CSRF checks. Registry, budget creation, sending settings and note redaction additionally require recent reauthentication and MFA. Domain conflicts use the existing safe envelope with 409, validation 422, missing/inaccessible conversation 404. Caller organization/user headers never grant authority. Actual SSE is /inbox/events; [ADR 012](../ADR/012-sprint-3-inbox-runtime.md) defines its bounded invalidation contract.

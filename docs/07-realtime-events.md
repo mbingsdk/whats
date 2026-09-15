@@ -56,3 +56,7 @@ Outbound webhooks use the same versioned domain vocabulary but independently fil
 contact.updated and contact.tag_changed carry contact ID, changed field names/tag ID and revision; consent.changed carries contact ID, category and state without evidence documents. campaign.reply_attributed carries campaign/recipient/message IDs plus attribution method/version. These events feed authorized automation and projections; they are not automatically exposed to external subscriptions. Agent-only notes and policy/role changes remain restricted. Every derived event retains origin/root ID for loop protection.
 
 SSE hidden-event checkpoints contain only the signed cursor. They must not reveal skipped event count, resource IDs or event types. Permission revision changes require cache invalidation even if no resource event is delivered.
+
+## Sprint 3 implemented minimum
+
+Earlier envelope/cursor sections describe the broader target. GET /api/v1/inbox/events emits inbox.invalidate with scoped IDs, safe event types and refresh_required=true. It reauthorizes every four seconds and reconnects after 24 seconds. Clients refresh authoritative REST on connection/event and use a 15-second fallback. No ordered replay or lossless browser delivery is claimed. Scope loss purges rendering/drafts. [ADR 012](../ADR/012-sprint-3-inbox-runtime.md) records rationale and limits.

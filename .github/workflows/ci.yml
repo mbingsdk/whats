@@ -1,4 +1,4 @@
-name: Foundation, identity and Meta ingestion
+name: Foundation, identity, Meta and guarded Inbox
 on:
   push:
   pull_request:
@@ -35,7 +35,7 @@ jobs:
           python3 scripts/dev.py migrate
       - name: Source, SQL, Go, real PostgreSQL, frontend and OpenAPI checks
         run: python3 scripts/dev.py check
-      - name: Install pinned Chromium and test identity and Meta browser flows
+      - name: Install pinned Chromium and test identity, Meta and Inbox browser flows
         run: |
           npx playwright install --with-deps chromium
           python3 scripts/dev.py e2e
