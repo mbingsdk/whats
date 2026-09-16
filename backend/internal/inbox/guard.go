@@ -79,10 +79,10 @@ func Evaluate(in GuardInput) Decision {
 	// Zero-cost proof is policy-based, independent of the unknown currency.
 	// A bounded delivery horizon must be evidenced, never supplied by the client.
 	if in.DeliveryLatest == nil {
-		return block("DELIVERY_PRICING_HORIZON_UNVERIFIED")
+		return block("PRICING_HORIZON_NOT_FULLY_COVERED")
 	}
-	if in.DeliveryLatest.Before(in.Now) || !in.DeliveryLatest.Before(in.PolicyTo) {
-		return block("PRICING_DELIVERY_COVERAGE_MISSING")
+	if _, _, e := intervalMaximum(in.Now, *in.DeliveryLatest, []ServicePriceInterval{{StartsAt: in.PolicyFrom, EndsAt: in.PolicyTo, UnitMaximum: "0", ZeroPolicy: true}}); e != nil {
+		return block(string(e.(Error)))
 	}
 	d.Allowed = true
 	d.Code = "ZERO_COST_SERVICE"
@@ -167,7 +167,7 @@ func (s *Service) preflight(ctx context.Context, tx pgx.Tx, v identity.Session, 
 	if e != nil {
 		return nil, e
 	}
-	result := map[string]any{"decision": decision, "server_now": now, "policy_id": policy, "window_expires_at": c.Window, "policy_basis": "Gate C reviewed effective-dated Service policy", "paid_authority": "CLOSED"}
+	result := map[string]any{"decision": decision, "server_now": now, "policy_id": policy, "window_expires_at": c.Window, "policy_basis": "Gate C reviewed effective-dated Service policy", "paid_authority": "CLOSED", "service_delivery_ttl_seconds": int64(ServiceDeliveryTTL / time.Second)}
 	if !decision.Allowed {
 		return result, nil
 	}

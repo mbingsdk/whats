@@ -1,6 +1,14 @@
 # Sprint 3 evidence: guarded Inbox, message domain and outbound safety
 
-Owner clarification (2026-09-15): Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; Sprint 3 AUTHORIZED; Gate D CLOSED. Company Meta billing currency UNKNOWN. Paid/template authority CLOSED. No currency inference from country, timezone, rate artifacts or locale.
+## Current acceptance decision, 2026-09-16
+
+Sprint 3 implementation remains COMPLETE; acceptance OPEN. Gates A/B/C APPROVED; Gate D CLOSED; Sprint 4 unauthorized. M73 establishes ordinary Service delivery TTL = 30 days. The unresolved dispatch requirement is complete executable pricing coverage across that interval, including October's effective-date transition. The stable denial is PRICING_HORIZON_NOT_FULLY_COVERED.
+
+The operator reports IDR directly from Meta Billing (OPERATOR_REVIEWED_META_BILLING; no independent authenticated Billing inspection). The operator designated one controlled TEST recipient through a protected local file and explicitly confirmed market ID (Indonesia). No full number, billing identifier or credentials are committed. These facts do not write runtime currency state, publish rates or authorize spending.
+
+The owner permits preparation for one bounded-cost TEST Service TEXT acceptance, conditional on complete reviewed Registry coverage and explicit approval of its calculated maximum. No maximum or financial approval exists yet. General paid/template, outbound media, campaigns and automation remain CLOSED. No live provider request or callback mutation has occurred in this review. Historical zero-cost-only and currency-UNKNOWN decisions below are superseded for this acceptance strategy; their evidence remains historical.
+
+Historical owner clarification (2026-09-15): Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; Sprint 3 AUTHORIZED; Gate D CLOSED. Company Meta billing currency UNKNOWN. Paid/template authority CLOSED. No currency inference from country, timezone, rate artifacts or locale.
 
 ## Status
 
@@ -67,6 +75,8 @@ Windows local runs did not use Go race instrumentation because a C compiler was 
 
 ## Live acceptance
 
+The September 16 bounded-cost decision above supersedes the following historical zero-cost checkpoint. Current results are recorded in the final section.
+
 Controlled TEST recipient: NOT DESIGNATED for Sprint 3 at this checkpoint. Prior Sprint 2 inbound evidence is not designation. Callback: last verified restored to empty after Sprint 2 acceptance; not rechecked or changed in this pass. No permanent ingress is inferred.
 
 Historical September 15 result, superseded by the focused review below: real Service delivery/pricing horizon UNVERIFIED. [M73](21-research-register.md#m73-service-delivery-horizon-review-2026-09-15) records first-party Direct Send TTL scope and source hash. That surface does not establish a bound for ordinary Service text. Because the reviewed source announces an October pricing change, a September dispatch with unbounded possible delivery cannot be assumed free. LoadLive provides no delivery-horizon override; preflight returns DELIVERY_PRICING_HORIZON_UNVERIFIED. One-minute bounds exist only in clearly synthetic tests.
@@ -85,7 +95,7 @@ No paid/template live test is authorized or required for this free-reply accepta
 
 Affected architecture, API, database, UI, security, deployment, observability, testing, sprint/readiness and research documents are reconciled. Existing dated Gate B/C restrictions are historical where superseded by September 15 owner approval. Implementation closure is COMPLETE based on published a498471 and its own successful hosted run 34970609872. All three browser suites, migration repeat/checksums, OpenAPI, lint/typecheck/build, real PostgreSQL and Go race checks passed. Live acceptance stays OPEN until real evidence above exists. Paid authority and Gate D remain CLOSED.
 
-## M73 focused acceptance review, 2026-09-16
+## Historical M73 focused acceptance review, 2026-09-16
 
 Implementation remains COMPLETE. Acceptance remains OPEN. [M73 follow-up](21-research-register.md#m73-focused-follow-up-2026-09-16) records current first-party HTML URLs, UTC retrieval times, original hashes, quality, scope and unresolved checks.
 
@@ -100,3 +110,34 @@ Safe alternatives are recorded in M73: precise first-party clock/transition clar
 Verification for this evidence commit: two added M73 unit tests (six transition subcases plus runtime fail-closed assertion) PASS. python scripts/dev.py up and the repeated full python scripts/dev.py check PASS (exit 0), including 24 Inbox unit/integration tests, 17 real PostgreSQL scenarios, frontend lint/typecheck/eight tests/build, OpenAPI, migration checksums and 183 local links. The first full attempt passed Go/PostgreSQL but npm ci failed with Windows EPERM because the running local frontend held the SWC binary. Only that frontend was stopped temporarily; the unchanged full check was rerun successfully and the frontend restarted. Hosted CI PASS for [M73 commit 5b3e536](https://github.com/mbingsdk/whats/commit/5b3e5369f3248d8d4bb1b86e26cc59dd4eb4417c), [run 35003395625](https://github.com/mbingsdk/whats/actions/runs/35003395625). All required repository, real PostgreSQL, Linux race, identity/Meta/Inbox browser and dependency checks executed successfully; no live Meta secrets were used. The eight M73 source URLs, UTC retrieval times and SHA-256 entries were checked against retained originals and match. This follow-up only records the result; it does not close live acceptance. Earlier implementation and evidence commits remain tied to passing runs 34970609872 and 34971097556.
 
 Review record: the six requested status/evidence documents and the focused regression tests are the only changes. Company billing currency UNKNOWN; paid/template authority CLOSED; Gate C APPROVED; Gate D CLOSED.
+
+
+## Current bounded-cost acceptance review, 2026-09-16
+
+This corrects acceptance evidence and the shared pricing predicate; it is not Sprint 4. Baseline implementation remains COMPLETE; acceptance OPEN. No migration or published pricing row changed. No financial authority, rate publication, recipient database fixture or runtime currency write was created.
+
+| Item | Actual result |
+| --- | --- |
+| M73 / domain denial | Ordinary Service TTL: 30 days. PRICING_HORIZON_NOT_FULLY_COVERED replaces both older horizon/coverage codes; preflight, submit and worker share the gate. |
+| Currency | IDR from operator-reviewed Meta Billing answer; not independently inspected; runtime state not modified. |
+| TEST recipient / market | Operator-designated protected file, valid format, market ID confirmed; number excluded from source. TEST_ONLY/campaign exclusion awaits acceptance fixture. |
+| 30-day coverage | INCOMPLETE. Zero policy ends before the projected horizon; canonical evidence lacks a reviewed complete executable interval mapping. |
+| Publications | No complete executable publication chain selected or created. Historical published rows immutable. |
+| Maximum / approval | NOT CALCULABLE from available executable evidence; no ceiling, TEST budget or owner financial confirmation exists. |
+| Callback / fresh inbound | Current callback not re-read or mutated. Historical empty Sprint 2 rollback is not current proof. No fresh challenge/inbound claimed. |
+| Window / preflight | No live ACTIVE window or ALLOW claimed. Synthetic PostgreSQL preflight and queued worker reject incomplete coverage even with verified IDR. |
+| Provider / ID / status | Zero live attempts; no new Meta ID, UNCERTAIN outcome or authentic outbound status. |
+| Metadata / settlement | No live metadata, financial reservation or invoice settlement. Calculator output is INTERNAL_ESTIMATE only. |
+| Idempotency / attempts | Synthetic PostgreSQL recovery retains one reservation/ledger entry including UNCERTAIN; existing send tests prove one intent/provider attempt and no retry. |
+| Window non-reset / UI | Existing synthetic integration/browser coverage; new authentic Inbox/Event Center/window evidence pending. |
+| Cleanup | No callback/tunnel created in this review; no rollback performed or falsely claimed. |
+| Internal work before live acceptance | Reviewed executable Registry mapping plus bounded financial quote/confirmation/dispatch integration and final UI financial confirmation are not enabled. Separate from operator approvals. |
+| Gate / authority | Gate D CLOSED; generic paid/template/media/campaign/automation authority CLOSED. One bounded TEST Service TEXT may later be approved for an explicit maximum. |
+
+Focused local verification: 28 Inbox top-level tests (10 unit, 18 real PostgreSQL) PASS, including full-period pricing cases, changed currency evidence, maximum increase, idempotent positive reservations, uncertain retention, tenant isolation, authorization and final-worker blocking. All rate/approval fixtures are synthetic; no test reaches Meta.
+
+Verification of this correction: python scripts/dev.py up, python scripts/dev.py check and python scripts/dev.py e2e all PASS (exit 0). This includes Go vet/unit/build, all actual PostgreSQL suites, 28 Inbox top-level tests, 21-table populated RLS under both runtime roles, concurrency/security cases, frontend lint/typecheck/eight tests/build, OpenAPI, immutable migration checksums and 183 local documentation links. Identity, Meta and Inbox browser suites all passed against isolated databases and fake/local services. No live Meta secrets or provider requests were used.
+
+Dependency review: go mod verify PASS; pinned govulncheck v1.8.0 reports zero reachable vulnerabilities and zero vulnerabilities in imported packages, with one advisory in a required module whose vulnerable package is not used; npm audit reports zero vulnerabilities. Windows local Go tests were not race-instrumented; unchanged hosted CI must run Linux race checks. All eight retained M73 source hashes/timestamps/URLs match. No CI, dependency lock or published SQL/checksum changes.
+
+Hosted CI for this correction: PENDING publication/run. Prior HEAD 7f2d47b passed run 35003849607; it does not verify these new changes. Automatic review rejected a proposed AGENTS.md edit, so that instruction file was left unchanged; current owner decisions are recorded in the authorized project documents instead.

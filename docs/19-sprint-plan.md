@@ -1,14 +1,22 @@
 # Delivery plan
 
+## Current acceptance decision, 2026-09-16
+
+Sprint 3 implementation remains COMPLETE; acceptance OPEN. Gates A/B/C APPROVED; Gate D CLOSED; Sprint 4 unauthorized. M73 establishes ordinary Service delivery TTL = 30 days. The unresolved dispatch requirement is complete executable pricing coverage across that interval, including October's effective-date transition. The stable denial is PRICING_HORIZON_NOT_FULLY_COVERED.
+
+The operator reports IDR directly from Meta Billing (OPERATOR_REVIEWED_META_BILLING; no independent authenticated Billing inspection). The operator designated one controlled TEST recipient through a protected local file and explicitly confirmed market ID (Indonesia). No full number, billing identifier or credentials are committed. These facts do not write runtime currency state, publish rates or authorize spending.
+
+The owner permits preparation for one bounded-cost TEST Service TEXT acceptance, conditional on complete reviewed Registry coverage and explicit approval of its calculated maximum. No maximum or financial approval exists yet. General paid/template, outbound media, campaigns and automation remain CLOSED. No live provider request or callback mutation has occurred in this review. Historical zero-cost-only and currency-UNKNOWN decisions below are superseded for this acceptance strategy; their evidence remains historical.
+
 ## M73 acceptance evidence review, 2026-09-16
 
-M73 follow-up (2026-09-16): general Cloud API Service delivery TTL of 30 days is now documented, independently of retention. A current send's possible delivery crosses October pricing; exact acceptance-clock/rate-lock proof remains incomplete. Safe zero-cost acceptance remains OPEN and the runtime guard is unchanged. No live recipient/callback/send setup was performed.
+Historical M73 research checkpoint: TTL documented; the later owner acceptance decision above supersedes the zero-cost-only strategy. Original sources and test results are retained in the research/evidence records.
 
 ## Sprint 3 implementation review, 2026-09-15
 
 Gates A/B/C APPROVED; Sprints 0/1/2 COMPLETE. Sprint 3 implementation COMPLETE: local checks and its own hosted CI passed for commit a498471 (run 34970609872). Live acceptance is OPEN. Company billing currency UNKNOWN; paid/template authority and Gate D CLOSED. Sprint 4 unauthorized. See [Sprint 3 evidence](28-sprint-3-evidence.md).
 
-Owner clarification (2026-09-15): **Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; Gate D CLOSED; Sprint 3 AUTHORIZED. COMPANY META BILLING CURRENCY UNKNOWN; PAID-SEND AUTHORITY CLOSED.** Currency must not be inferred from timezone, business/phone/recipient country, available rate cards or locale. Only a currently reviewed, provably zero-cost policy can permit the single operator-triggered controlled TEXT live reply after all recipient/callback/security prerequisites. Paid/template live sends, outbound media, campaigns and Sprint 4 remain unauthorized.
+Historical owner clarification (2026-09-15): **Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; Gate D CLOSED; Sprint 3 AUTHORIZED. COMPANY META BILLING CURRENCY UNKNOWN; PAID-SEND AUTHORITY CLOSED.** Currency must not be inferred from timezone, business/phone/recipient country, available rate cards or locale. Only a currently reviewed, provably zero-cost policy can permit the single operator-triggered controlled TEXT live reply after all recipient/callback/security prerequisites. Paid/template live sends, outbound media, campaigns and Sprint 4 remain unauthorized.
 
 Earlier dated status/review entries below are historical and superseded by this owner clarification where they describe Gate C or Sprint 3 authorization.
 
@@ -63,4 +71,4 @@ Immediate Gate C blocker: company billing currency omitted by GET and awaiting o
 
 ## Sprint 3 execution record
 
-GUARDED INBOX + MESSAGE DOMAIN + OUTBOUND SAFETY is implemented behind live guards; [Sprint 3 evidence](28-sprint-3-evidence.md) records closure status. Numeric artifacts can be validated/reviewed without selecting the company's unknown currency. Implementation correctness, its own hosted CI and live acceptance are separate evidence tracks. Only one human-triggered provably free text reply is live-authorized after prerequisites. No Sprint 4, media send, template mutation/send, CRM import, Broadcast or Automation work is included.
+GUARDED INBOX + MESSAGE DOMAIN + OUTBOUND SAFETY is implemented behind live guards; [Sprint 3 evidence](28-sprint-3-evidence.md) records closure status. Numeric artifacts require independent review/publication; operator-reviewed IDR does not automatically activate a runtime rate head. Implementation correctness, its own hosted CI and live acceptance are separate evidence tracks. Only one human-triggered TEST Service TEXT reply may become authorized after full pricing coverage and explicit approval of the calculated maximum; it need not be guaranteed free. No Sprint 4, media send, template mutation/send, CRM import, Broadcast or Automation work is included.

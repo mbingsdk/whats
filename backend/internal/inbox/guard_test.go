@@ -29,8 +29,8 @@ func TestGuardAuthorityAndPricingAreIndependent(t *testing.T) {
 		{"missing policy", "PRICING_COVERAGE_MISSING", func(i *GuardInput) { i.PolicyFrom = time.Time{} }},
 		{"expired policy", "PRICING_COVERAGE_MISSING", func(i *GuardInput) { i.PolicyTo = i.Now }},
 		{"overdue policy", "PRICING_POLICY_REVIEW_OVERDUE", func(i *GuardInput) { i.ReviewAt = i.Now }},
-		{"unknown delivery horizon", "DELIVERY_PRICING_HORIZON_UNVERIFIED", func(i *GuardInput) { i.DeliveryLatest = nil }},
-		{"delivery crosses rate boundary", "PRICING_DELIVERY_COVERAGE_MISSING", func(i *GuardInput) { i.DeliveryLatest = &i.PolicyTo }},
+		{"missing executable interval", "PRICING_HORIZON_NOT_FULLY_COVERED", func(i *GuardInput) { i.DeliveryLatest = nil }},
+		{"delivery crosses rate boundary", "PRICING_HORIZON_NOT_FULLY_COVERED", func(i *GuardInput) { i.DeliveryLatest = &i.PolicyTo }},
 		{"permission revoked", "PERMISSION_DENIED", func(i *GuardInput) { i.Authorized = false }},
 		{"suppressed", "RECIPIENT_SUPPRESSED", func(i *GuardInput) { i.Suppressed = true }},
 		{"sending disabled", "SENDING_DISABLED", func(i *GuardInput) { i.SendingEnabled = false }},
@@ -96,7 +96,7 @@ func TestOfficialRateBundleAndDecimalValues(t *testing.T) {
 }
 func TestLiveConfigNeverInfersRecipientOrDeliveryEvidence(t *testing.T) {
 	c, e := LoadLive(func(string) string { return "" })
-	if e != nil || c.Enabled || c.Recipient != "" || c.DeliveryBound != 0 {
+	if e != nil || c.Enabled || c.Recipient != "" || c.DeliveryBound != ServiceDeliveryTTL {
 		t.Fatal("unsafe default")
 	}
 	if _, e = LoadLive(func(k string) string {
@@ -160,11 +160,11 @@ func TestM73ThirtyDayTTLAndOctoberCoverage(t *testing.T) {
 		want     string
 	}{
 		{"whole horizon before conservative cutoff", cutoff.Add(-ttl - time.Nanosecond), cutoff, "UNKNOWN", "ZERO_COST_SERVICE"},
-		{"delivery exactly at cutoff is not covered", cutoff.Add(-ttl), cutoff, "UNKNOWN", "PRICING_DELIVERY_COVERAGE_MISSING"},
-		{"delivery beyond cutoff is not covered", cutoff.Add(-ttl + time.Second), cutoff, "UNKNOWN", "PRICING_DELIVERY_COVERAGE_MISSING"},
-		{"September acceptance can cross October", time.Date(2026, 9, 16, 0, 0, 0, 0, time.UTC), cutoff, "UNKNOWN", "PRICING_DELIVERY_COVERAGE_MISSING"},
-		{"known currency cannot fill future policy gap", time.Date(2026, 9, 16, 0, 0, 0, 0, time.UTC), cutoff, "VERIFIED", "PRICING_DELIVERY_COVERAGE_MISSING"},
-		{"policy expires before complete provider period", time.Date(2026, 8, 15, 0, 0, 0, 0, time.UTC), time.Date(2026, 9, 1, 0, 0, 0, 0, time.UTC), "UNKNOWN", "PRICING_DELIVERY_COVERAGE_MISSING"},
+		{"delivery exactly at cutoff is not covered", cutoff.Add(-ttl), cutoff, "UNKNOWN", "PRICING_HORIZON_NOT_FULLY_COVERED"},
+		{"delivery beyond cutoff is not covered", cutoff.Add(-ttl + time.Second), cutoff, "UNKNOWN", "PRICING_HORIZON_NOT_FULLY_COVERED"},
+		{"September acceptance can cross October", time.Date(2026, 9, 16, 0, 0, 0, 0, time.UTC), cutoff, "UNKNOWN", "PRICING_HORIZON_NOT_FULLY_COVERED"},
+		{"known currency cannot fill future policy gap", time.Date(2026, 9, 16, 0, 0, 0, 0, time.UTC), cutoff, "VERIFIED", "PRICING_HORIZON_NOT_FULLY_COVERED"},
+		{"policy expires before complete provider period", time.Date(2026, 8, 15, 0, 0, 0, 0, time.UTC), time.Date(2026, 9, 1, 0, 0, 0, 0, time.UTC), "UNKNOWN", "PRICING_HORIZON_NOT_FULLY_COVERED"},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -187,9 +187,9 @@ func TestM73ThirtyDayTTLAndOctoberCoverage(t *testing.T) {
 	}
 }
 
-func TestM73ResearchDoesNotEnableLiveDeliveryAssumption(t *testing.T) {
+func TestM73KnownTTLDoesNotFillPricingCoverage(t *testing.T) {
 	c, err := LoadLive(func(string) string { return "" })
-	if err != nil || c.Enabled || c.DeliveryBound != 0 {
+	if err != nil || c.Enabled || c.DeliveryBound != ServiceDeliveryTTL {
 		t.Fatal("research enabled runtime dispatch")
 	}
 	in := baseGuard()
@@ -199,8 +199,9 @@ func TestM73ResearchDoesNotEnableLiveDeliveryAssumption(t *testing.T) {
 	in.PolicyFrom = in.Now.Add(-time.Hour)
 	in.PolicyTo = time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)
 	in.ReviewAt = time.Date(2026, 9, 21, 0, 0, 0, 0, time.UTC)
-	in.DeliveryLatest = nil
-	if got := Evaluate(in); got.Allowed || got.Code != "DELIVERY_PRICING_HORIZON_UNVERIFIED" {
-		t.Fatalf("missing runtime evidence stopped failing closed: %+v", got)
+	latest := in.Now.Add(c.DeliveryBound)
+	in.DeliveryLatest = &latest
+	if got := Evaluate(in); got.Allowed || got.Code != "PRICING_HORIZON_NOT_FULLY_COVERED" {
+		t.Fatalf("known TTL bypassed incomplete coverage: %+v", got)
 	}
 }

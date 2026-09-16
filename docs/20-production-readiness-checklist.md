@@ -1,14 +1,22 @@
 # Production readiness evidence
 
+## Current acceptance decision, 2026-09-16
+
+Sprint 3 implementation remains COMPLETE; acceptance OPEN. Gates A/B/C APPROVED; Gate D CLOSED; Sprint 4 unauthorized. M73 establishes ordinary Service delivery TTL = 30 days. The unresolved dispatch requirement is complete executable pricing coverage across that interval, including October's effective-date transition. The stable denial is PRICING_HORIZON_NOT_FULLY_COVERED.
+
+The operator reports IDR directly from Meta Billing (OPERATOR_REVIEWED_META_BILLING; no independent authenticated Billing inspection). The operator designated one controlled TEST recipient through a protected local file and explicitly confirmed market ID (Indonesia). No full number, billing identifier or credentials are committed. These facts do not write runtime currency state, publish rates or authorize spending.
+
+The owner permits preparation for one bounded-cost TEST Service TEXT acceptance, conditional on complete reviewed Registry coverage and explicit approval of its calculated maximum. No maximum or financial approval exists yet. General paid/template, outbound media, campaigns and automation remain CLOSED. No live provider request or callback mutation has occurred in this review. Historical zero-cost-only and currency-UNKNOWN decisions below are superseded for this acceptance strategy; their evidence remains historical.
+
 ## M73 acceptance evidence review, 2026-09-16
 
-M73 follow-up (2026-09-16): general Cloud API Service delivery TTL of 30 days is now documented, independently of retention. A current send's possible delivery crosses October pricing; exact acceptance-clock/rate-lock proof remains incomplete. Safe zero-cost acceptance remains OPEN and the runtime guard is unchanged. No live recipient/callback/send setup was performed.
+Historical M73 research checkpoint: TTL documented; the later owner acceptance decision above supersedes the zero-cost-only strategy. Original sources and test results are retained in the research/evidence records.
 
 ## Sprint 3 implementation review, 2026-09-15
 
 Gates A/B/C APPROVED; Sprints 0/1/2 COMPLETE. Sprint 3 implementation COMPLETE: local checks and its own hosted CI passed for commit a498471 (run 34970609872). Live acceptance is OPEN. Company billing currency UNKNOWN; paid/template authority and Gate D CLOSED. Sprint 4 unauthorized. See [Sprint 3 evidence](28-sprint-3-evidence.md).
 
-Owner clarification (2026-09-15): **Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; Gate D CLOSED; Sprint 3 AUTHORIZED. COMPANY META BILLING CURRENCY UNKNOWN; PAID-SEND AUTHORITY CLOSED.** Currency must not be inferred from timezone, business/phone/recipient country, available rate cards or locale. Only a currently reviewed, provably zero-cost policy can permit the single operator-triggered controlled TEXT live reply after all recipient/callback/security prerequisites. Paid/template live sends, outbound media, campaigns and Sprint 4 remain unauthorized.
+Historical owner clarification (2026-09-15): **Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; Gate D CLOSED; Sprint 3 AUTHORIZED. COMPANY META BILLING CURRENCY UNKNOWN; PAID-SEND AUTHORITY CLOSED.** Currency must not be inferred from timezone, business/phone/recipient country, available rate cards or locale. Only a currently reviewed, provably zero-cost policy can permit the single operator-triggered controlled TEXT live reply after all recipient/callback/security prerequisites. Paid/template live sends, outbound media, campaigns and Sprint 4 remain unauthorized.
 
 Earlier dated status/review entries below are historical and superseded by this owner clarification where they describe Gate C or Sprint 3 authorization.
 
@@ -72,9 +80,9 @@ The October 1 service/utility change and observed America/Los_Angeles WABA timez
 
 - Gate C approval and documentation-baseline hosted PASS: recorded.
 - Implementation closure: COMPLETE. Local full checks, all three browser suites and own hosted run 34970609872 PASS, including Linux Go race verification.
-- Controlled TEST recipient: not yet designated for Sprint 3.
+- Controlled TEST recipient: operator-designated protected file; format validated; market ID confirmed. Runtime TEST_ONLY/campaign exclusion must be established in the eventual acceptance fixture.
 - Callback: last verified empty after Sprint 2 rollback; no new callback change performed.
 - General Service delivery TTL: 30 days documented. Safe acceptance/pricing coverage remains UNVERIFIED; fail-closed guard active.
-- Live free text/status evidence: OPEN; no real outbound request made.
-- Company billing currency UNKNOWN; paid/template authority CLOSED.
+- Live bounded-cost TEST text/status evidence: OPEN; maximum, explicit financial approval and live quote/confirmation integration outstanding; no real outbound request made.
+- Company billing currency: IDR, operator-reviewed Meta Billing. Runtime VERIFIED state has not been written by this review; no financial authority exists.
 - Gate D CLOSED. Local/temporary evidence does not establish production deployment, retention, backup/restore or operational acceptance.

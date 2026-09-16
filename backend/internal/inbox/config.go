@@ -8,7 +8,7 @@ import (
 )
 
 func LoadLive(get func(string) string) (LiveConfig, error) {
-	var c LiveConfig
+	c := LiveConfig{DeliveryBound: ServiceDeliveryTTL}
 	enabled := get("INBOX_LIVE_ACCEPTANCE_ENABLED")
 	if enabled != "" && enabled != "false" && enabled != "true" {
 		return c, errors.New("INBOX_LIVE_ACCEPTANCE_ENABLED must be true or false")
@@ -41,7 +41,8 @@ func LoadLive(get func(string) string) (LiveConfig, error) {
 	if c.Enabled && c.AcceptanceNotBefore.IsZero() {
 		return c, errors.New("explicit acceptance start timestamp required")
 	}
-	// There is no operator override for unverified delivery/pricing coverage.
-	// The reviewed Direct Send TTL contract does not establish a Service text delivery bound.
+	// M73 establishes ordinary Service TTL. The guard must cover the full
+	// interval; this duration neither selects rates nor proves a zero charge.
+	// No operator variable can shorten the reviewed duration.
 	return c, nil
 }

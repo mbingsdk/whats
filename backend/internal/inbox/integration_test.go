@@ -287,3 +287,32 @@ func TestUncertainNeverResends(t *testing.T) {
 		t.Fatal(state, e)
 	}
 }
+
+// The ordinary TTL remains known even when current executable pricing stops
+// before its end. Both preflight and the last worker barrier must deny.
+func TestKnownTTLIncompleteCoverageBlocksPreflightAndWorker(t *testing.T) {
+	h := newHarness(t)
+	c := h.ingest(t, "wamid.synthetic-horizon", "text", time.Now().Add(-time.Minute))
+	pending := h.submit(t, c, "synthetic-horizon-queued", "synthetic reply")
+	h.s.Live.DeliveryBound = ServiceDeliveryTTL
+	h.sql(t, "UPDATE app.inbox_settings SET billing_currency_state='VERIFIED',billing_currency='IDR',currency_evidence='SYNTHETIC OPERATOR EVIDENCE'")
+	pre := h.expect(t, "POST", "/pricing/preflight", map[string]any{"conversation_id": c, "assignment_revision": 1, "text": "another synthetic reply"}, 200)
+	decision := pre["decision"].(map[string]any)
+	if decision["allowed"] != false || decision["code"] != "PRICING_HORIZON_NOT_FULLY_COVERED" || pre["service_delivery_ttl_seconds"] != float64(2592000) || pre["authorization"] != nil {
+		t.Fatal(pre)
+	}
+	if e := h.s.DispatchOnce(h.ctx); e != nil {
+		t.Fatal(e)
+	}
+	var state, code string
+	if e := h.db.QueryRow(h.ctx, "SELECT state,error_code FROM app.outbound_intents WHERE id=$1", pending["id"]).Scan(&state, &code); e != nil {
+		t.Fatal(e)
+	}
+	if state != "BLOCKED" || code != "PRICING_HORIZON_NOT_FULLY_COVERED" || h.sender.calls.Load() != 0 {
+		t.Fatal(state, code, h.sender.calls.Load())
+	}
+	var attempts, reservations int
+	if e := h.db.QueryRow(h.ctx, "SELECT (SELECT count(*) FROM app.send_attempts),(SELECT count(*) FROM app.budget_reservations)").Scan(&attempts, &reservations); e != nil || attempts != 0 || reservations != 0 {
+		t.Fatal(attempts, reservations, e)
+	}
+}

@@ -284,7 +284,44 @@ func TestRegistryMFAReviewPublicationAndBudgetRace(t *testing.T) {
 	if ok != 1 || blocked != 1 {
 		t.Fatal("budget overspend", ok, blocked)
 	}
+
+	// Recover the winning intent repeatedly, including after an uncertain outcome.
+	// The same exact monetary reservation and append-only ledger entry must remain.
+	var winner uuid.UUID
+	if e := h.db.QueryRow(h.ctx, "SELECT intent_id FROM app.budget_reservations").Scan(&winner); e != nil {
+		t.Fatal(e)
+	}
+	repeat := func(requested string) error {
+		tx, e := h.s.Auth.Pool.Begin(h.ctx)
+		if e != nil {
+			return e
+		}
+		defer rollback(tx)
+		if _, e = tx.Exec(h.ctx, "SELECT set_config('app.organization_id',$1,true)", h.org.String()); e != nil {
+			return e
+		}
+		if e = reserveBudget(h.ctx, tx, h.org, period, winner, requested, "USD"); e != nil {
+			return e
+		}
+		return tx.Commit(h.ctx)
+	}
+	for range 3 {
+		if e := repeat("1.00000000"); e != nil {
+			t.Fatal("idempotent reservation", e)
+		}
+	}
+	if e := repeat("0.5"); e != Error("INTENT_SCOPE_CHANGED") {
+		t.Fatal("changed reservation accepted", e)
+	}
 	h.sql(t, "UPDATE app.budget_reservations SET state='UNCERTAIN'")
+	if e := repeat("1"); e != nil {
+		t.Fatal("uncertain recovery", e)
+	}
+	var reservations, entries int
+	if e := h.db.QueryRow(h.ctx, "SELECT (SELECT count(*) FROM app.budget_reservations),(SELECT count(*) FROM app.budget_ledger WHERE entry_kind='RESERVE')").Scan(&reservations, &entries); e != nil || reservations != 1 || entries != 1 {
+		t.Fatal("duplicate financial reservation", reservations, entries, e)
+	}
+
 	var exposure string
 	if e := h.db.QueryRow(h.ctx, "SELECT sum(amount)::text FROM app.budget_reservations WHERE state<>'RELEASED'").Scan(&exposure); e != nil || exposure != "1.00000000" {
 		t.Fatal(exposure, e)

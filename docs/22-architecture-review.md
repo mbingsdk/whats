@@ -150,3 +150,10 @@ Review fixed stale permission discovery, ambiguous-submit recovery, sender/recip
 [ADR 012](../ADR/012-sprint-3-inbox-runtime.md) records bounded SSE/REST and PostgreSQL presence; earlier cursor/Valkey target remains future design. [Sprint 3 evidence](28-sprint-3-evidence.md) separates local, hosted and live results. No production, paid/template, campaign or Sprint 4 approval is implied.
 
 Sprint 3 publication review (2026-09-15): implementation COMPLETE at a49847151bb6ea3592856d9989201375102eca40; own [hosted run 34970609872](https://github.com/mbingsdk/whats/actions/runs/34970609872) PASS, including Linux race and identity/Meta/Inbox browser verification. Live acceptance remains OPEN for explicit TEST designation, approved fresh callback/inbound and verified Service delivery/pricing horizon. No real outbound was performed. Company currency UNKNOWN; paid/template authority and Gate D CLOSED.
+
+
+## M73 pricing-coverage correction, 2026-09-16
+
+Reconciled the owner's bounded TEST strategy and operator-reviewed IDR/ID evidence across status, pricing, research, acceptance and ADR 012. Ordinary TTL is 30 days; complete interval coverage is distinct from duration. The shared gate returns PRICING_HORIZON_NOT_FULLY_COVERED; decimal maximum/evidence predicates are tested without live financial authority. Registry evidence is not silently promoted to executable complete coverage; published migrations/rates remain immutable.
+
+Live bounded quote/confirmation integration is explicitly recorded as internal work, not an external-service blocker. No recipient number, payment identifier, credentials, callback mutation or live send is included. Tests verify preflight/final-worker blocking and monetary recovery idempotency. Hosted results must be tied to the actual published correction in the Sprint 3 evidence record.

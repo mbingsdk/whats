@@ -1,6 +1,14 @@
 # Research register
 
-Owner clarification (2026-09-15): **Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; Gate D CLOSED; Sprint 3 AUTHORIZED. COMPANY META BILLING CURRENCY UNKNOWN; PAID-SEND AUTHORITY CLOSED.** Currency must not be inferred from timezone, business/phone/recipient country, available rate cards or locale. Only a currently reviewed, provably zero-cost policy can permit the single operator-triggered controlled TEXT live reply after all recipient/callback/security prerequisites. Paid/template live sends, outbound media, campaigns and Sprint 4 remain unauthorized.
+## Current acceptance decision, 2026-09-16
+
+Sprint 3 implementation remains COMPLETE; acceptance OPEN. Gates A/B/C APPROVED; Gate D CLOSED; Sprint 4 unauthorized. M73 establishes ordinary Service delivery TTL = 30 days. The unresolved dispatch requirement is complete executable pricing coverage across that interval, including October's effective-date transition. The stable denial is PRICING_HORIZON_NOT_FULLY_COVERED.
+
+The operator reports IDR directly from Meta Billing (OPERATOR_REVIEWED_META_BILLING; no independent authenticated Billing inspection). The operator designated one controlled TEST recipient through a protected local file and explicitly confirmed market ID (Indonesia). No full number, billing identifier or credentials are committed. These facts do not write runtime currency state, publish rates or authorize spending.
+
+The owner permits preparation for one bounded-cost TEST Service TEXT acceptance, conditional on complete reviewed Registry coverage and explicit approval of its calculated maximum. No maximum or financial approval exists yet. General paid/template, outbound media, campaigns and automation remain CLOSED. No live provider request or callback mutation has occurred in this review. Historical zero-cost-only and currency-UNKNOWN decisions below are superseded for this acceptance strategy; their evidence remains historical.
+
+Historical owner clarification (2026-09-15): **Sprints 0/1/2 COMPLETE; Gates A/B/C APPROVED; Gate D CLOSED; Sprint 3 AUTHORIZED. COMPANY META BILLING CURRENCY UNKNOWN; PAID-SEND AUTHORITY CLOSED.** Currency must not be inferred from timezone, business/phone/recipient country, available rate cards or locale. Only a currently reviewed, provably zero-cost policy can permit the single operator-triggered controlled TEXT live reply after all recipient/callback/security prerequisites. Paid/template live sends, outbound media, campaigns and Sprint 4 remain unauthorized.
 
 Earlier dated status/review entries below are historical and superseded by this owner clarification where they describe Gate C or Sprint 3 authorization.
 
@@ -242,3 +250,14 @@ Safe next steps:
 3. If the owner later considers bounded paid exposure, first verify company billing currency, applicable rates/billing facts and budget authority under separate approval. This pass authorizes no paid send.
 
 Focused regression cases exercise hypothetical delivery wholly before, exactly at, and after the conservative October cutoff; current September acceptance; early policy expiry; and known currency without future coverage. A separate test proves the runtime still supplies no delivery assumption and keeps the stable missing-evidence denial. These tests do not install the hypothetical horizon into production.
+
+
+## M73 owner interpretation and evidence update, 2026-09-16
+
+Current TTL finding: VERIFIED_CURRENT_CONTRACT, ordinary Service = 30 days. The previous combined zero-cost-only disposition is historical. Remaining requirement: complete executable pricing coverage for every possible delivery instant, including effective-date transitions. Stable runtime blocker: PRICING_HORIZON_NOT_FULLY_COVERED. Bounded TEST acceptance requires an explicitly approved conservative maximum; no send-time price lock is needed or claimed.
+
+The retained eight first-party sources, actual retrieval timestamps and hashes above remain the contract record. Fresh web-tool opens of the general send guide and pricing page in this pass returned HTTP 429; they add no verified content or refreshed timestamps. No provider terminal-status delay or invoice amount is inferred.
+
+Account evidence: the operator supplied IDR in response to the Meta Billing question; classify OPERATOR_REVIEWED_META_BILLING, not an independently inspected API response. No billing file was supplied or required for operator evidence. TEST market ID was separately confirmed and the designated protected recipient file passed format/prefix checks without printing its contents. Minimal private provenance is retained locally; no sensitive identifiers are committed.
+
+Official-derived July/October numerical artifacts remain evidence, not automatic publication. The runtime zero policy cannot cover a September 16 projection through October 16. Missing complete reviewed executable intervals and absent live financial integration prevent a quote/authority. No maximum is invented; unknown allowance consumption is ignored. ACCOUNT_VERIFICATION_REQUIRED remains separate for the eventual controlled outbound attempt.
