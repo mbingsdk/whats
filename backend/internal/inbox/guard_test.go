@@ -205,3 +205,44 @@ func TestM73KnownTTLDoesNotFillPricingCoverage(t *testing.T) {
 		t.Fatalf("known TTL bypassed incomplete coverage: %+v", got)
 	}
 }
+
+func TestPinnedIDRServiceCoverageArtifact(t *testing.T) {
+	if e := validateRates(serviceIDRCoverage); e != nil {
+		t.Fatal(e)
+	}
+	var bundle struct {
+		Intervals []ServicePriceInterval `json:"service_intervals"`
+	}
+	if e := json.Unmarshal(serviceIDRCoverage, &bundle); e != nil {
+		t.Fatal(e)
+	}
+	for i := range bundle.Intervals {
+		bundle.Intervals[i].PublicationID = "SYNTHETIC_PUBLICATION_ONLY"
+	}
+	now := time.Date(2026, 9, 18, 9, 41, 21, 0, time.UTC)
+	quote, e := serviceExposure(now, now, now.Add(ServiceDeliveryTTL), "ID", "IDR", "SYNTHETIC BILLING EVIDENCE", bundle.Intervals)
+	if e != nil || quote.Maximum != "356.65000000" || quote.AllowanceApplied {
+		t.Fatal(quote, e)
+	}
+	cutoff := time.Date(2026, 10, 1, 7, 0, 0, 0, time.UTC)
+	if !bundle.Intervals[0].EndsAt.Equal(cutoff) || !bundle.Intervals[1].StartsAt.Equal(cutoff) {
+		t.Fatal("timezone boundary")
+	}
+	// Includes the exact next-period boundary, so October's charge must count.
+	early := cutoff.Add(-ServiceDeliveryTTL)
+	atBoundary, e := serviceExposure(early, early, cutoff, "ID", "IDR", "SYNTHETIC", bundle.Intervals)
+	if e != nil || atBoundary.Maximum != "356.65000000" {
+		t.Fatal(atBoundary, e)
+	}
+	tampered := bytes.Replace(serviceIDRCoverage, []byte("356.65000000"), []byte("1.00000000"), 1)
+	if validateRates(tampered) == nil {
+		t.Fatal("unreviewed price mapping accepted")
+	}
+	diff := diffArtifacts(gateC, serviceIDRCoverage)
+	if len(diff["service_intervals"].(map[string]any)["added"].([]string)) != 2 {
+		t.Fatal("coverage omitted from review diff")
+	}
+	if _, e := serviceExposure(time.Date(2026, 9, 21, 0, 0, 0, 0, time.UTC), now, now.Add(ServiceDeliveryTTL), "ID", "IDR", "SYNTHETIC", bundle.Intervals); e != Error("PRICING_HORIZON_NOT_FULLY_COVERED") {
+		t.Fatal("review deadline", e)
+	}
+}

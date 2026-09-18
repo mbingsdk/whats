@@ -17,6 +17,9 @@ import (
 
 //go:embed evidence/gate-c.json
 var gateC []byte
+
+//go:embed evidence/service-idr-20260918.json
+var serviceIDRCoverage []byte
 var decimalPattern = regexp.MustCompile("^[0-9]{1,16}(\\.[0-9]{1,8})?$")
 
 func amount(v string) (*big.Rat, error) {
@@ -42,7 +45,7 @@ type rateBundle struct {
 
 func validateRates(raw []byte) error {
 	var bundle rateBundle
-	if json.Unmarshal(raw, &bundle) != nil || len(bundle.Rows) != 20 || len(bundle.Sources) != 6 {
+	if json.Unmarshal(raw, &bundle) != nil || len(bundle.Rows) != 20 || (len(bundle.Sources) != 6 && len(bundle.Sources) != 7) {
 		return Error("RATE_EVIDENCE_INVALID")
 	}
 	seen := map[string]bool{}
@@ -68,8 +71,13 @@ func validateRates(raw []byte) error {
 	// embedded original-derived bundle. This importer does not accept uploads
 	// or silently extend July tier evidence to October.
 	var actual, reviewed any
-	if json.Unmarshal(raw, &actual) != nil || json.Unmarshal(gateC, &reviewed) != nil || hash(encode(actual)) != hash(encode(reviewed)) {
+	if json.Unmarshal(raw, &actual) != nil || json.Unmarshal(gateC, &reviewed) != nil {
 		return Error("RATE_SOURCE_NOT_REVIEWED")
+	}
+	if hash(encode(actual)) != hash(encode(reviewed)) {
+		if json.Unmarshal(serviceIDRCoverage, &reviewed) != nil || hash(encode(actual)) != hash(encode(reviewed)) {
+			return Error("RATE_SOURCE_NOT_REVIEWED")
+		}
 	}
 	return nil
 }
@@ -87,7 +95,7 @@ func diffArtifacts(before, after []byte) map[string]any {
 	_ = json.Unmarshal(before, &old)
 	_ = json.Unmarshal(after, &newValue)
 	result := map[string]any{}
-	for _, key := range []string{"rows", "tiers", "sources"} {
+	for _, key := range []string{"rows", "tiers", "sources", "service_intervals"} {
 		a, b := map[string]any{}, map[string]any{}
 		index := func(value any, target map[string]any) {
 			values, _ := value.([]any)
@@ -207,11 +215,14 @@ func (s *Service) registry(ctx context.Context, tx pgx.Tx, v identity.Session, m
 		if e := decode(r, &in); e != nil {
 			return nil, e
 		}
-		if in.Source != "GATE_C_20260914" {
+		source := gateC
+		if in.Source == "SPRINT3_IDR_SERVICE_20260918" {
+			source = serviceIDRCoverage
+		} else if in.Source != "GATE_C_20260914" {
 			return nil, Error("RATE_SOURCE_NOT_REVIEWED")
 		}
 		var value any
-		if json.Unmarshal(gateC, &value) != nil {
+		if json.Unmarshal(source, &value) != nil {
 			return nil, Error("RATE_EVIDENCE_INVALID")
 		}
 		canonical := encode(value)
@@ -224,7 +235,7 @@ func (s *Service) registry(ctx context.Context, tx pgx.Tx, v identity.Session, m
 		}
 		id := newID()
 		_, e := tx.Exec(ctx, `INSERT INTO app.rate_imports(id,organization_id,importer_member_id,source_url,source_sha256,retrieved_at,artifact,import_hash,next_review_at,base_publication_id,correction_reason)
- VALUES($1,$2,$3,'https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing',$4,'2026-09-14T06:50:00Z',$5,$6,'2026-09-21T00:00:00Z',$7,$8)`, id, org, member, hash(gateC), canonical, hash(canonical), base, in.CorrectionReason)
+ VALUES($1,$2,$3,'https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing',$4,'2026-09-14T06:50:00Z',$5,$6,'2026-09-21T00:00:00Z',$7,$8)`, id, org, member, hash(source), canonical, hash(canonical), base, in.CorrectionReason)
 		if e != nil {
 			return nil, e
 		}
@@ -288,7 +299,13 @@ func (s *Service) registry(ctx context.Context, tx pgx.Tx, v identity.Session, m
 		if e = validateRates(artifact); e != nil {
 			return nil, e
 		}
-		_, e = tx.Exec(ctx, "UPDATE app.rate_imports SET state='VALIDATED',validation_report=$2 WHERE id=$1", id, encode(map[string]any{"valid": true, "scope": "INDEPENDENT_MULTI_CURRENCY_ARTIFACTS", "rows": 20, "hash": importHash}))
+		report := map[string]any{"valid": true, "scope": "INDEPENDENT_MULTI_CURRENCY_ARTIFACTS", "rows": 20, "hash": importHash}
+		if data, ok := parsed.(map[string]any); ok && data["service_intervals"] != nil {
+			report["scope"] = "IDR_SERVICE_FINITE_COVERAGE"
+			report["service_intervals"] = data["service_intervals"]
+			report["source_evidence"] = data["sources"]
+		}
+		_, e = tx.Exec(ctx, "UPDATE app.rate_imports SET state='VALIDATED',validation_report=$2 WHERE id=$1", id, encode(report))
 		next = "VALIDATED"
 	case "diff":
 		if state != "VALIDATED" {

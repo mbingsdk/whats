@@ -261,3 +261,19 @@ The retained eight first-party sources, actual retrieval timestamps and hashes a
 Account evidence: the operator supplied IDR in response to the Meta Billing question; classify OPERATOR_REVIEWED_META_BILLING, not an independently inspected API response. No billing file was supplied or required for operator evidence. TEST market ID was separately confirmed and the designated protected recipient file passed format/prefix checks without printing its contents. Minimal private provenance is retained locally; no sensitive identifiers are committed.
 
 Official-derived July/October numerical artifacts remain evidence, not automatic publication. The runtime zero policy cannot cover a September 16 projection through October 16. Missing complete reviewed executable intervals and absent live financial integration prevent a quote/authority. No maximum is invented; unknown allowance consumption is ignored. ACCOUNT_VERIFICATION_REQUIRED remains separate for the eventual controlled outbound attempt.
+
+
+## M74: executable IDR Service candidate review, 2026-09-18
+
+Retained Gate C first-party evidence was re-inspected and its original bytes rehashed; no third-party rates were used. A fresh web-tool open of the official pricing page returned HTTP 429, so original retrieval timestamps are preserved.
+
+| Source | Original retrieval UTC | SHA-256 | Applicable fact |
+| --- | --- | --- | --- |
+| [Official pricing policy](https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing) | 2026-09-14T06:41:18.727268Z | ea440b87f09dadfc89ae21449fccf51807d2ba308da1aaf81adf080b8e22cca4 | Service zero before October; October Service list charging and monthly allowance; WABA midnight; changes only at quarter start |
+| IDR-rates-1.csv, linked from official pricing page | 2026-09-14T06:45:41.808978Z | 21e429a67aadc420eba36fc73be8bac7b10fc587303e3906bcadb0fd00c90a7c | Indonesia July Service n/a; not numerical proof of zero |
+| IDR-rates-october-pdf.pdf, linked from official pricing page | 2026-09-14T06:47:03.749254Z | 1703a6c639694240c97955afa597226eecb2f5dc1705b8c1dca0495ba9bc4ea0 | Indonesia IDR SERVICE 356.6500 per delivered message, effective October 1 |
+| [Official timezone mapping](https://developers.facebook.com/documentation/business-messaging/whatsapp/timezone-ids/) | 2026-09-14T06:50:09.003495+00:00 | 2145f05dffda0d9c819eba0e23d8a5643d214a269231bd9b2a5064563e15fa3a | ID 1 = America/Los_Angeles; historical scoped account evidence, not a fresh Graph GET |
+
+Evidence quality: VERIFIED_CURRENT_CONTRACT within the retained inspected policy scope; rate artifacts are official source evidence, not company publication. The proposed finite October end, 2027-01-01T08:00:00Z exclusive, is an inference from the quarterly calendar and WABA timezone, explicitly subject to independent Registry review. It is not inferred from recipient country, locale or the chosen currency.
+
+Frozen planning interval: 2026-09-18T10:02:48Z through 2026-10-18T10:02:48Z, 30 days, crossing 2026-10-01T07:00:00Z. This is a dated planning basis, not a live provider acceptance time or current send permit. Offline candidate maximum = max(0, 356.65000000) = IDR 356.65000000; unknown free allowance and discounts are ignored. Real executable coverage remains BLOCKED until an authorized distinct reviewer/publisher completes the Registry lifecycle and runtime currency evidence is recorded. Existing review expiry remains September 21 00:00 UTC.

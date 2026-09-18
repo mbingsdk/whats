@@ -30,6 +30,10 @@ type command struct {
 func (s *Service) operation(ctx context.Context, tx pgx.Tx, v identity.Session, member uuid.UUID, r *http.Request, rt route) (any, error) {
 	org := *v.OrganizationID
 	switch rt.Path {
+	case "/pricing/billing-currency":
+		return s.recordBillingCurrency(ctx, tx, v, member, r)
+	case "/pricing/service-exposure":
+		return s.servicePricingPreflight(ctx, tx, v, member, r)
 	case "/pricing", "/rate-cards/imports", "/rate-cards/imports/{id}/{action}", "/budgets":
 		return s.registry(ctx, tx, v, member, r, rt)
 	case "/pricing/preflight":

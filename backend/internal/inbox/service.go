@@ -173,6 +173,7 @@ var Routes = []route{
 	{"PATCH", "/notes/{id}", false}, {"POST", "/notes/{id}/redact", true},
 	{"POST", "/conversations/{id}/presence", false}, {"GET", "/inbox/events", false},
 	{"POST", "/pricing/preflight", false}, {"POST", "/outbound-intents", false}, {"GET", "/outbound-intents", false}, {"GET", "/outbound-intents/{id}", false},
+	{"PUT", "/pricing/billing-currency", true}, {"POST", "/pricing/service-exposure", false},
 	{"GET", "/pricing", false}, {"POST", "/rate-cards/imports", true}, {"POST", "/rate-cards/imports/{id}/{action}", true},
 	{"GET", "/budgets", false}, {"POST", "/budgets", true}, {"PATCH", "/inbox/settings", true},
 }
